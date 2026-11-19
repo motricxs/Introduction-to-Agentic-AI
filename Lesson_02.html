@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="درسنامه اجزای اصلی عامل‌های هوش مصنوعی؛ محیط، حسگرها، مدل، منطق تصمیم‌گیری، عملگرها و بازخورد">
+  <title>Lesson_02 | اجزای اصلی عامل‌های هوش مصنوعی</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="quiz-engine.js" defer></script>
+  <script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <main class="container">
+    <nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+      <a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span>
+      </a>
+    </nav>
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#top">MATCUB · Learning Notes</a>
+      <nav class="topbar__links" aria-label="ناوبری صفحه">
+        <a href="#overview">معرفی</a>
+        <a href="#content">درسنامه</a>
+        <a href="#quiz">آزمون</a>
+      </nav>
+    </header>
+
+    <header class="hero" id="overview">
+      <div class="hero-content">
+        <div class="hero-label">🤖 مبانی طراحی عامل‌های هوش مصنوعی</div>
+        <h1>اجزای اصلی <span>AI Agents</span></h1>
+        <p class="hero-subtitle">از دریافت اطلاعات محیط تا تحلیل، تصمیم‌گیری، اجرای عمل و یادگیری از بازخورد؛ با ساختار درونی یک عامل هوشمند آشنا شوید.</p>
+        <div class="hero-badge">شناخت معماری عامل · مثال‌های کاربردی · آزمون تعاملی</div>
+      </div>
+    </header>
+
+    <div class="lesson-meta" aria-label="اطلاعات درس">
+      <span class="lesson-meta__item">🧭 <strong>Lesson_02</strong></span>
+      <span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی</strong></span>
+      <span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۲۰ دقیقه</strong></span>
+      <span class="lesson-meta__item">🧪 همراه با آزمون</span>
+    </div>
+
+    <div class="badges" aria-label="موضوعات درس">
+      <span class="badge gold">معماری عامل هوشمند</span>
+      <span class="badge green">محیط و حسگرها</span>
+      <span class="badge purple">مدل و تصمیم‌گیری</span>
+      <span class="badge blue">عملگرها</span>
+      <span class="badge orange">حلقه بازخورد</span>
+    </div>
+
+    <section class="learning-intro" aria-labelledby="learning-intro-title">
+      <div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div>
+      <h2 id="learning-intro-title">نقشه راه یادگیری</h2>
+      <p>برای ساخت یک عامل هوش مصنوعی، تنها داشتن یک مدل قدرتمند کافی نیست. عامل باید اطلاعات محیط را دریافت کند، آن‌ها را بفهمد، درباره اقدام مناسب تصمیم بگیرد، عمل کند و نتیجه کارش را بسنجد.</p>
+      <ul class="learning-objectives">
+        <li>تعریف محیط و تشخیص محیط‌های دیجیتال و فیزیکی</li>
+        <li>شناخت حسگرها و راه‌های دریافت داده</li>
+        <li>درک نقش مدل در تفسیر اطلاعات</li>
+        <li>تمایز مدل از منطق تصمیم‌گیری</li>
+        <li>شناخت عملگرهای فیزیکی و مجازی</li>
+        <li>توضیح نقش بازخورد در بهبود عملکرد عامل</li>
+      </ul>
+    </section>
+
+    <nav class="toc" aria-label="فهرست مطالب">
+      <h2>📑 فهرست مطالب</h2>
+      <ol>
+        <li><a href="#section-architecture">نمای کلی اجزای عامل هوشمند</a></li>
+        <li><a href="#section-environment">محیط: جایی که عامل فعالیت می‌کند</a></li>
+        <li><a href="#section-sensors">حسگرها: دریافت اطلاعات از محیط</a></li>
+        <li><a href="#section-model">مدل: مغز تحلیل‌گر عامل</a></li>
+        <li><a href="#section-decision">منطق تصمیم‌گیری: انتخاب اقدام مناسب</a></li>
+        <li><a href="#section-actuators">عملگرها: اثرگذاری بر محیط</a></li>
+        <li><a href="#section-feedback">بازخورد: یادگیری از نتیجه اقدامات</a></li>
+        <li><a href="#section-summary">جمع‌بندی</a></li>
+        <li><a href="#quiz">آزمون تعاملی</a></li>
+      </ol>
+    </nav>
+
+    <div id="content">
+      <section class="section gold" id="section-architecture">
+        <h2 class="section-title">🧠 ۱. نمای کلی اجزای یک عامل هوشمند</h2>
+        <p>یک عامل هوش مصنوعی در محیطی مشخص فعالیت می‌کند. برای شناخت وضعیت آن محیط به ورودی نیاز دارد؛ سپس اطلاعات دریافتی را با کمک یک مدل تفسیر می‌کند، درباره اقدام مناسب تصمیم می‌گیرد و از طریق سازوکارهایی به نام عملگر بر محیط اثر می‌گذارد. پس از اجرا نیز نتیجه را بررسی می‌کند تا مشخص شود آیا به هدف نزدیک شده است یا نه.</p>
+
+        <div class="path-flow">
+          <article class="path-flow__step"><h3>محیط</h3><p>فضایی که عامل در آن فعالیت می‌کند و از آن داده دریافت می‌کند.</p></article>
+          <article class="path-flow__step"><h3>حسگرها</h3><p>اطلاعات و نشانه‌های محیط را جمع‌آوری می‌کنند.</p></article>
+          <article class="path-flow__step"><h3>مدل</h3><p>ورودی‌ها را تفسیر می‌کند و به عامل در فهم موقعیت کمک می‌کند.</p></article>
+          <article class="path-flow__step"><h3>منطق تصمیم‌گیری</h3><p>اقدام مناسب را بر اساس تحلیل و قواعد تعیین می‌کند.</p></article>
+          <article class="path-flow__step"><h3>عملگرها</h3><p>اقدام انتخاب‌شده را اجرا و محیط را تغییر می‌دهند.</p></article>
+          <article class="path-flow__step"><h3>بازخورد</h3><p>نتیجه اقدام را بررسی می‌کند و داده تازه‌ای برای بهبود فراهم می‌آورد.</p></article>
+        </div>
+
+        <div class="box note">
+          <p>این اجزا را باید به‌صورت یک چرخه مرتبط در نظر گرفت، نه مجموعه‌ای از ابزارهای جدا از هم. نتیجه هر اقدام می‌تواند وضعیت محیط را تغییر دهد و ورودی تازه‌ای برای دور بعدی فعالیت عامل ایجاد کند.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="section-environment">
+        <h2 class="section-title">🌍 ۲. محیط: جایی که عامل فعالیت می‌کند</h2>
+        <p><strong>محیط (Environment)</strong> به تمام شرایط، موجودیت‌ها و اطلاعاتی گفته می‌شود که عامل در آن فعالیت می‌کند، از آن‌ها تأثیر می‌پذیرد یا بر آن‌ها اثر می‌گذارد. نوع محیط به کاربرد عامل بستگی دارد؛ بعضی عامل‌ها در جهان فیزیکی فعالیت می‌کنند، بعضی با داده‌ها و سامانه‌های دیجیتال سروکار دارند و برخی ترکیبی از هر دو را در نظر می‌گیرند.</p>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🚗</div>
+            <h3>خودروی خودران</h3>
+            <p>جاده، خودروهای دیگر، عابران پیاده، علائم راهنمایی و رانندگی و شرایط آب‌وهوا بخشی از محیط آن هستند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🛍️</div>
+            <h3>دستیار خرید آنلاین</h3>
+            <p>فروشگاه‌ها، فهرست محصولات، قیمت‌ها، نظرات کاربران، ترجیحات مشتری و پیشنهادهای تخفیف را بررسی می‌کند.</p>
+          </article>
+        </div>
+
+        <h3>محیط فقط به داده‌های دیجیتال محدود نیست</h3>
+        <p>فرض کنید یک عامل برای پیشنهاد لباس یا تجهیزات مناسب به کار گرفته شده است. اطلاعات محصول و سابقه مرور کاربر به‌تنهایی کافی نیستند. شرایط آب‌وهوا، پیش‌بینی روزهای آینده و فصل جاری نیز ممکن است در مناسب بودن یک پیشنهاد نقش داشته باشند.</p>
+        <p>بنابراین محیط یک عامل خرید می‌تواند ترکیبی از دو دسته اطلاعات باشد:</p>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>محیط دیجیتال</h4>
+            <p>اطلاعات محصولات، موجودی، قیمت، تخفیف‌ها، امتیازها، نظرات و سابقه جست‌وجو یا مرور کاربر.</p>
+          </article>
+          <article class="info-card">
+            <h4>عوامل دنیای واقعی</h4>
+            <p>آب‌وهوا، موقعیت مکانی، فصل و رویدادهای محلی که می‌توانند بر نیاز یا انتخاب کاربر اثر بگذارند.</p>
+          </article>
+        </div>
+
+        <div class="box example">
+          <p><strong>مثال:</strong> اگر کاربر برای سفر به منطقه‌ای سردسیر خرید می‌کند، یک دستیار هوشمند بهتر است علاوه بر قیمت و مشخصات لباس، دمای مقصد و زمان سفر را نیز در نظر بگیرد. در نتیجه ممکن است کاپشن گرم را به لباسی سبک‌تر ترجیح دهد.</p>
+        </div>
+        <div class="box important">
+          <p>پیش از طراحی عامل، باید مرز و ویژگی‌های محیط فعالیت آن را مشخص کنید. عامل بدون شناخت درست محیط، اطلاعات ناقص یا نامرتبطی برای تصمیم‌گیری در اختیار خواهد داشت.</p>
+        </div>
+      </section>
+
+      <section class="section blue" id="section-sensors">
+        <h2 class="section-title">👁️ ۳. حسگرها: دریافت اطلاعات از محیط</h2>
+        <p>انسان با چشم، گوش، پوست و دیگر حواس خود اطلاعات فراوانی از پیرامون جمع‌آوری می‌کند. مغز این داده‌ها را دریافت و تفسیر می‌کند تا فرد بتواند با محیط تعامل داشته باشد. در عامل‌های هوش مصنوعی نیز سازوکاری برای دریافت داده از محیط لازم است که به آن <strong>حسگر (Sensor)</strong> می‌گوییم.</p>
+        <div class="definition">
+          <span class="definition__term">حسگر (Sensor)</span>
+          <p>هر ابزار یا سازوکاری که اطلاعات را از محیط به عامل منتقل کند. حسگرها امکان مشاهده وضعیت محیط را برای عامل فراهم می‌کنند؛ همان‌طور که حواس، اطلاعات را به مغز انسان می‌رسانند.</p>
+        </div>
+
+        <h3>عامل‌ها چگونه داده دریافت می‌کنند؟</h3>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>خزیدن وب</h4>
+            <p>جمع‌آوری خودکار اطلاعات از صفحه‌های وب، مانند مشخصات و قیمت محصولات.</p>
+          </article>
+          <article class="info-card">
+            <h4>رابط برنامه‌نویسی</h4>
+            <p>دریافت داده از سامانه‌های دیگر از طریق <bdi dir="ltr" class="en">API</bdi>؛ برای نمونه سابقه مرور یا اطلاعات حساب کاربر.</p>
+          </article>
+          <article class="info-card">
+            <h4>دوربین و میکروفون</h4>
+            <p>دریافت تصویر و صدا برای تحلیل صحنه، شناسایی اشیا یا پردازش گفتار.</p>
+          </article>
+          <article class="info-card">
+            <h4>دستگاه‌های اینترنت اشیا</h4>
+            <p>دریافت داده از حسگرهای متصل، مانند دما، رطوبت یا وضعیت تجهیزات.</p>
+          </article>
+        </div>
+
+        <h3>نمونه حسگرها در دو کاربرد متفاوت</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>نوع عامل</th>
+                <th>ورودی‌ها و حسگرهای نمونه</th>
+                <th>اطلاعات به‌دست‌آمده</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>خودروی خودران</td>
+                <td>دوربین، حسگر <bdi dir="ltr" class="en">LIDAR</bdi>، موقعیت‌یاب <bdi dir="ltr" class="en">GPS</bdi> و اتصال اینترنت</td>
+                <td>تصویر جاده، فاصله اشیا، موقعیت خودرو و اطلاعات مرتبط</td>
+              </tr>
+              <tr>
+                <td>دستیار خرید آنلاین</td>
+                <td>خزنده وب، <bdi dir="ltr" class="en">API</bdi>، ابزار مقایسه قیمت و اتصال داده آب‌وهوا</td>
+                <td>مشخصات کالا، سابقه کاربر، قیمت‌های جاری و شرایط آب‌وهوا</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="box note">
+          <p>در این درس، واژه «حسگر» معنایی گسترده دارد و فقط به قطعه سخت‌افزاری محدود نیست. یک خزنده وب یا اتصال نرم‌افزاری به <bdi dir="ltr" class="en">API</bdi> نیز می‌تواند نقش دریافت اطلاعات از محیط را برای عامل ایفا کند.</p>
+        </div>
+        <div class="box warning">
+          <p>دریافت داده به‌تنهایی به معنی فهم آن نیست. حسگرها اطلاعات را فراهم می‌کنند؛ تفسیر و تحلیل این اطلاعات وظیفه لایه مدل است.</p>
+        </div>
+      </section>
+
+      <section class="section purple" id="section-model">
+        <h2 class="section-title">🧩 ۴. مدل: مغز تحلیل‌گر عامل</h2>
+        <p>پس از جمع‌آوری داده، عامل باید بتواند آن را تفسیر کند. در انسان این وظیفه بر عهده مغز است؛ در عامل هوش مصنوعی، <strong>مدل (Model)</strong> نقش اصلی را در پردازش و معنا دادن به ورودی‌ها ایفا می‌کند.</p>
+        <div class="definition">
+          <span class="definition__term">مدل (Model)</span>
+          <p>سامانه‌ای محاسباتی که ورودی‌های عامل را تحلیل و تفسیر می‌کند تا از داده‌های خام، اطلاعات قابل استفاده برای درک موقعیت و انتخاب اقدام به دست آید.</p>
+        </div>
+
+        <h3>مدل‌ها از نظر پیچیدگی یکسان نیستند</h3>
+        <p>مدل مورد استفاده در یک عامل می‌تواند از الگوریتم‌های ساده‌تر یادگیری ماشین تا شبکه‌های عصبی پیچیده و مدل‌های زبانی بزرگ را شامل شود. مدل‌های زبانی بزرگ یا <bdi dir="ltr" class="en">LLM</bdi>ها توانایی پردازش و استدلال روی داده‌های زبانی را دارند و مدل‌های چندوجهی می‌توانند چند نوع داده را هم‌زمان دریافت و تحلیل کنند.</p>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">📊</div>
+            <h3>مدل‌های یادگیری ماشین</h3>
+            <p>برای تحلیل داده و شناسایی الگوها در مسائل مشخص به کار می‌روند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🕸️</div>
+            <h3>شبکه‌های عصبی</h3>
+            <p>ساختارهای محاسباتی پیچیده‌تری هستند که می‌توانند الگوهای دشوارتر را یاد بگیرند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">💬</div>
+            <h3>مدل زبانی بزرگ</h3>
+            <p>برای فهم و تولید زبان و انجام وظایف استدلالی مبتنی بر متن استفاده می‌شود.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🎧</div>
+            <h3>مدل چندوجهی</h3>
+            <p>می‌تواند ورودی‌هایی مانند متن، تصویر، صوت و ویدئو را در کنار یکدیگر پردازش کند.</p>
+          </article>
+        </div>
+
+        <div class="box example">
+          <p><strong>مثال:</strong> در یک خودروی خودران، داده دوربین و حسگر فاصله می‌تواند به مدل برسد. مدل با تحلیل این ورودی‌ها به درکی از موقعیت خودروها، موانع و وضعیت مسیر کمک می‌کند. این درک، مبنایی برای مرحله تصمیم‌گیری خواهد بود.</p>
+        </div>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">🧠</div>
+          <div><h3>نکته کلیدی</h3><p>مدل مسئول «دانستن و فهمیدن» بر اساس داده‌های ورودی است؛ اما فهمیدن به‌تنهایی کافی نیست. عامل باید بتواند بر پایه این تحلیل، اقدام مناسب را انتخاب و اجرا کند.</p></div>
+        </div>
+      </section>
+
+      <section class="section orange" id="section-decision">
+        <h2 class="section-title">⚖️ ۵. منطق تصمیم‌گیری: انتخاب اقدام مناسب</h2>
+        <p>پس از آنکه مدل اطلاعات محیط را تحلیل کرد، عامل به سازوکاری نیاز دارد تا از میان گزینه‌های ممکن، اقدام مناسب را انتخاب کند. این سازوکار را <strong>منطق تصمیم‌گیری (Decision-Making Logic)</strong> می‌نامیم.</p>
+        <p>در برخی معماری‌ها، این لایه قواعد یا الگوریتم‌های مشخصی را روی خروجی مدل اعمال می‌کند. به این ترتیب، خروجی تحلیلی مدل به تصمیمی روشن و قابل اجرا تبدیل می‌شود.</p>
+
+        <h3>مثال اول: عامل معامله‌گر خودکار</h3>
+        <p>فرض کنید عامل قرار است دارایی‌های قابل سرمایه‌گذاری را بررسی کند. ابتدا اطلاعاتی مانند قیمت سهام، نرخ تورم و نرخ تبدیل ارز را از محیط دریافت می‌کند. مدل، بازده مورد انتظار و ریسک هر دارایی را تحلیل می‌کند. سپس لایه تصمیم‌گیری می‌تواند قواعدی از پیش تعیین‌شده را اعمال کند.</p>
+        <div class="box example">
+          <p>برای نمونه، یک قاعده ممکن است فقط سرمایه‌گذاری‌هایی را بپذیرد که بازده مورد انتظار آن‌ها بیشتر از ۷ درصد و نوسان آن‌ها کمتر از ۱۵ درصد باشد. این اعداد صرفاً نمونه‌ای برای توضیح سازوکار قاعده‌گذاری هستند.</p>
+        </div>
+        <p>در این معماری، منطق تصمیم‌گیری مانند یک لایه اعتبارسنجی عمل می‌کند: تحلیل مدل را با معیارهای از پیش تعیین‌شده می‌سنجد و فقط در صورت برقرار بودن شرایط، اجازه اقدام می‌دهد.</p>
+
+        <h3>مثال دوم: عامل تشخیص هرزنامه</h3>
+        <p>یک عامل فیلتر ایمیل باید پیام‌ها را به دو گروه هرزنامه و پیام معتبر تقسیم کند. ابتدا مدل محتوای ایمیل، فرستنده، قالب‌بندی و نشانه‌های دیگر را تحلیل می‌کند و احتمال هرزنامه بودن پیام را برآورد می‌کند.</p>
+        <div class="path-flow">
+          <article class="path-flow__step"><h3>دریافت ایمیل</h3><p>متن، فرستنده و ویژگی‌های پیام جمع‌آوری می‌شوند.</p></article>
+          <article class="path-flow__step"><h3>تحلیل مدل</h3><p>مدل احتمال هرزنامه بودن را تخمین می‌زند.</p></article>
+          <article class="path-flow__step"><h3>اعمال آستانه</h3><p>منطق تصمیم‌گیری خروجی را با آستانه مقایسه می‌کند.</p></article>
+          <article class="path-flow__step"><h3>اقدام</h3><p>پیام در پوشه هرزنامه یا صندوق ورودی قرار می‌گیرد.</p></article>
+        </div>
+        <div class="box example">
+          <p>اگر مدل احتمال هرزنامه بودن یک ایمیل را بیش از ۸۵ درصد تخمین بزند، لایه تصمیم‌گیری می‌تواند آن را هرزنامه تشخیص دهد و به پوشه مربوط منتقل کند. در این مثال، مدل یک احتمال ارائه می‌کند و منطق تصمیم‌گیری آن را به یک تصمیم عملی تبدیل می‌کند.</p>
+        </div>
+
+        <h3>آیا در عامل‌های مبتنی بر مدل زبانی همیشه به لایه جداگانه نیاز داریم؟</h3>
+        <p>نه لزوماً. وقتی از یک <bdi dir="ltr" class="en">LLM</bdi> به‌عنوان مدل عامل استفاده می‌شود، مرز میان مدل و منطق تصمیم‌گیری ممکن است کم‌رنگ شود؛ زیرا خود مدل می‌تواند استدلال کند و اقدام‌های مناسب را پیشنهاد یا انتخاب کند.</p>
+        <p>با این حال، در بسیاری از پیاده‌سازی‌های عملی، یک لایه بیرونی و سبک همچنان مفید است. این لایه می‌تواند اقدام‌های ساختاریافته را استخراج کند و مطمئن شود که رفتار عامل با قواعد ایمنی، محدودیت‌های قانونی و سیاست‌های سامانه سازگار است.</p>
+        <div class="box warning">
+          <p><strong>مثال امنیتی:</strong> اگر یک مدل زبانی پیشنهاد تأیید یک تراکنش مالی را بدهد، لایه بیرونی می‌تواند سقف مجاز تراکنش و احراز هویت کاربر را بررسی کند. در نتیجه، تصمیم مدل به‌تنهایی برای اجرای تراکنش کافی نخواهد بود.</p>
+        </div>
+        <p>در بعضی موارد نیز می‌توان با مهندسی پرامپت، دستورالعمل‌های روشن و روش‌هایی مانند استدلال زنجیره‌ای، فرایند تصمیم‌گیری را درون خود مدل هدایت کرد. انتخاب معماری مناسب به سطح کنترل، ایمنی و پیچیدگی کاربرد بستگی دارد.</p>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">⚖️</div>
+          <div><h3>تفاوت دو لایه</h3><p>مدل داده را تفسیر و تحلیل می‌کند؛ منطق تصمیم‌گیری تعیین می‌کند بر اساس آن تحلیل، چه اقدامی مجاز یا مناسب است. این دو نقش می‌توانند جدا یا در برخی معماری‌ها تا حدی درهم‌تنیده باشند.</p></div>
+        </div>
+      </section>
+
+      <section class="section blue" id="section-actuators">
+        <h2 class="section-title">🦾 ۶. عملگرها: اثرگذاری بر محیط</h2>
+        <p>عامل پس از انتخاب اقدام باید راهی برای اجرای آن داشته باشد. <strong>عملگر (Actuator)</strong> سازوکار یا ابزاری است که امکان اثرگذاری عامل بر محیط را فراهم می‌کند. اقدام می‌تواند وضعیت فیزیکی جهان را تغییر دهد یا تغییری در یک سامانه نرم‌افزاری ایجاد کند.</p>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🤖</div>
+            <h3>عملگر فیزیکی</h3>
+            <p>در دنیای واقعی اثر می‌گذارد؛ مانند بازوی ربات یا سامانه فرمان خودروی خودران.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🔌</div>
+            <h3>عملگر مجازی</h3>
+            <p>از طریق ابزارهای نرم‌افزاری یا رابط‌ها اقدام می‌کند؛ مانند <bdi dir="ltr" class="en">API</bdi> اجرای سفارش خرید یا فروش.</p>
+          </article>
+        </div>
+
+        <h3>بازگشت به مثال فیلتر هرزنامه</h3>
+        <p>پس از تحلیل ایمیل توسط مدل و ارزیابی نتیجه به‌وسیله منطق تصمیم‌گیری، عامل باید پیام را به محل مناسب منتقل کند. در این مثال، عامل از طریق اتصال به سامانه ایمیل، پیام تشخیص‌داده‌شده به‌عنوان هرزنامه را به پوشه هرزنامه می‌فرستد. این تعامل نرم‌افزاری نمونه‌ای از استفاده از عملگر مجازی است.</p>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>عامل</th>
+                <th>اقدام</th>
+                <th>نوع عملگر</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>خودروی خودران</td>
+                <td>چرخاندن فرمان و هدایت خودرو</td>
+                <td>فیزیکی</td>
+              </tr>
+              <tr>
+                <td>عامل معامله‌گر</td>
+                <td>ارسال سفارش خرید یا فروش از طریق <bdi dir="ltr" class="en">API</bdi></td>
+                <td>مجازی</td>
+              </tr>
+              <tr>
+                <td>عامل فیلتر ایمیل</td>
+                <td>انتقال پیام به پوشه هرزنامه</td>
+                <td>مجازی</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="box important">
+          <p>حسگر و عملگر دو نقش متفاوت دارند: حسگر اطلاعات را از محیط به عامل می‌رساند؛ عملگر فرمان عامل را به محیط منتقل می‌کند.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="section-feedback">
+        <h2 class="section-title">🔁 ۷. بازخورد: یادگیری از نتیجه اقدامات</h2>
+        <p>پس از اجرای اقدام، وضعیت محیط تغییر می‌کند. عامل باید وضعیت تازه را دوباره مشاهده کند و نتیجه اقدام خود را بسنجد. این اطلاعات جدید به عامل کمک می‌کنند عملکردش را ارزیابی کند و در اقدامات بعدی بهتر عمل کند. این فرایند را <strong>بازخورد (Feedback)</strong> می‌نامیم.</p>
+        <p>بازخورد حلقه‌ای پیوسته ایجاد می‌کند: عامل اطلاعات را دریافت می‌کند، آن‌ها را تحلیل می‌کند، تصمیم می‌گیرد، اقدام انجام می‌دهد و سپس نتیجه را مشاهده می‌کند. تکرار این چرخه می‌تواند به اصلاح رفتار و افزایش اثربخشی عامل در طول زمان کمک کند.</p>
+
+        <div class="path-flow">
+          <article class="path-flow__step"><h3>دریافت داده</h3><p>حسگرها وضعیت فعلی محیط را ثبت می‌کنند.</p></article>
+          <article class="path-flow__step"><h3>تحلیل و تصمیم</h3><p>مدل و منطق تصمیم‌گیری اقدام مناسب را تعیین می‌کنند.</p></article>
+          <article class="path-flow__step"><h3>اجرای اقدام</h3><p>عملگرها تغییر موردنظر را در محیط ایجاد می‌کنند.</p></article>
+          <article class="path-flow__step"><h3>مشاهده نتیجه</h3><p>عامل وضعیت جدید و پیامد اقدام را دریافت می‌کند.</p></article>
+          <article class="path-flow__step"><h3>بهبود رفتار</h3><p>اطلاعات تازه برای تنظیم اقدامات آینده به کار می‌روند.</p></article>
+        </div>
+
+        <h3>مثال اول: ترموستات هوشمند</h3>
+        <p>یک ترموستات هوشمند ممکن است در ابتدا دمای اتاق را بر اساس تنظیمات کارخانه کنترل کند. اگر کاربر دما را به‌صورت دستی تغییر دهد، این رفتار می‌تواند به‌عنوان بازخوردی درباره ترجیح او ثبت شود و در تنظیم‌های آینده مورد استفاده قرار گیرد.</p>
+
+        <h3>مثال دوم: پیشنهاد محتوای Netflix</h3>
+        <p>سامانه پیشنهاددهنده <bdi dir="ltr" class="en">Netflix</bdi> در آغاز می‌تواند پیشنهادهایی عمومی بر اساس محبوبیت محتوا ارائه کند. با گذشت زمان، رفتار تماشای کاربر اطلاعات بیشتری فراهم می‌کند: چه چیزی را تماشا کرده، از چه محتوایی گذشته، کجا پخش را متوقف کرده و به چه چیزی امتیاز داده است. سامانه می‌تواند از این نشانه‌ها برای شخصی‌سازی پیشنهادهای بعدی استفاده کند.</p>
+
+        <div class="box note">
+          <p>بازخورد به معنای بهتر شدن خودکار و تضمین‌شده در هر شرایطی نیست. کیفیت داده‌های دریافتی، روش تحلیل و نحوه استفاده از نتیجه‌ها اهمیت دارد؛ اما حلقه بازخورد امکان ارزیابی و اصلاح رفتار را فراهم می‌کند.</p>
+        </div>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">🔄</div>
+          <div><h3>اصل مهم</h3><p>عامل هوشمند فقط یک بار ادراک و اقدام نمی‌کند؛ نتیجه هر اقدام می‌تواند به ورودی تازه‌ای تبدیل شود و رفتار بعدی عامل را تحت تأثیر قرار دهد.</p></div>
+        </div>
+      </section>
+
+      <section class="section gold" id="section-summary">
+        <h2 class="section-title">📌 ۸. جمع‌بندی و نکات کلیدی</h2>
+        <p>یک عامل هوش مصنوعی از چند جزء مرتبط تشکیل می‌شود که با همکاری یکدیگر چرخه ادراک، تحلیل، تصمیم و اقدام را می‌سازند.</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>جزء</th>
+                <th>پرسش اصلی</th>
+                <th>نقش</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>محیط</td><td>عامل کجا فعالیت می‌کند؟</td><td>شرایط و اطلاعاتی که عامل با آن‌ها تعامل دارد.</td></tr>
+              <tr><td>حسگرها</td><td>عامل چه چیزی را دریافت می‌کند؟</td><td>جمع‌آوری داده از محیط.</td></tr>
+              <tr><td>مدل</td><td>عامل چه چیزی از داده می‌فهمد؟</td><td>تفسیر و تحلیل ورودی‌ها.</td></tr>
+              <tr><td>منطق تصمیم‌گیری</td><td>چه اقدامی باید انتخاب شود؟</td><td>اعمال قواعد و انتخاب اقدام مناسب.</td></tr>
+              <tr><td>عملگرها</td><td>اقدام چگونه اجرا می‌شود؟</td><td>اثرگذاری بر محیط از راه فیزیکی یا مجازی.</td></tr>
+              <tr><td>بازخورد</td><td>نتیجه اقدام چه بود؟</td><td>ارزیابی پیامد و کمک به بهبود رفتار آینده.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="checklist">
+          <li><span class="step-number">۱</span> ابتدا محیط فعالیت عامل را مشخص کنید؛ محیط می‌تواند دیجیتال، فیزیکی یا ترکیبی باشد.</li>
+          <li><span class="step-number">۲</span> حسگرها داده را جمع‌آوری می‌کنند، اما به‌تنهایی آن را تفسیر نمی‌کنند.</li>
+          <li><span class="step-number">۳</span> مدل اطلاعات دریافتی را تحلیل می‌کند و به عامل در فهم موقعیت کمک می‌کند.</li>
+          <li><span class="step-number">۴</span> منطق تصمیم‌گیری می‌تواند خروجی مدل را با قواعد و محدودیت‌ها اعتبارسنجی کند.</li>
+          <li><span class="step-number">۵</span> عملگرها اقدام انتخاب‌شده را در محیط اجرا می‌کنند.</li>
+          <li><span class="step-number">۶</span> بازخورد نتیجه اقدام را به چرخه ادراک و تصمیم‌گیری بازمی‌گرداند.</li>
+        </ul>
+        <div class="box success">
+          <p>اگر بتوانید مسیر «محیط ← حسگرها ← مدل ← تصمیم‌گیری ← عملگرها ← بازخورد» را توضیح دهید، چارچوب پایه‌ای معماری یک عامل هوشمند را شناخته‌اید.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" id="quiz">
+      <h2 class="section-title">📝 آزمون تعاملی پایان جلسه</h2>
+      <p>به پرسش‌های زیر پاسخ دهید تا میزان درک خود از اجزای اصلی عامل‌های هوش مصنوعی را ارزیابی کنید. در سؤال‌های چهارگزینه‌ای بازخورد بلافاصله نمایش داده می‌شود؛ برای سؤال تطبیقی و جای خالی، پاسخ را کامل و سپس بررسی کنید.</p>
+
+      <div class="quiz-container" data-quiz>
+        <div class="quiz-header">
+          <div>
+            <strong>آزمون اجزای عامل هوشمند</strong>
+            <p>۶ پرسش · شامل چهارگزینه‌ای، تطبیقی و جای خالی</p>
+          </div>
+          <span class="quiz-counter" data-quiz-counter>۰ از ۶ سؤال پاسخ داده‌شده</span>
+        </div>
+        <progress class="quiz-progress" data-quiz-progress value="0" max="100" aria-label="پیشرفت آزمون"></progress>
+
+        <article class="quiz-item" data-type="single_select" data-correct="context" data-feedback-correct="درست است؛ دستیار خرید باید هم داده‌های محصول و ترجیحات کاربر و هم عوامل زمینه‌ای مانند آب‌وهوا و فصل را در نظر بگیرد." data-feedback-incorrect="این گزینه کامل نیست. پیشنهاد مناسب باید از ترکیب اطلاعات محصول، ترجیحات کاربر و شرایط محیطی به دست آید.">
+          <p class="quiz-question"><span class="quiz-question__number">۱</span> یک عامل دستیار خرید برای ارائه پیشنهاد مناسب، در حالت ایده‌آل باید کدام مجموعه اطلاعات را در نظر بگیرد؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="history">فقط سابقه مرور کاربر</button>
+            <button class="quiz-option" type="button" data-value="context">اطلاعات محصول، ترجیحات کاربر، آب‌وهوا و فصل جاری</button>
+            <button class="quiz-option" type="button" data-value="traffic">حرکت عابران پیاده و علائم راهنمایی و رانندگی</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="senses" data-feedback-correct="درست است؛ حسگرها نقش حواس عامل را دارند و اطلاعات محیط را برای پردازش در اختیار آن قرار می‌دهند." data-feedback-incorrect="به نقش حواس انسان توجه کنید؛ حسگرها نیز برای دریافت اطلاعات از محیط به کار می‌روند.">
+          <p class="quiz-question"><span class="quiz-question__number">۲</span> کدام گزینه بهترین توصیف از شباهت حسگرهای عامل هوش مصنوعی با توانایی‌های انسان است؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="senses">حسگرها مانند بینایی، شنوایی و چشایی انسان، نقش حواس عامل را دارند.</button>
+            <button class="quiz-option" type="button" data-value="decision">حسگرها فقط برای تصمیم‌گیری استفاده می‌شوند و نقشی در جمع‌آوری داده ندارند.</button>
+            <button class="quiz-option" type="button" data-value="robots">حسگرها فقط در ربات‌های صنعتی کاربرد دارند و در خودروهای خودران یا سامانه‌های آنلاین نقشی ندارند.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="matching" data-feedback-correct="همه مفاهیم با تعریف درست تطبیق داده شده‌اند." data-feedback-incorrect="حداقل یک تطبیق نادرست است. به تفاوت مدل، حسگر، آگاهی زمینه‌ای و مدل چندوجهی توجه کنید.">
+          <p class="quiz-question"><span class="quiz-question__number">۳</span> هر مفهوم را با تعریف مناسب آن تطبیق دهید.</p>
+          <div class="matching-grid">
+            <div class="matching-row"><span class="matching-term">آگاهی زمینه‌ای</span><select class="quiz-control matching-select" data-answer="context"><option value="">انتخاب تعریف</option><option value="brain">مغز عامل که ورودی‌های حسی را تفسیر می‌کند.</option><option value="sensor">ابزاری برای جمع‌آوری داده از محیط، مانند چشم و گوش.</option><option value="context">توانایی تشخیص و واکنش به محیط‌های پیچیده و پویای دنیای واقعی.</option><option value="multi">مدل زبانی بزرگی که متن، تصویر، صوت و ویدئو را با هم پردازش می‌کند.</option></select></div>
+            <div class="matching-row"><span class="matching-term">مدل</span><select class="quiz-control matching-select" data-answer="brain"><option value="">انتخاب تعریف</option><option value="brain">مغز عامل که ورودی‌های حسی را تفسیر می‌کند.</option><option value="sensor">ابزاری برای جمع‌آوری داده از محیط، مانند چشم و گوش.</option><option value="context">توانایی تشخیص و واکنش به محیط‌های پیچیده و پویای دنیای واقعی.</option><option value="multi">مدل زبانی بزرگی که متن، تصویر، صوت و ویدئو را با هم پردازش می‌کند.</option></select></div>
+            <div class="matching-row"><span class="matching-term">حسگر</span><select class="quiz-control matching-select" data-answer="sensor"><option value="">انتخاب تعریف</option><option value="brain">مغز عامل که ورودی‌های حسی را تفسیر می‌کند.</option><option value="sensor">ابزاری برای جمع‌آوری داده از محیط، مانند چشم و گوش.</option><option value="context">توانایی تشخیص و واکنش به محیط‌های پیچیده و پویای دنیای واقعی.</option><option value="multi">مدل زبانی بزرگی که متن، تصویر، صوت و ویدئو را با هم پردازش می‌کند.</option></select></div>
+            <div class="matching-row"><span class="matching-term">مدل زبانی چندوجهی</span><select class="quiz-control matching-select" data-answer="multi"><option value="">انتخاب تعریف</option><option value="brain">مغز عامل که ورودی‌های حسی را تفسیر می‌کند.</option><option value="sensor">ابزاری برای جمع‌آوری داده از محیط، مانند چشم و گوش.</option><option value="context">توانایی تشخیص و واکنش به محیط‌های پیچیده و پویای دنیای واقعی.</option><option value="multi">مدل زبانی بزرگی که متن، تصویر، صوت و ویدئو را با هم پردازش می‌کند.</option></select></div>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="rules" data-feedback-correct="درست است؛ منطق تصمیم‌گیری قواعد یا آستانه‌هایی را روی خروجی مدل اعمال می‌کند تا تصمیم عملی مشخص شود." data-feedback-incorrect="نقش این لایه، تبدیل خروجی تحلیلی مدل به تصمیم روشن با استفاده از قواعد یا آستانه‌هاست.">
+          <p class="quiz-question"><span class="quiz-question__number">۴</span> در مثال فیلتر هرزنامه، نقش منطق تصمیم‌گیری کدام است؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="input">فراهم کردن داده‌های ورودی برای پردازش مدل</button>
+            <button class="quiz-option" type="button" data-value="patterns">تحلیل داده خام با مدل‌های احتمالاتی برای شناسایی الگوها</button>
+            <button class="quiz-option" type="button" data-value="rules">اعمال قواعد یا آستانه‌های مشخص بر خروجی مدل برای اتخاذ تصمیم قطعی</button>
+            <button class="quiz-option" type="button" data-value="replace">جایگزین کردن همیشگی مهندسی پرامپت در عامل‌های مبتنی بر مدل زبانی</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="actuators" data-feedback-correct="درست است؛ عملگرها سازوکار اجرای اقدام و اثرگذاری مستقیم عامل بر محیط هستند." data-feedback-incorrect="حسگرها داده را دریافت می‌کنند؛ اجرای اقدام و تغییر محیط بر عهده عملگرهاست.">
+          <p class="quiz-question"><span class="quiz-question__number">۵</span> کدام جزء مستقیماً به عامل هوش مصنوعی امکان می‌دهد بر محیط اثر بگذارد یا آن را تغییر دهد؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="actuators">عملگرها</button>
+            <button class="quiz-option" type="button" data-value="sensors">حسگرها</button>
+            <button class="quiz-option" type="button" data-value="processors">پردازشگرهای داده</button>
+            <button class="quiz-option" type="button" data-value="training">الگوریتم‌های آموزش</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="fill_text" data-feedback-correct="درست است؛ خودرو از عملگر فیزیکی و عامل معامله‌گر از عملگر مجازی استفاده می‌کند." data-feedback-incorrect="خودرو با سازوکارهایی مانند فرمان بر دنیای فیزیکی اثر می‌گذارد؛ عامل معامله‌گر از رابط نرم‌افزاری برای اجرای سفارش استفاده می‌کند.">
+          <p class="quiz-question"><span class="quiz-question__number">۶</span> جاهای خالی را با واژه مناسب کامل کنید.</p>
+          <div class="quiz-field-grid">
+            <div class="quiz-field-row">
+              <label class="quiz-field-label" for="q6a">خودروی خودران برای هدایت فرمان از عملگرهای ... استفاده می‌کند.</label>
+              <input class="quiz-control" id="q6a" type="text" data-answers="فیزیکی|physical" placeholder="پاسخ را وارد کنید">
+            </div>
+            <div class="quiz-field-row">
+              <label class="quiz-field-label" for="q6b">عامل معامله‌گر برای اجرای سفارش‌های سهام از عملگرهای ... استفاده می‌کند.</label>
+              <input class="quiz-control" id="q6b" type="text" data-answers="مجازی|virtual" placeholder="پاسخ را وارد کنید">
+            </div>
+          </div>
+          <button class="quiz-action" type="button" data-quiz-submit>بررسی پاسخ</button>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <div class="quiz-result" data-quiz-result>
+          <strong class="quiz-result__score" data-quiz-score></strong>
+          <p data-quiz-result-detail></p>
+          <button class="quiz-action quiz-action--secondary" type="button" data-quiz-reset>تکرار آزمون</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="social">
+      <h2>یادگیری را ادامه دهید 🚀</h2>
+      <p>برای تثبیت مفاهیم، اجزای مختلف یک عامل هوشمند را در مثال‌های واقعی شناسایی کنید و ارتباط میان دریافت داده، تصمیم‌گیری و اجرای اقدام را در ذهن خود مرور کنید.</p>
+    </section>
+
+    <nav class="lesson-navigation" aria-label="ناوبری درس‌ها">
+      <a class="lesson-navigation__link lesson-navigation__link--prev" href="Lesson_01.html">
+        <span><span class="lesson-navigation__label">جلسه قبل</span><span class="lesson-navigation__title">مقدمه‌ای بر عامل‌های هوش مصنوعی</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_03.html">
+        <span><span class="lesson-navigation__label">جلسه بعد</span><span class="lesson-navigation__title">ادامه مسیر یادگیری</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <p class="site-footer">MATCUB · Learning Notes</p>
+    <p class="text-center"><a class="inline-link" href="#top">↑ بازگشت به ابتدای صفحه</a></p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="درسنامه هشتم درباره زیرساخت توسعه و استقرار عامل‌های هوش مصنوعی، API، رایانش ابری، یکپارچه‌سازی دانش و چارچوب‌های توسعه عامل.">
+  <title>Lesson_08 | زیرساخت توسعه و استقرار عامل‌های هوش مصنوعی</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="quiz-engine.js" defer></script>
+  <script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <main class="container">
+    <nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+      <a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span>
+      </a>
+    </nav>
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#top">MATCUB · Learning Notes</a>
+      <nav class="topbar__links" aria-label="ناوبری صفحه">
+        <a href="#overview">معرفی</a>
+        <a href="#api">API</a>
+        <a href="#cloud">رایانش ابری</a>
+        <a href="#knowledge">دانش</a>
+        <a href="#frameworks">چارچوب‌ها</a>
+        <a href="#deployment">استقرار</a>
+      </nav>
+    </header>
+
+    <header class="hero" id="overview">
+      <div class="hero-content">
+        <div class="hero-label">🏗️ زیرساخت و معماری عامل‌های هوش مصنوعی</div>
+        <h1>از ساخت عامل تا <span>استقرار در دنیای واقعی</span></h1>
+        <p class="hero-subtitle">آشنایی با اتصال مدل‌ها از طریق API، زیرساخت ابری، منابع دانش سازمانی، چارچوب‌های توسعه و محیط عملیاتی عامل‌ها</p>
+        <div class="hero-badge">عامل هوشمند فقط به یک مدل نیاز ندارد؛ به زیرساخت، داده و محیط اجرا هم نیازمند است.</div>
+      </div>
+    </header>
+
+    <div class="lesson-meta" aria-label="اطلاعات درس">
+      <span class="lesson-meta__item">🧭 <strong>Lesson_08</strong></span>
+      <span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی تا متوسط</strong></span>
+      <span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۲۵ دقیقه</strong></span>
+      <span class="lesson-meta__item">🏗️ موضوع: <strong>زیرساخت و استقرار</strong></span>
+    </div>
+
+    <div class="badges" aria-label="موضوعات درس">
+      <span class="badge gold">API و مدل‌های بیرونی</span>
+      <span class="badge blue">Cloud Services</span>
+      <span class="badge green">یکپارچه‌سازی دانش</span>
+      <span class="badge purple">Agent Frameworks</span>
+      <span class="badge orange">Deployment</span>
+    </div>
+
+    <section class="learning-intro" aria-labelledby="learning-intro-title">
+      <div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div>
+      <h2 id="learning-intro-title">مسیر یادگیری</h2>
+      <p>تا اینجا با مفهوم عامل‌های هوش مصنوعی، اجزای سازنده، الگوهای طراحی و نمونه‌ای عملی از ساخت عامل آشنا شدیم. حالا باید به زیرساختی بپردازیم که توسعه و استفاده واقعی از این عامل‌ها را ممکن می‌کند. یک عامل برای کارآمد بودن، علاوه بر مدل زبانی، به توان پردازشی، دسترسی به داده‌های مرتبط، ابزارهای توسعه و محیطی برای اجرا و ارائه خدمت نیاز دارد.</p>
+      <ul class="learning-objectives">
+        <li>درک تصمیم «ساخت مدل درون‌سازمانی یا استفاده از مدل آماده»</li>
+        <li>شناخت نقش API در اتصال عامل به مدل‌های زبانی بیرونی</li>
+        <li>مقایسه تأمین زیرساخت محاسباتی به‌صورت داخلی و استفاده از خدمات ابری</li>
+        <li>شناخت منابع دانش سازمانی و عمومی برای غنی‌سازی اطلاعات عامل</li>
+        <li>آشنایی با چارچوب‌های LangChain، LangGraph، AutoGen، CrewAI، Google ADK و Flowise</li>
+        <li>درک مفهوم استقرار عامل و نمونه‌هایی از خدمات ابری مرتبط</li>
+      </ul>
+    </section>
+
+    <nav class="toc" aria-label="فهرست مطالب">
+      <h2>📑 فهرست مطالب</h2>
+      <ol>
+        <li><a href="#infrastructure">زیرساخت؛ حلقه اتصال نمونه اولیه به محصول واقعی</a></li>
+        <li><a href="#api">اتصال مدل زبانی بیرونی از طریق API</a></li>
+        <li><a href="#cloud">تأمین توان پردازشی با خدمات ابری</a></li>
+        <li><a href="#knowledge">اتصال عامل به منابع دانش</a></li>
+        <li><a href="#frameworks">چارچوب‌های توسعه عامل‌های هوش مصنوعی</a></li>
+        <li><a href="#deployment">استقرار عامل در محیط واقعی</a></li>
+        <li><a href="#summary">جمع‌بندی و نقشه تصمیم‌گیری</a></li>
+      </ol>
+    </nav>
+
+    <div id="content">
+      <section class="section gold" id="infrastructure">
+        <h2 class="section-title">🏗️ ۱. زیرساخت؛ حلقه اتصال نمونه اولیه به محصول واقعی</h2>
+        <p>ساخت یک عامل که در محیط آزمایشی به‌درستی کار می‌کند، پایان مسیر نیست. برای استفاده واقعی باید مشخص کنیم مدل از کجا تأمین می‌شود، محاسبات سنگین کجا انجام می‌شوند، عامل به چه اطلاعاتی دسترسی دارد، با چه ابزارهایی توسعه پیدا می‌کند و در نهایت کاربران از چه طریقی با آن تعامل خواهند داشت.</p>
+        <p>به مجموعه این امکانات و اجزای پشتیبان، <bdi dir="ltr" class="en">Infrastructure</bdi> یا زیرساخت می‌گوییم. زیرساخت مناسب کمک می‌کند عامل از یک نمونه اولیه به سامانه‌ای قابل استفاده، قابل مدیریت و مقیاس‌پذیر تبدیل شود.</p>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🧠</div>
+            <h3>مدل هوش مصنوعی</h3>
+            <p>توانایی تحلیل و تولید پاسخ را فراهم می‌کند؛ می‌تواند داخلی یا متعلق به یک ارائه‌دهنده بیرونی باشد.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">☁️</div>
+            <h3>توان محاسباتی</h3>
+            <p>منابعی مانند پردازنده‌های گرافیکی و فضای ذخیره‌سازی، اجرای مدل و عامل را ممکن می‌کنند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">📚</div>
+            <h3>منابع دانش</h3>
+            <p>اطلاعات سازمانی و عمومی را در اختیار عامل می‌گذارند تا پاسخ‌ها با زمینه کسب‌وکار مرتبط باشند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🧰</div>
+            <h3>ابزارهای توسعه</h3>
+            <p>چارچوب‌ها و سرویس‌هایی هستند که ساخت، هماهنگی و مدیریت اجزای عامل را ساده‌تر می‌کنند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🚀</div>
+            <h3>محیط استقرار</h3>
+            <p>محلی است که عامل در آن اجرا می‌شود و از طریق وب‌سایت، برنامه یا فرایند پس‌زمینه در دسترس قرار می‌گیرد.</p>
+          </article>
+        </div>
+
+        <div class="box note">
+          <p><strong>تصویر کلی:</strong> مدل، توانایی زبانی و استدلالی را فراهم می‌کند؛ زیرساخت محاسباتی امکان اجرای آن را می‌دهد؛ منابع دانش زمینه لازم را اضافه می‌کنند؛ چارچوب توسعه اجزا را کنار هم قرار می‌دهد؛ و استقرار، عامل را به دست کاربران می‌رساند.</p>
+        </div>
+      </section>
+
+      <section class="section blue" id="api">
+        <h2 class="section-title">🔌 ۲. اتصال مدل زبانی بیرونی از طریق API</h2>
+        <p>یکی از نخستین تصمیم‌های سازمان هنگام استفاده از عامل هوش مصنوعی این است که مدل زبانی را خودش توسعه دهد یا از یک مدل آماده و بیرونی استفاده کند. این تصمیم را معمولاً <bdi dir="ltr" class="en">Make vs. Buy</bdi> یا «ساختن در برابر خریدن» می‌نامند.</p>
+
+        <h3>ساخت مدل یا استفاده از مدل آماده؟</h3>
+        <p>توسعه یک مدل زبانی بزرگ از ابتدا، به تخصص، داده، نیروی انسانی و منابع محاسباتی قابل‌توجهی نیاز دارد. به همین دلیل، فقط تعداد محدودی از سازمان‌ها توان و انگیزه لازم برای ساخت مدل اختصاصی خود را دارند. بسیاری از کسب‌وکارها ترجیح می‌دهند از مدل یک ارائه‌دهنده تخصصی استفاده کنند و در ازای آن هزینه سرویس را بپردازند.</p>
+        <div class="table-scroll">
+          <table dir="rtl">
+            <thead>
+              <tr><th>گزینه</th><th>ویژگی اصلی</th><th>ملاحظه مهم</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>ساخت مدل درون‌سازمانی</td><td>کنترل و مالکیت بیشتر بر توسعه مدل</td><td>نیازمند تخصص و سرمایه‌گذاری سنگین</td></tr>
+              <tr><td>استفاده از مدل بیرونی</td><td>دسترسی سریع‌تر به مدل آماده</td><td>پرداخت هزینه سرویس و وابستگی به ارائه‌دهنده</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>API چگونه این اتصال را برقرار می‌کند؟</h3>
+        <p><bdi dir="ltr" class="en">API</bdi> مخفف <bdi dir="ltr" class="en">Application Programming Interface</bdi> و به معنای رابط برنامه‌نویسی کاربردی است. API راهی استاندارد برای ارتباط دو نرم‌افزار فراهم می‌کند. در این سناریو، عامل از طریق API با سرویس مدل زبانی ارتباط می‌گیرد؛ لازم نیست خود مدل را روی زیرساخت سازمان نصب و اجرا کند.</p>
+        <p>ارائه‌دهندگانی مانند <bdi dir="ltr" class="en">OpenAI</bdi>، <bdi dir="ltr" class="en">Google</bdi> و <bdi dir="ltr" class="en">Anthropic</bdi> مدل‌های زبانی را به‌عنوان سرویس ارائه می‌کنند. هنگام انتخاب ارائه‌دهنده، عواملی مانند سرعت پاسخ‌گویی، دقت و کیفیت خروجی و هزینه استفاده اهمیت دارند.</p>
+
+        <h3>چرخه ارتباط عامل با مدل بیرونی</h3>
+        <div class="path-flow">
+          <article class="path-flow__step">
+            <h3>۱. آماده‌سازی درخواست</h3>
+            <p>عامل، دستور یا اطلاعات موردنیاز مدل را آماده می‌کند.</p>
+          </article>
+          <article class="path-flow__step">
+            <h3>۲. ارسال از طریق API</h3>
+            <p>درخواست به سرویس ارائه‌دهنده مدل فرستاده می‌شود.</p>
+          </article>
+          <article class="path-flow__step">
+            <h3>۳. پردازش در سرویس بیرونی</h3>
+            <p>مدل روی زیرساخت ارائه‌دهنده درخواست را پردازش می‌کند.</p>
+          </article>
+          <article class="path-flow__step">
+            <h3>۴. دریافت پاسخ</h3>
+            <p>پاسخ مدل به عامل بازمی‌گردد و در ادامه فرایند استفاده می‌شود.</p>
+          </article>
+        </div>
+        <p>به بیان ساده، بخش زبانی و محاسبات مدل را به یک سرویس تخصصی می‌سپاریم. عامل درخواست را ارسال می‌کند، پاسخ را در زمان اجرا دریافت می‌کند و می‌تواند از آن برای ادامه تصمیم‌گیری یا انجام مرحله بعدی استفاده کند.</p>
+
+        <div class="box important">
+          <p><strong>مزیت اصلی این رویکرد:</strong> سازمان می‌تواند بدون سرمایه‌گذاری اولیه سنگین برای ساخت مدل اختصاصی، قابلیت‌های هوش مصنوعی خود را سریع‌تر توسعه دهد و در صورت نیاز ظرفیت استفاده را افزایش دهد.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="cloud">
+        <h2 class="section-title">☁️ ۳. تأمین توان پردازشی با خدمات ابری</h2>
+        <p>عامل‌های پیشرفته برای اجرای مدل‌ها، پردازش درخواست‌ها و انجام وظایف متعدد به منابع محاسباتی زیادی نیاز دارند. هرچه عامل پیچیده‌تر شود و وظایف بیشتری انجام دهد، نیاز آن به توان پردازشی نیز افزایش پیدا می‌کند.</p>
+        <p>در اینجا نیز با یک تصمیم از جنس ساختن یا خریدن روبه‌رو هستیم: آیا سازمان باید سخت‌افزار را خودش تهیه و مدیریت کند یا از منابع محاسباتی یک ارائه‌دهنده ابری استفاده کند؟</p>
+
+        <h3>گزینه اول: زیرساخت داخلی</h3>
+        <p>اگر سازمان تصمیم بگیرد منابع را خودش فراهم کند، باید سخت‌افزاری متناسب با بیشترین میزان استفاده احتمالی تهیه کند. برای پردازش‌های سنگین هوش مصنوعی، وجود <bdi dir="ltr" class="en">GPU</bdi> یا واحد پردازش گرافیکی قدرتمند اهمیت زیادی دارد.</p>
+        <p>در این روش، سازمان باید ظرفیت کافی برای زمان‌های اوج مصرف را از قبل آماده کند. در نتیجه ممکن است بخشی از سخت‌افزار در زمان‌هایی که تقاضا پایین است، بلااستفاده بماند.</p>
+
+        <h3>گزینه دوم: استفاده از خدمات ابری</h3>
+        <p>در مدل ابری، منابع پردازشی و ذخیره‌سازی از طریق یک ارائه‌دهنده بیرونی در اختیار سازمان قرار می‌گیرند. مزیت مهم این روش انعطاف‌پذیری است: سازمان می‌تواند هنگام افزایش تقاضا از ظرفیت بیشتری استفاده کند و در زمان کاهش استفاده، منابع کمتری مصرف کند.</p>
+        <p>به این ترتیب، لازم نیست از ابتدا سخت‌افزار گران‌قیمتی بخرید که ممکن است در بخش زیادی از زمان ظرفیت آن استفاده نشود. هزینه نیز بر اساس میزان استفاده از منابع محاسباتی پرداخت می‌شود.</p>
+
+        <div class="table-scroll">
+          <table dir="rtl">
+            <thead>
+              <tr><th>معیار</th><th>زیرساخت داخلی</th><th>خدمات ابری</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>سرمایه‌گذاری اولیه</td><td>معمولاً زیاد؛ نیازمند خرید سخت‌افزار</td><td>معمولاً کمتر؛ بدون خرید اولیه همان سخت‌افزار</td></tr>
+              <tr><td>ظرفیت در زمان اوج</td><td>باید از قبل برای اوج مصرف پیش‌بینی شود</td><td>امکان افزایش ظرفیت بر اساس نیاز</td></tr>
+              <tr><td>زمان کم‌مصرف</td><td>ممکن است سخت‌افزار بلااستفاده بماند</td><td>امکان کاهش مصرف و هزینه منابع</td></tr>
+              <tr><td>مدیریت زیرساخت</td><td>بر عهده سازمان</td><td>بخش مهمی از زیرساخت را ارائه‌دهنده فراهم می‌کند</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>سه ارائه‌دهنده بزرگ خدمات ابری</h3>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4><bdi dir="ltr" class="en">Amazon Web Services (AWS)</bdi></h4>
+            <p>مجموعه‌ای از خدمات پردازشی، ذخیره‌سازی و ابزارهای مرتبط با توسعه و اجرای سامانه‌های هوش مصنوعی ارائه می‌کند.</p>
+          </article>
+          <article class="info-card">
+            <h4><bdi dir="ltr" class="en">Microsoft Azure</bdi></h4>
+            <p>زیرساخت ابری و سرویس‌های متنوعی برای اجرای بارهای کاری و راهکارهای هوش مصنوعی در اختیار سازمان‌ها قرار می‌دهد.</p>
+          </article>
+          <article class="info-card">
+            <h4><bdi dir="ltr" class="en">Google Cloud Platform</bdi></h4>
+            <p>منابع پردازشی، فضای ذخیره‌سازی، APIها و ابزارهای توسعه و استقرار راهکارهای هوش مصنوعی را فراهم می‌کند.</p>
+          </article>
+        </div>
+        <p>این ارائه‌دهندگان خدماتی مانند GPUهای قدرتمند، فضای ذخیره‌سازی گسترده، APIهای یکپارچه و ابزارهای توسعه و استقرار را عرضه می‌کنند. به همین دلیل می‌توانند بخش مهمی از نیاز زیرساختی پروژه‌های عامل‌محور را پوشش دهند.</p>
+
+        <div class="box note">
+          <p><strong>نکته تصمیم‌گیری:</strong> استفاده از ابر همیشه و برای همه سازمان‌ها بهترین انتخاب نیست. در این درس مزیت اصلی آن، انعطاف‌پذیری و کاهش نیاز به سرمایه‌گذاری اولیه معرفی می‌شود؛ انتخاب نهایی باید با توجه به الگوی مصرف و نیازهای همان سازمان انجام شود.</p>
+        </div>
+      </section>
+
+      <section class="section purple" id="knowledge">
+        <h2 class="section-title">📚 ۴. اتصال عامل به منابع دانش</h2>
+        <p>فرض کنید یک تحلیل‌گر مالی بسیار توانمند استخدام کرده‌اید، اما به او اجازه دسترسی به سامانه مالی شرکت را نمی‌دهید. یا یک تیم فروش حرفه‌ای دارید که اطلاعات کافی درباره محصولاتی که می‌فروشد در اختیارش نیست. در هر دو حالت، توانایی افراد به‌طور کامل به نتیجه تبدیل نمی‌شود؛ چون دانش لازم برای انجام کار را ندارند.</p>
+        <p>عامل هوش مصنوعی نیز به همین شکل عمل می‌کند. هرچه به اطلاعات مرتبط‌تری درباره کسب‌وکار و محیط کاری خود دسترسی داشته باشد، بهتر می‌تواند درخواست‌ها را در زمینه درست تفسیر کند و تصمیم‌های مفیدتری بگیرد.</p>
+
+        <h3>چهار منبع مهم دانش برای عامل</h3>
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🗄️</div>
+            <h3>۱. پایگاه‌های داده</h3>
+            <p>محل نگهداری اصلی اطلاعات شرکت هستند؛ مانند داده مشتریان، سفارش‌ها یا سوابق عملیاتی.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🏢</div>
+            <h3>۲. سامانه‌های سازمانی</h3>
+            <p>سیستم‌هایی مانند ERP اطلاعات یکپارچه‌ای درباره عملیات، موجودی، تولید، مالی و سفارش‌ها دارند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">📖</div>
+            <h3>۳. پایگاه‌های دانش</h3>
+            <p>سیاست‌ها، دستورالعمل‌ها و راهنماهای شرکت را نگهداری می‌کنند تا عامل مطابق قواعد سازمان عمل کند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🌐</div>
+            <h3>۴. اینترنت</h3>
+            <p>اطلاعات عمومی و گسترده‌ای را در دسترس عامل قرار می‌دهد که می‌تواند برای تحلیل و استدلال مفید باشد.</p>
+          </article>
+        </div>
+
+        <h3>۱. پایگاه‌های داده؛ دسترسی به اطلاعات اصلی شرکت</h3>
+        <p><bdi dir="ltr" class="en">Database</bdi> یا پایگاه داده، محل سازمان‌یافته نگهداری اطلاعات شرکت است. با اتصال عامل به پایگاه داده، امکان دسترسی به اطلاعاتی فراهم می‌شود که برای پاسخ‌گویی یا انجام وظایف به آن‌ها نیاز دارد.</p>
+        <p>برای مثال، عامل پشتیبانی مشتری می‌تواند با دسترسی مجاز به اطلاعات سفارش‌ها، وضعیت سفارش یک مشتری را بررسی کند؛ یا عامل مالی برای تحلیل وضعیت یک حساب به داده‌های مرتبط رجوع کند.</p>
+
+        <h3>۲. سامانه‌های برنامه‌ریزی منابع سازمانی (ERP)</h3>
+        <p><bdi dir="ltr" class="en">ERP</bdi> مخفف <bdi dir="ltr" class="en">Enterprise Resource Planning</bdi> است و به سامانه‌ای گفته می‌شود که بخش‌های مختلف عملیات سازمان را به هم مرتبط می‌کند. این سامانه می‌تواند اطلاعاتی درباره موجودی کالا، برنامه تولید، عملکرد مالی و سفارش‌های مشتریان در خود داشته باشد.</p>
+        <p>اتصال عامل به ERP دید گسترده‌تری از فرایندهای کسب‌وکار در اختیار آن قرار می‌دهد؛ زیرا اطلاعات فقط به یک واحد یا یک نوع فعالیت محدود نمی‌شوند.</p>
+
+        <h3>۳. پایگاه دانش؛ دسترسی به قواعد و راهنمای سازمان</h3>
+        <p><bdi dir="ltr" class="en">Knowledge Base</bdi> یا پایگاه دانش، مجموعه‌ای از اسناد و اطلاعات مرجع است که عامل می‌تواند برای فهم قواعد و رویه‌های سازمان به آن مراجعه کند.</p>
+        <p>برای مثال، شرکتی ممکن است سیاست‌های مشخصی درباره نحوه پاسخ‌گویی به مشتریان داشته باشد. با اتصال عامل به مستندات این سیاست‌ها، عامل می‌تواند پاسخ‌های خود را با دستورالعمل‌های شرکت هماهنگ کند. نمونه دیگر، راهنمای هویت برند است که لحن و شیوه ارتباطی مورد انتظار شرکت را مشخص می‌کند.</p>
+
+        <h3>۴. اینترنت؛ دسترسی به اطلاعات عمومی</h3>
+        <p>عامل‌ها می‌توانند در صورت فراهم بودن ابزار و دسترسی مناسب، از اینترنت برای بازیابی اطلاعات عمومی استفاده کنند. این امکان دامنه اطلاعات در دسترس عامل را گسترش می‌دهد و می‌تواند در فرایند استدلال و بررسی موضوعات مختلف مفید باشد.</p>
+
+        <div class="table-scroll">
+          <table dir="rtl">
+            <thead>
+              <tr><th>منبع دانش</th><th>چه نوع اطلاعاتی فراهم می‌کند؟</th><th>نمونه کاربرد</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>پایگاه داده</td><td>اطلاعات ذخیره‌شده و ساختاریافته شرکت</td><td>یافتن اطلاعات مشتری یا سفارش</td></tr>
+              <tr><td>ERP</td><td>اطلاعات یکپارچه عملیات سازمان</td><td>بررسی موجودی، تولید و عملکرد مالی</td></tr>
+              <tr><td>پایگاه دانش</td><td>سیاست‌ها، دستورالعمل‌ها و راهنماها</td><td>پاسخ‌گویی مطابق سیاست شرکت</td></tr>
+              <tr><td>اینترنت</td><td>اطلاعات عمومی در دسترس</td><td>تحقیق درباره موضوعات بیرونی</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="box important">
+          <p><strong>اصل مهم:</strong> دسترسی بیشتر به داده به‌تنهایی تضمین‌کننده عملکرد بهتر نیست. اطلاعات باید به وظیفه عامل مرتبط باشند و دسترسی به منابع سازمانی نیز باید مطابق مجوزها و سیاست‌های همان سازمان تعریف شود.</p>
+        </div>
+      </section>
+
+      <section class="section orange" id="frameworks">
+        <h2 class="section-title">🧰 ۵. چارچوب‌های توسعه عامل‌های هوش مصنوعی</h2>
+        <p>پروژه‌های عامل‌محور معمولاً از صفر ساخته نمی‌شوند. توسعه‌دهندگان می‌توانند از اجزای ازپیش‌طراحی‌شده استفاده کنند؛ اجزایی که قابلیت‌هایی مانند حافظه، برنامه‌ریزی، فراخوانی ابزارها و هماهنگ‌سازی چند عامل را در اختیارشان قرار می‌دهند.</p>
+        <p>به این مجموعه ابزارها و اجزای آماده، <bdi dir="ltr" class="en">Framework</bdi> یا چارچوب توسعه گفته می‌شود. چارچوب‌ها کمک می‌کنند به‌جای پیاده‌سازی همه قابلیت‌های پایه از ابتدا، تمرکز بیشتری روی منطق و هدف اصلی پروژه داشته باشیم.</p>
+
+        <h3>۱. LangChain؛ زنجیره‌ها و عامل‌ها</h3>
+        <p><bdi dir="ltr" class="en">LangChain</bdi> یکی از چارچوب‌های شناخته‌شده برای ساخت برنامه‌های مبتنی بر مدل‌های زبانی است. دو مفهوم مهم در آن، <bdi dir="ltr" class="en">Chains</bdi> و <bdi dir="ltr" class="en">Agents</bdi> هستند.</p>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>Chain یا زنجیره</h4>
+            <p>برای ساخت فرایندی با مراحل ازپیش‌تعریف‌شده به کار می‌رود. ترتیب کارها مشخص است و ورودی هر مرحله به مرحله بعد منتقل می‌شود.</p>
+          </article>
+          <article class="info-card">
+            <h4>Agent یا عامل</h4>
+            <p>می‌تواند با توجه به اطلاعات جدید، اقدام بعدی خود را تنظیم کند و از ابزارهای در دسترس برای رسیدن به هدف کمک بگیرد.</p>
+          </article>
+        </div>
+        <p>برای درک زنجیره، یک برنامه خلاصه‌سازی بازخورد مشتریان را در نظر بگیرید. برنامه ابتدا متن بازخوردها را جمع‌آوری می‌کند، سپس آن‌ها را برای خلاصه‌سازی به مدل می‌فرستد و در پایان خلاصه تولیدشده را ذخیره می‌کند. هر بار که بازخورد جدیدی برسد، همین مراحل مشخص و ثابت اجرا می‌شوند. این نمونه‌ای از منطق یک Chain است.</p>
+        <p>در مقابل، عامل می‌تواند بر اساس محتوای درخواست یا اطلاعات تازه، درباره اقدام بعدی تصمیم بگیرد؛ بنابراین الزاماً در تمام اجراها یک مسیر کاملاً ثابت را دنبال نمی‌کند.</p>
+
+        <h3>۲. LangGraph؛ زمانی که یک مسیر خطی کافی نیست</h3>
+        <p><bdi dir="ltr" class="en">LangGraph</bdi> افزونه‌ای در اکوسیستم LangChain است که برای طراحی گردش‌کارهایی مناسب است که از یک زنجیره خطی ساده پیچیده‌تر هستند. در این ابزار می‌توان گردش‌کار را به شکل یک گراف جهت‌دار از گره‌ها نمایش داد.</p>
+        <p>در چنین گرافی، گره‌ها مراحل یا اجزای فرایند هستند و یال‌ها جهت انتقال و ارتباط میان آن‌ها را نشان می‌دهند. این ساختار برای سناریوهایی مناسب است که شاخه‌های مختلف، تصمیم‌گیری یا همکاری چند عامل در آن‌ها وجود دارد.</p>
+        <div class="box note">
+          <p><strong>چه زمانی سراغ این مجموعه برویم؟</strong> وقتی به یک پایه منعطف برای ساخت برنامه‌های ساده تا سامانه‌های پیچیده‌تر نیاز داریم؛ از یک ربات پرسش‌های متداول گرفته تا گرافی از چند عامل همکار.</p>
+        </div>
+
+        <h3>۳. Microsoft AutoGen؛ گفت‌وگوی ساختاریافته میان چند عامل</h3>
+        <p><bdi dir="ltr" class="en">AutoGen</bdi> چارچوبی از Microsoft است که تمرکز ویژه‌ای بر مکالمه و همکاری میان چند عامل دارد. در این روش، به هر عامل یک نقش مشخص اختصاص می‌دهیم؛ برای مثال:</p>
+        <ul>
+          <li><strong>پژوهشگر:</strong> اطلاعات موردنیاز را جمع‌آوری می‌کند.</li>
+          <li><strong>برنامه‌نویس:</strong> راه‌حل یا کد لازم را تولید می‌کند.</li>
+          <li><strong>بازبین:</strong> نتیجه را بررسی می‌کند و درباره کیفیت آن بازخورد می‌دهد.</li>
+        </ul>
+        <p>چارچوب، گفت‌وگوی ساختاریافته میان این عامل‌ها را مدیریت می‌کند. عامل‌ها می‌توانند پیام ردوبدل کنند، از حافظه مشترک استفاده کنند و در تصمیم‌گیری مشارکت داشته باشند. این ابزار برای مسائلی مناسب است که تقسیم مسئولیت و همکاری تخصصی میان عامل‌ها اهمیت دارد. در متن درس، یکپارچگی آن با گردش‌کارهای Azure و OpenAI نیز به‌عنوان یکی از مزیت‌هایش مطرح می‌شود.</p>
+
+        <h3>۴. CrewAI؛ سازمان‌دهی یک گروه از عامل‌ها</h3>
+        <p><bdi dir="ltr" class="en">CrewAI</bdi> برای سازمان‌دهی گروهی از عامل‌ها طراحی شده است. هر عامل می‌تواند پیشینه یا نقش مشخص و هدفی معین داشته باشد و اعضای گروه با کمک منطق واگذاری وظایف، کارها را میان خود تقسیم کنند.</p>
+        <p>این چارچوب یک رابط برنامه‌نویسی ساده‌تر و همچنین یک محیط استودیویی بدون نیاز به کدنویسی برای کاربران کسب‌وکار ارائه می‌کند. در پشت صحنه می‌تواند از ابزارهای اکوسیستم LangChain نیز استفاده کند.</p>
+        <p>CrewAI برای سناریوهایی مناسب است که می‌خواهیم چند عامل مانند اعضای یک تیم با هم همکاری کنند؛ برای مثال یک گروه کاری که هر عضو مسئولیت متفاوتی در پیشبرد پروژه دارد، یا نمونه نمایشی سریعی که افراد غیرفنی نیز بتوانند منطق آن را درک کنند.</p>
+
+        <h3>۵. Google ADK؛ توسعه عامل در اکوسیستم Google Cloud</h3>
+        <p><bdi dir="ltr" class="en">ADK</bdi> مخفف <bdi dir="ltr" class="en">Agent Development Kit</bdi> و چارچوب توسعه عامل گوگل است. این ابزار، الگوها و تجربه‌های گوگل در ساخت سامانه‌های پیچیده و مشارکتی عامل‌ها را در قالب یک بسته توسعه در اختیار برنامه‌نویسان قرار می‌دهد.</p>
+        <p>این چارچوب امکان اتصال مستقیم به <bdi dir="ltr" class="en">Vertex AI</bdi> و مدل‌های <bdi dir="ltr" class="en">Gemini</bdi> را فراهم می‌کند و مجموعه‌ای از اتصال‌دهنده‌های سازمانی، از جمله ابزارهایی مانند <bdi dir="ltr" class="en">BigQuery</bdi> و <bdi dir="ltr" class="en">SAP</bdi> را پشتیبانی می‌کند.</p>
+        <p>اگر سازمان از قبل در اکوسیستم Google Cloud فعالیت می‌کند، ADK می‌تواند بخشی از کارهای اتصال و آماده‌سازی زیرساخت را ساده کند. این گزینه به‌ویژه برای سازمان‌هایی مطرح است که می‌خواهند عامل‌های خود را به داده‌های اختصاصی متصل کنند و هم‌زمان روی حاکمیت و امنیت کنترل داشته باشند.</p>
+
+        <h3>۶. Flowise؛ ساخت عامل با ابزارهای کم‌کد و بدون‌کد</h3>
+        <p><bdi dir="ltr" class="en">Flowise</bdi> امکان ساخت عامل‌ها را برای افرادی که توسعه‌دهنده حرفه‌ای نیستند ساده‌تر می‌کند. این ابزار بخشی از پیچیدگی پیاده‌سازی مبتنی بر JavaScript در LangChain را پشت یک محیط دیداری از نوع کشیدن و رها کردن پنهان می‌کند.</p>
+        <p>در محیط آن، هر بلوک می‌تواند نماینده یک پرامپت، ابزار یا حتی یک عامل کامل باشد. Flowise از منطق شاخه‌ای، نقاط بررسی با حضور انسان و قابلیت مشاهده‌پذیری فرایند نیز پشتیبانی می‌کند.</p>
+        <p>پس از تکمیل گردش‌کار، می‌توان آن را به شکل یک <bdi dir="ltr" class="en">REST Endpoint</bdi> یا یک ابزار گفت‌وگو که داخل وب‌سایت قرار می‌گیرد، منتشر کرد. این ویژگی برای نمونه‌سازی سریع و بررسی تجربه کاربری همراه با مدیران محصول مفید است.</p>
+
+        <h3>مقایسه سریع چارچوب‌ها</h3>
+        <div class="table-scroll">
+          <table dir="rtl">
+            <thead>
+              <tr><th>چارچوب</th><th>تمرکز اصلی</th><th>مناسب برای</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><bdi dir="ltr" class="en">LangChain</bdi></td><td>زنجیره‌ها، عامل‌ها و ابزارهای توسعه</td><td>ساخت برنامه‌های مبتنی بر مدل زبانی با سطح پیچیدگی متفاوت</td></tr>
+              <tr><td><bdi dir="ltr" class="en">LangGraph</bdi></td><td>گردش‌کار گراف‌محور و چندشاخه</td><td>فرایندهایی که یک زنجیره خطی برایشان کافی نیست</td></tr>
+              <tr><td><bdi dir="ltr" class="en">AutoGen</bdi></td><td>گفت‌وگوی چندعاملی با نقش‌های مشخص</td><td>وظایف نیازمند تخصص و همکاری چند عامل</td></tr>
+              <tr><td><bdi dir="ltr" class="en">CrewAI</bdi></td><td>سازمان‌دهی گروه عامل‌ها و واگذاری وظایف</td><td>شبیه‌سازی یک تیم همکار و ساخت نمونه‌های قابل‌فهم</td></tr>
+              <tr><td><bdi dir="ltr" class="en">Google ADK</bdi></td><td>توسعه عامل در اکوسیستم Google Cloud</td><td>یکپارچه‌سازی سازمانی با داده‌ها و سرویس‌های گوگل</td></tr>
+              <tr><td><bdi dir="ltr" class="en">Flowise</bdi></td><td>ساخت دیداری با رویکرد کم‌کد و بدون‌کد</td><td>نمونه‌سازی سریع و توسعه برای کاربران غیرفنی</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="box warning">
+          <p><strong>چطور چارچوب مناسب را انتخاب کنیم؟</strong> صرفاً محبوبیت ابزار کافی نیست. ابتدا مشخص کنید مسئله شما به زنجیره‌ای ثابت، یک عامل منعطف، همکاری چند عامل، اتصال سازمانی یا محیط دیداری کم‌کد نیاز دارد؛ سپس چارچوب را بر اساس همان نیاز انتخاب کنید.</p>
+        </div>
+      </section>
+
+      <section class="section red" id="deployment">
+        <h2 class="section-title">🚀 ۶. استقرار عامل در محیط واقعی</h2>
+        <p>فرض کنید نمونه اولیه عامل خود را ساخته‌اید و در محیط توسعه، مثلاً یک <bdi dir="ltr" class="en">Jupyter Notebook</bdi>، به‌درستی کار می‌کند. اما تا زمانی که کاربران نتوانند با آن تعامل داشته باشند، عامل هنوز به هدف نهایی خود نرسیده است.</p>
+        <p><bdi dir="ltr" class="en">Deployment</bdi> یا استقرار، فرایند قرار دادن عامل در محیطی است که بتواند در شرایط واقعی اجرا شود و کاربران یا سامانه‌های دیگر به آن دسترسی داشته باشند.</p>
+
+        <h3>عامل پس از استقرار کجا می‌تواند قرار بگیرد؟</h3>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>رابط چت در وب‌سایت</h4>
+            <p>کاربر مستقیماً در وب‌سایت با عامل گفتگو می‌کند و پاسخ را در همان صفحه دریافت می‌کند.</p>
+          </article>
+          <article class="info-card">
+            <h4>بخشی از یک پلتفرم</h4>
+            <p>عامل می‌تواند در یک بخش مشخص از محصول، مانند قسمت پرسش‌وپاسخ یک سامانه آموزشی، قرار بگیرد.</p>
+          </article>
+          <article class="info-card">
+            <h4>فرایند پس‌زمینه</h4>
+            <p>عامل ممکن است بدون رابط گفت‌وگوی مستقیم، در پشت صحنه اجرا شود و وظایف خودکار را انجام دهد.</p>
+          </article>
+        </div>
+
+        <h3>نقش خدمات ابری در استقرار</h3>
+        <p>در بسیاری از پروژه‌ها، برای استقرار عامل از خدمات ابری استفاده می‌شود. ارائه‌دهندگان بزرگ ابر ابزارهای اختصاصی دارند که اجرای مدل‌ها و برنامه‌های هوش مصنوعی را ساده‌تر می‌کنند.</p>
+        <p>برای نمونه، در اکوسیستم <bdi dir="ltr" class="en">Amazon Web Services (AWS)</bdi> سرویس‌هایی مانند موارد زیر برای بخش‌های مختلف اجرای راهکارهای هوش مصنوعی مطرح هستند:</p>
+        <ul>
+          <li><bdi dir="ltr" class="en">AWS Lambda</bdi></li>
+          <li><bdi dir="ltr" class="en">Amazon Bedrock</bdi></li>
+          <li><bdi dir="ltr" class="en">Amazon SageMaker</bdi></li>
+          <li><bdi dir="ltr" class="en">Amazon Lex</bdi></li>
+        </ul>
+        <p>پیکربندی و استقرار این سرویس‌ها معمولاً کار فنی است و در بسیاری از موارد به تخصص حوزه <bdi dir="ltr" class="en">AI Ops</bdi> نیاز دارد؛ یعنی مهارت‌هایی برای عملیاتی‌سازی، مدیریت و نگهداری سامانه‌های هوش مصنوعی.</p>
+
+        <h3>چرا استقرار ابری اهمیت دارد؟</h3>
+        <ul>
+          <li><strong>مقیاس‌پذیری:</strong> زیرساخت می‌تواند متناسب با افزایش یا کاهش تقاضا تنظیم شود.</li>
+          <li><strong>آمادگی عملیاتی:</strong> ابزارهای لازم برای اجرای سرویس در محیط واقعی فراهم می‌شوند.</li>
+          <li><strong>قابلیت اطمینان:</strong> خدمات ابری امکاناتی برای اجرای پایدارتر سامانه در اختیار سازمان می‌گذارند.</li>
+          <li><strong>ارتباط با برنامه‌ها:</strong> برنامه وب می‌تواند درخواست را به عامل بفرستد و پاسخ آن را دریافت کند.</li>
+        </ul>
+
+        <div class="path-flow">
+          <article class="path-flow__step">
+            <h3>۱. ساخت و آزمایش</h3>
+            <p>عامل در محیط توسعه ساخته و عملکرد اولیه آن بررسی می‌شود.</p>
+          </article>
+          <article class="path-flow__step">
+            <h3>۲. آماده‌سازی اجرا</h3>
+            <p>مدل، منابع محاسباتی و سرویس‌های موردنیاز برای محیط عملیاتی فراهم می‌شوند.</p>
+          </article>
+          <article class="path-flow__step">
+            <h3>۳. استقرار</h3>
+            <p>عامل در سرویس یا محیطی قرار می‌گیرد که امکان اجرای واقعی دارد.</p>
+          </article>
+          <article class="path-flow__step">
+            <h3>۴. دسترسی کاربران</h3>
+            <p>وب‌سایت، پلتفرم یا فرایند پس‌زمینه با عامل ارتباط برقرار می‌کند.</p>
+          </article>
+        </div>
+
+        <div class="box important">
+          <p><strong>تفاوت توسعه و استقرار:</strong> توسعه به ساخت و آماده‌سازی عامل مربوط است؛ استقرار یعنی قرار دادن آن در محیطی که بتواند به‌صورت عملیاتی در دسترس کاربران یا سایر سامانه‌ها قرار بگیرد.</p>
+        </div>
+      </section>
+
+      <section class="section gold" id="summary">
+        <h2 class="section-title">🧭 ۷. جمع‌بندی و نقشه تصمیم‌گیری</h2>
+        <p>برای تبدیل یک عامل آزمایشی به راهکاری قابل استفاده در کسب‌وکار، باید چند تصمیم زیرساختی مهم بگیریم: مدل را از کجا تأمین کنیم، توان پردازشی را چگونه فراهم کنیم، عامل به چه منابع دانشی نیاز دارد، با چه چارچوبی ساخته می‌شود و در کجا اجرا خواهد شد.</p>
+
+        <div class="table-scroll">
+          <table dir="rtl">
+            <thead>
+              <tr><th>موضوع</th><th>پرسش کلیدی</th><th>مفهوم یا راهکار مطرح‌شده</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>تأمین مدل</td><td>مدل را خودمان بسازیم یا از سرویس بیرونی استفاده کنیم؟</td><td>تصمیم Make vs. Buy و اتصال API</td></tr>
+              <tr><td>توان محاسباتی</td><td>سخت‌افزار داخلی تهیه کنیم یا از ابر استفاده کنیم؟</td><td>GPU و خدمات ابری</td></tr>
+              <tr><td>دانش عامل</td><td>عامل برای انجام وظیفه به چه اطلاعاتی نیاز دارد؟</td><td>Database، ERP، Knowledge Base و اینترنت</td></tr>
+              <tr><td>توسعه عامل</td><td>کدام ابزار با ساختار پروژه سازگارتر است؟</td><td>LangChain، LangGraph، AutoGen، CrewAI، Google ADK و Flowise</td></tr>
+              <tr><td>اجرای واقعی</td><td>کاربران یا سامانه‌ها چگونه به عامل دسترسی پیدا می‌کنند؟</td><td>Deployment در محیط ابری یا عملیاتی</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ul class="checklist">
+          <li>برای بسیاری از سازمان‌ها، استفاده از مدل زبانی بیرونی از ساخت مدل اختصاصی عملی‌تر است.</li>
+          <li>API رابط ارتباط عامل با مدل یا سرویس بیرونی است.</li>
+          <li>زیرساخت داخلی به سرمایه‌گذاری سخت‌افزاری و پیش‌بینی ظرفیت اوج مصرف نیاز دارد.</li>
+          <li>خدمات ابری امکان استفاده انعطاف‌پذیر از منابع محاسباتی و پرداخت متناسب با میزان استفاده را فراهم می‌کنند.</li>
+          <li>پایگاه‌های داده، ERP، پایگاه دانش و اینترنت منابعی برای غنی‌سازی دانش عامل هستند.</li>
+          <li>LangChain ابزارهایی برای ساخت زنجیره‌ها و عامل‌ها ارائه می‌کند و LangGraph برای گردش‌کارهای گراف‌محور مناسب است.</li>
+          <li>AutoGen بر گفت‌وگوی ساختاریافته چند عامل تمرکز دارد.</li>
+          <li>CrewAI گروهی از عامل‌ها را با نقش‌ها و هدف‌های مشخص سازمان‌دهی می‌کند.</li>
+          <li>Google ADK برای توسعه عامل در اکوسیستم Google Cloud و اتصال به سرویس‌های سازمانی مطرح است.</li>
+          <li>Flowise ساخت دیداری عامل‌ها را با رویکرد کم‌کد و بدون‌کد ساده‌تر می‌کند.</li>
+          <li>استقرار، عامل را از محیط آزمایشی به محیطی می‌برد که کاربران یا سامانه‌ها بتوانند از آن استفاده کنند.</li>
+        </ul>
+
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">🌐</div>
+          <div>
+            <h3>نگاه نهایی</h3>
+            <p>عامل هوش مصنوعی یک مدل تنها نیست. یک راهکار واقعی از مدل، منابع محاسباتی، داده و دانش، ابزارهای توسعه و محیط استقرار تشکیل می‌شود. انتخاب درست این اجزا است که امکان استفاده پایدار و مؤثر از عامل را در دنیای واقعی فراهم می‌کند.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="social">
+      <h2>🌱 یک قدم فراتر</h2>
+      <p>برای طراحی یک عامل واقعی، از نیاز کسب‌وکار شروع کنید: چه مدلی لازم است، چه داده‌ای باید در دسترس باشد، چه مقدار پردازش نیاز دارید و کاربر از چه مسیری با عامل ارتباط برقرار می‌کند؟ پاسخ به این پرسش‌ها انتخاب زیرساخت و ابزار مناسب را روشن‌تر می‌کند.</p>
+      <div class="buttons">
+        <a class="btn telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">پیوستن به کانال تلگرام</a>
+        <a class="btn instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">صفحه اینستاگرام</a>
+        <a class="btn btn-blue" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">ارتباط در لینکدین</a>
+      </div>
+    </section>
+
+    <nav class="lesson-navigation" aria-label="ناوبری جلسات">
+      <a class="lesson-navigation__link" href="Lesson_07.html">
+        <span><span class="lesson-navigation__label">بازگشت به جلسه قبل</span><span class="lesson-navigation__title">Lesson_07 · ساخت عامل در n8n</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_09.html">
+        <span><span class="lesson-navigation__label">ادامه مسیر یادگیری</span><span class="lesson-navigation__title">رفتن به جلسه نهم</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <footer class="site-footer">
+      <p>© MATCUB · یادداشت‌های آموزشی</p>
+      <p><a class="inline-link" href="#top">بازگشت به ابتدای صفحه</a></p>
+    </footer>
+  </main>
+</body>
+</html>

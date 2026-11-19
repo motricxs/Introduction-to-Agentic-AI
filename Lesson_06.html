@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="درسنامه ششم؛ پیاده‌سازی، پیکربندی، ایمنی و ارزیابی عامل‌های هوش مصنوعی.">
+<title>Lesson_06 | پیاده‌سازی و ارزیابی عامل‌های هوش مصنوعی</title>
+<link rel="stylesheet" href="style.css">
+<script src="quiz-engine.js" defer></script>
+<script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+<div class="reading-progress" aria-hidden="true"><span></span></div>
+<main class="container">
+<nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+<a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer"><span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span></a>
+<a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer"><span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span></a>
+<a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer"><span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span></a>
+</nav>
+<header class="topbar"><a class="topbar__brand" href="#top">MATCUB · Learning Notes</a><nav class="topbar__links" aria-label="ناوبری صفحه"><a href="#overview">معرفی</a><a href="#content">درسنامه</a><a href="#guardrails">گاردریل‌ها</a><a href="#evaluation">ارزیابی</a><a href="#quiz">آزمون</a></nav></header>
+<header class="hero" id="overview"><div class="hero-content"><div class="hero-label">🤖 مبانی عامل‌های هوش مصنوعی</div><h1>پیاده‌سازی و <span>ارزیابی عامل‌های هوش مصنوعی</span></h1><p class="hero-subtitle">از تعیین هدف و انتخاب مدل تا طراحی ابزارها، دستورالعمل‌ها، گاردریل‌های ایمنی و سنجش کیفیت عملکرد</p><div class="hero-badge">طراحی عامل قابل‌اعتماد · بهینه‌سازی عملکرد · تجربه کاربری مؤثر</div></div></header>
+<div class="lesson-meta" aria-label="اطلاعات درس"><span class="lesson-meta__item">🧭 <strong>Lesson_06</strong></span><span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی تا متوسط</strong></span><span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۲۵ دقیقه</strong></span><span class="lesson-meta__item">🧪 همراه با آزمون تعاملی</span></div>
+<div class="badges" aria-label="موضوعات درس"><span class="badge gold">پیاده‌سازی کسب‌وکاری</span><span class="badge green">انتخاب مدل و ابزار</span><span class="badge purple">مهندسی پرامپت</span><span class="badge blue">Chain of Thought</span><span class="badge orange">Guardrails و ارزیابی</span></div>
+<section class="learning-intro" aria-labelledby="learning-intro-title"><div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div><h2 id="learning-intro-title">مسیر یادگیری</h2><p>پس از آشنایی با ماهیت عامل‌ها و الگوهای طراحی آن‌ها، اکنون نوبت تصمیم‌های عملی برای ساخت و استفاده از یک عامل در کسب‌وکار است. در این جلسه، از تعریف هدف و آماده‌سازی داده تا انتخاب مدل، اتصال ابزارها، نوشتن دستورالعمل، طراحی لایه‌های ایمنی و ارزیابی عملکرد را بررسی می‌کنیم.</p><ul class="learning-objectives"><li>تعیین هدف، داده‌های موردنیاز و ساختار مناسب عامل</li><li>انتخاب مدل با توجه به دقت، سرعت، هزینه و مقیاس‌پذیری</li><li>شناخت ابزارهای داده و ابزارهای اقدام</li><li>نوشتن دستورالعمل‌های روشن و مؤثر برای عامل</li><li>تمایز میان Zero-shot، One-shot، Few-shot و Fine-tuning</li><li>درک کاربرد Chain of Thought در استدلال و شفافیت</li><li>طراحی Guardrails و سازوکار مداخله انسانی</li><li>ارزیابی عامل با معیارهای فنی و تجربه واقعی کاربران</li></ul></section>
+<nav class="toc" aria-label="فهرست مطالب"><h2>📑 فهرست مطالب</h2><ol><li><a href="#section-implementation">مراحل پیاده‌سازی عامل در کسب‌وکار</a></li><li><a href="#section-model">انتخاب مدل زبانی مناسب</a></li><li><a href="#section-tools">ابزارهای عامل: داده و اقدام</a></li><li><a href="#section-prompt">طراحی دستورالعمل و System Prompt</a></li><li><a href="#section-shot">Zero-shot، One-shot و Few-shot</a></li><li><a href="#section-cot">استدلال زنجیره‌ای (Chain of Thought)</a></li><li><a href="#guardrails">گاردریل‌ها و کاهش ریسک</a></li><li><a href="#section-human">مداخله و نظارت انسانی</a></li><li><a href="#evaluation">ارزیابی عملکرد عامل</a></li><li><a href="#section-summary">جمع‌بندی</a></li><li><a href="#quiz">آزمون پایانی</a></li></ol></nav>
+
+<div id="content">
+<section class="section gold" id="section-implementation">
+<h2 class="section-title">🧭 ۱. مراحل پیاده‌سازی عامل در کسب‌وکار</h2>
+<p>ساخت عامل برای یک سازمان، صرفاً انتخاب یک مدل زبانی و اتصال آن به چند ابزار نیست. پیش از توسعه باید روشن کنیم عامل قرار است چه مسئله‌ای را حل کند، به چه داده‌هایی نیاز دارد و موفقیت آن چگونه سنجیده خواهد شد.</p>
+<h3>گام اول: تعیین هدف‌های روشن</h3>
+<p>ابتدا مشخص کنید کسب‌وکار چرا به عامل نیاز دارد و چه نتیجه‌ای انتظار دارد. برای مثال، آیا هدف افزایش رضایت مشتری از طریق پشتیبانی شبانه‌روزی است یا کاهش هزینه‌ها با جایگزین کردن بخشی از ساعت‌های کاری انسانی با فعالیت عامل؟ هدف روشن به طراحی نقشه راه کمک می‌کند و مشخص می‌سازد موفقیت پروژه چه شکلی خواهد بود.</p>
+<h3>گام دوم: شناسایی داده‌های موردنیاز</h3>
+<p>عامل برای آموزش، شکل‌دهی پایگاه دانش و اجرای وظایف به داده‌های باکیفیت و قابل‌اعتماد نیاز دارد. باید بررسی کنید چه اطلاعاتی در سامانه‌های داخلی سازمان وجود دارد و چگونه می‌توان آن‌ها را به شکلی پایدار در اختیار عامل قرار داد.</p>
+<h3>گام سوم: انتخاب ساختار و نوع عامل</h3>
+<p>فرایند کاری را ترسیم کنید و بر اساس پیچیدگی وظیفه، ساختار مناسبی برگزینید. یک چت‌بات ساده که به پرسش‌های متداول وب‌سایت پاسخ می‌دهد، ممکن است با یک عامل واکنشی ساده نیاز خود را برطرف کند. اما عاملی که باید آخرین پیشنهاد فروش را پیدا کند، با پیشنهادهای رقبا مقایسه کند و مزیت قیمت و ویژگی‌های محصول را توضیح دهد، به توانایی یادگیری و سازگاری با محیط متغیر نیاز دارد؛ در این مثال، عامل یادگیرنده انتخاب مناسب‌تری است.</p>
+<h3>گام چهارم: یکپارچه‌سازی و ساخت نمونه اولیه</h3>
+<p>سامانه‌های داخلی باید اطلاعات لازم را در اختیار عامل قرار دهند. پس از آماده شدن نمونه اولیه، تجربه کاربری را بررسی کنید: کاربران چگونه با عامل تعامل می‌کنند؟ کجا دچار سردرگمی می‌شوند؟ کدام دستورالعمل‌ها باید اصلاح شوند؟</p>
+<h3>گام پنجم: استقرار و پایش</h3>
+<p>پس از استقرار در محیط عملیاتی، عملکرد عامل باید با شاخص‌های کلیدی عملکرد یا <bdi dir="ltr" class="en">KPI</bdi>ها پایش شود. نظارت انسانی نیز ضروری است؛ زیرا اعداد همیشه تمام واقعیت تجربه کاربران یا کیفیت تصمیم‌ها را نشان نمی‌دهند. برای وظایف پیچیده یا حساس باید قواعد روشنی وجود داشته باشد که مشخص کند انسان چه زمانی و چگونه وارد فرایند شود.</p>
+<div class="path-flow"><div class="path-flow__step"><h3>تعیین هدف</h3><p>تعریف مسئله کسب‌وکار و نتیجه مورد انتظار.</p></div><div class="path-flow__step"><h3>آماده‌سازی داده</h3><p>شناسایی داده‌های باکیفیت و قابل‌اعتماد.</p></div><div class="path-flow__step"><h3>طراحی و نمونه‌سازی</h3><p>انتخاب نوع عامل، اتصال سامانه‌ها و آزمودن نمونه اولیه.</p></div><div class="path-flow__step"><h3>استقرار و پایش</h3><p>اندازه‌گیری KPIها، بررسی تجربه کاربر و مداخله انسانی در مواقع لازم.</p></div></div>
+<div class="key-takeaway"><div class="key-takeaway__icon" aria-hidden="true">🎯</div><div><h3>اصل اجرایی</h3><p>پروژه را با هدف و معیار موفقیت آغاز کنید، نه با انتخاب مدل. مدل و معماری باید در خدمت مسئله واقعی کسب‌وکار باشند.</p></div></div>
+</section>
+
+<section class="section blue" id="section-model">
+<h2 class="section-title">🧠 ۲. انتخاب مدل زبانی مناسب برای عامل</h2>
+<p>مدل‌های زبانی بزرگ متعددی با توانایی‌ها و ویژگی‌های متفاوت وجود دارند. بنابراین انتخاب مدل مناسب همیشه به معنای انتخاب پیشرفته‌ترین مدل نیست؛ تصمیم درست به نوع وظیفه و محدودیت‌های پروژه بستگی دارد. برخی مدل‌ها در حل مسائل پیچیده عملکرد خوبی دارند، اما ممکن است کندتر و پرهزینه‌تر باشند. مدل‌های سبک‌تر سریع و ارزان‌اند، ولی برای وظایف دشوار ممکن است توانایی کافی نداشته باشند.</p>
+<h3>مدل را متناسب با پیچیدگی وظیفه انتخاب کنید</h3>
+<div class="info-grid"><article class="info-card"><h4>وظایف ساده و پرتکرار</h4><p>برای پاسخ سریع به پرسش‌های متداول یا تشخیص قصد کاربر، یک مدل ساده‌تر و سریع‌تر ممکن است کافی باشد.</p></article><article class="info-card"><h4>تصمیم‌های پیچیده و حساس</h4><p>برای تصمیم‌هایی مانند بررسی واجد شرایط بودن مشتری برای بازپرداخت یا ارزیابی درخواست وام، معمولاً به مدل توانمندتری نیاز است.</p></article></div>
+<h3>روش پیشنهادی: ساخت خط مبنا و سپس بهینه‌سازی</h3>
+<p>نمونه اولیه عامل را ابتدا با توانمندترین مدل مناسب بسازید و عملکرد آن را به‌عنوان خط مبنا ثبت کنید. پس از رسیدن به سطح عملکرد موردنیاز، مدل‌های دیگر را آزمایش کنید و بسنجید آیا کیفیت خروجی آن‌ها در مقایسه با خط مبنا همچنان قابل‌قبول است یا نه. به این ترتیب ابتدا مطمئن می‌شوید وظیفه به‌درستی قابل انجام است و سپس به سراغ اجرای کارآمدتر آن می‌روید.</p>
+<div class="table-scroll"><table><thead><tr><th>معیار تصمیم</th><th>پرسش راهنما</th><th>اهمیت در انتخاب</th></tr></thead><tbody><tr><td>دقت</td><td>آیا مدل پاسخ‌ها و تصمیم‌های درست تولید می‌کند؟</td><td>برای وظایف حساس و پیچیده بسیار مهم است.</td></tr><tr><td>سرعت</td><td>پاسخ‌گویی با چه تأخیری انجام می‌شود؟</td><td>برای تعامل سریع و حجم بالای درخواست‌ها اهمیت دارد.</td></tr><tr><td>هزینه</td><td>اجرای مدل در مقیاس موردنظر چقدر هزینه دارد؟</td><td>بر پایداری اقتصادی راهکار اثر می‌گذارد.</td></tr><tr><td>مقیاس‌پذیری</td><td>آیا مدل با افزایش کاربران و درخواست‌ها همچنان قابل استفاده است؟</td><td>برای رشد و گسترش سامانه ضروری است.</td></tr></tbody></table></div>
+<div class="box important"><p>انتخاب مدل یک تصمیم مبتنی بر موازنه است: دقت، سرعت، هزینه و مقیاس‌پذیری باید در کنار یکدیگر سنجیده شوند. استفاده از پیشرفته‌ترین مدل برای تمام وظایف، لزوماً بهترین تصمیم کسب‌وکاری نیست.</p></div>
+</section>
+
+<section class="section green" id="section-tools">
+<h2 class="section-title">🔌 ۳. ابزارهای عامل: ابزارهای داده و ابزارهای اقدام</h2>
+<p>عامل‌ها برای ارتباط با نرم‌افزارهای دیگر به ابزار نیاز دارند. رابط‌های برنامه‌نویسی یا <bdi dir="ltr" class="en">API</bdi>ها اغلب نقش پلی میان عامل و سامانه‌های نرم‌افزاری را ایفا می‌کنند. اگر نرم‌افزار موردنظر API نداشته باشد، گاهی عامل می‌تواند مانند یک کاربر انسانی از رابط کاربری آن استفاده کند؛ بااین‌حال این روش ایده‌آل نیست و ممکن است دقت درک عامل و کیفیت اقدام‌های آن را کاهش دهد. دریافت داده ساختاریافته، مانند یک جدول، معمولاً از جست‌وجوی دستی در صفحات وب برای یافتن همان اطلاعات روشن‌تر است.</p>
+<h3>نوع اول: ابزارهای داده (Data Tools)</h3>
+<p>ابزارهای داده به عامل کمک می‌کنند اطلاعات موردنیاز را پیدا و دریافت کند. این ابزارها محیط را تغییر نمی‌دهند؛ بلکه اطلاعات لازم برای برنامه‌ریزی و اجرای وظایف را فراهم می‌کنند.</p>
+<ul><li>بررسی اطلاعات یک مشتری در پایگاه داده</li><li>خواندن و استخراج اطلاعات از یک فایل PDF</li><li>جست‌وجوی اطلاعات در وب</li><li>دریافت داده از یک سامانه داخلی یا API</li></ul>
+<h3>نوع دوم: ابزارهای اقدام (Action Tools)</h3>
+<p>ابزارهای اقدام به عامل اجازه می‌دهند کاری انجام دهد و محیط را تغییر دهد. این ابزارها برای اجرای تصمیم‌ها و تحقق هدف عامل به کار می‌روند.</p>
+<ul><li>تنظیم جلسه در تقویم</li><li>ایجاد تیکت پشتیبانی مشتری</li><li>رسیدگی به درخواست بازپرداخت</li><li>ارسال پیام یا ثبت یک عملیات در سامانه سازمانی</li></ul>
+<div class="concept-grid"><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">📥</div><h3>ابزار داده</h3><p>اطلاعات را بازیابی می‌کند تا عامل بتواند وضعیت را بفهمد و تصمیم بگیرد.</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">⚡</div><h3>ابزار اقدام</h3><p>تصمیم عامل را به عملی مشخص تبدیل می‌کند و تغییری در محیط ایجاد می‌کند.</p></article></div>
+<div class="box note"><p>برای تشخیص نوع ابزار بپرسید: آیا ابزار فقط اطلاعاتی به عامل می‌دهد یا باعث انجام عملی در یک سامانه می‌شود؟ مورد اول ابزار داده و مورد دوم ابزار اقدام است.</p></div>
+</section>
+
+<section class="section purple" id="section-prompt">
+<h2 class="section-title">✍️ ۴. طراحی دستورالعمل و System Prompt</h2>
+<p>مهندسی پرامپت به معنای ارائه دستورالعمل‌های روشن به مدل زبانی است تا ابهام کاهش یابد و کیفیت خروجی بهتر شود. همین اصل در طراحی عامل‌ها نیز اهمیت دارد. یک <bdi dir="ltr" class="en">System Prompt</bdi> مناسب می‌تواند تصمیم‌گیری عامل را بهبود دهد و اجرای گردش‌کار را با خطاهای کمتری همراه کند.</p>
+<h3>۱. استفاده از اسناد موجود برای ساخت روال‌های قابل‌فهم برای مدل</h3>
+<p>اسناد و دانش سازمانی را به روال‌ها و دستورالعمل‌هایی تبدیل کنید که مدل بتواند به‌آسانی از آن‌ها استفاده کند. یک پایگاه دانش باکیفیت، زمینه و اطلاعات موردنیاز را برای تولید خروجی مناسب در اختیار عامل قرار می‌دهد.</p>
+<h3>۲. شکستن وظایف به گام‌های کوچک‌تر</h3>
+<p>عامل را راهنمایی کنید که کارهای پیچیده را به چند زیرکار تقسیم کند. این کار پردازش مسئله را ساده‌تر می‌کند و احتمال عبور از محدودیت پنجره زمینه مدل هنگام تولید خروجی را کاهش می‌دهد.</p>
+<h3>۳. تعریف اقدام‌های روشن و صریح</h3>
+<p>دستورالعمل‌ها باید کوتاه، روشن و بدون ابهام باشند. عبارت کلی «به مشتری در مورد سفارش کمک کن» فضای زیادی برای تفسیر باقی می‌گذارد. بهتر است دقیقاً مشخص کنید عامل چه مراحلی را انجام دهد.</p>
+<div class="box example"><p><strong>نمونه دستورالعمل عملیاتی:</strong> اگر مشتری گزارش کرد سفارش به دستش نرسیده است، ابتدا شناسه سفارش را دریافت کن و وضعیت ارسال را بررسی کن. اگر سفارش با تأخیر مواجه شده است، امکان ارسال مجدد یا بازپرداخت را مطابق سیاست سازمان به مشتری پیشنهاد بده.</p></div>
+<h3>۴. پیش‌بینی و پوشش حالت‌های مرزی</h3>
+<p>حالت‌های مرزی یا <bdi dir="ltr" class="en">Edge Cases</bdi> موقعیت‌های غیرمعمولی هستند که ممکن است در استفاده واقعی رخ دهند. نمی‌توان همه آن‌ها را از ابتدا پیش‌بینی کرد؛ بخشی از آن‌ها پس از استقرار عامل آشکار می‌شوند. بااین‌حال، فکر کردن به سناریوهای محتمل پیش از راه‌اندازی می‌تواند تجربه کاربری را از همان ابتدا بهتر کند.</p>
+<div class="box example"><p><strong>مثال:</strong> ممکن است مشتری پس از پایان مهلت مجاز بازگشت کالا درخواست بازپرداخت کند. عامل باید سیاست بازپرداخت را مؤدبانه توضیح دهد و در صورت امکان، راهکار جایگزینی مانند اعتبار خرید یا تعویض کالا را پیشنهاد کند.</p></div>
+<div class="key-takeaway"><div class="key-takeaway__icon" aria-hidden="true">🧩</div><div><h3>چک‌لیست دستورالعمل مؤثر</h3><p>دانش معتبر فراهم کنید، وظایف را خرد کنید، اقدام‌های دقیق تعریف کنید و برای موقعیت‌های غیرمعمول پاسخ مشخصی در نظر بگیرید. دستورالعمل‌ها را پس از مشاهده رفتار واقعی عامل نیز به‌روزرسانی کنید.</p></div></div>
+</section>
+
+<section class="section orange" id="section-shot">
+<h2 class="section-title">🎓 ۵. Zero-shot، One-shot و Few-shot Prompting</h2>
+<p>یکی از تصمیم‌های مهم در تنظیم رفتار مدل، تعیین تعداد مثال‌هایی است که همراه دستورالعمل در اختیار آن قرار می‌دهیم. این روش‌ها را می‌توان با میزان آموزش اولیه یک نیروی فروش تازه‌کار مقایسه کرد.</p>
+<div class="info-grid"><article class="info-card"><h4><bdi dir="ltr" class="en">Zero-shot Prompting</bdi></h4><p>مدل فقط دستور را دریافت می‌کند و هیچ نمونه‌ای از خروجی مطلوب به آن داده نمی‌شود. مدل برای انجام کار به دانش قبلی خود تکیه می‌کند.</p></article><article class="info-card"><h4><bdi dir="ltr" class="en">One-shot Prompting</bdi></h4><p>علاوه بر دستورالعمل، یک مثال در اختیار مدل قرار می‌گیرد تا الگوی مورد انتظار را مشاهده کند.</p></article><article class="info-card"><h4><bdi dir="ltr" class="en">Few-shot Prompting</bdi></h4><p>دستورالعمل همراه با تعداد کمی مثال، معمولاً بین دو تا ده نمونه، به مدل داده می‌شود.</p></article><article class="info-card"><h4><bdi dir="ltr" class="en">Fine-tuning</bdi></h4><p>به‌جای چند مثال محدود در پرامپت، مدل با فرایند آموزشی گسترده‌تر و داده‌های بیشتر تنظیم می‌شود.</p></article></div>
+<h3>مثال با آموزش یک نیروی فروش</h3>
+<p>تصور کنید به‌عنوان نیروی فروش در یک فروشگاه خدمات ارتباطی استخدام شده‌اید:</p>
+<ul><li><strong>Zero-shot:</strong> بدون اینکه کسی شیوه کار را به شما نشان دهد، تنها با تکیه بر تجربه قبلی و مهارت ارتباطی خود به مشتریان پاسخ می‌دهید.</li><li><strong>One-shot:</strong> مدیر یک بار نحوه پاسخ‌گویی به مشتری را به شما نشان می‌دهد و سپس مسئولیت ادامه کار را به شما می‌سپارد.</li><li><strong>Few-shot:</strong> مدیر چند نمونه از تعامل با مشتریان را نمایش می‌دهد تا با چند الگوی مختلف آشنا شوید.</li><li><strong>Fine-tuning:</strong> طی چند هفته، آموزش ساختاریافته، تمرین نقش‌آفرینی، تمرین فروش و بازبینی عملکرد را پشت سر می‌گذارید.</li></ul>
+<div class="table-scroll"><table><thead><tr><th>روش</th><th>تعداد مثال در پرامپت</th><th>مبنای عملکرد مدل</th></tr></thead><tbody><tr><td><bdi dir="ltr" class="en">Zero-shot</bdi></td><td>صفر</td><td>دستور و دانش قبلی مدل</td></tr><tr><td><bdi dir="ltr" class="en">One-shot</bdi></td><td>یک</td><td>دستور به‌علاوه یک نمونه</td></tr><tr><td><bdi dir="ltr" class="en">Few-shot</bdi></td><td>معمولاً ۲ تا ۱۰</td><td>دستور به‌علاوه چند نمونه محدود</td></tr><tr><td><bdi dir="ltr" class="en">Fine-tuning</bdi></td><td>محدود به چند مثال در پرامپت نیست</td><td>آموزش و تنظیم گسترده‌تر مدل</td></tr></tbody></table></div>
+<p>همان‌طور که عملکرد نیروی فروش می‌تواند با میزان آموزش تغییر کند، اثربخشی عامل نیز به راهبرد پرامپت‌نویسی یا فرایند تنظیم مدل وابسته است. انتخاب روش مناسب کمک می‌کند عامل در کاربرد واقعی خروجی باثبات‌تری ارائه دهد.</p>
+</section>
+
+<section class="section blue" id="section-cot">
+<h2 class="section-title">🔍 ۶. استدلال زنجیره‌ای (Chain of Thought - CoT)</h2>
+<p>استدلال زنجیره‌ای یا <bdi dir="ltr" class="en">Chain of Thought (CoT)</bdi> روشی در مهندسی پرامپت است که از مدل می‌خواهد مسیر استدلال و گام‌های میانی لازم برای رسیدن به نتیجه را توضیح دهد.</p>
+<p>فرض کنید از مدل بپرسید بهترین ماه برای سفر ساحلی به یونان، با بودجه محدود، کدام است. پاسخ کوتاه ممکن است فقط نام «سپتامبر» باشد. چنین پاسخی نتیجه را می‌گوید، اما منطق انتخاب آن را روشن نمی‌کند.</p>
+<p>در یک پاسخ همراه با توضیح گام‌به‌گام، مدل می‌تواند ماه‌های مناسب برای ساحل را بررسی کند، تفاوت قیمت فصل‌های شلوغ و خلوت را در نظر بگیرد و سپس میان ماه‌های باقی‌مانده گزینه‌ای را انتخاب کند که با معیارهای سفر سازگارتر است.</p>
+<h3>چرا این روش برای طراحی عامل اهمیت دارد؟</h3>
+<div class="concept-grid"><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🧭</div><h3>بهبود تصمیم‌گیری در وظایف پیچیده</h3><p>تقسیم مسئله به گام‌های استدلالی می‌تواند به عامل کمک کند ارتباط میان اطلاعات و تصمیم نهایی را بهتر دنبال کند.</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🔎</div><h3>شفافیت بیشتر برای مهندسان</h3><p>مشاهده توضیح مراحل تصمیم‌گیری، بررسی منطق عامل و شناسایی نقاطی را که ممکن است در آن‌ها خطا رخ داده باشد آسان‌تر می‌کند.</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🛠️</div><h3>اصلاح خطاها</h3><p>وقتی مسیر تصمیم‌گیری قابل بررسی باشد، یافتن منشأ برخی خطاها و اصلاح دستورالعمل یا فرایند آسان‌تر می‌شود.</p></article></div>
+<div class="box note"><p>در طراحی سامانه، هدف از درخواست توضیح و مراحل استدلال، فراهم کردن امکان بررسی و ارزیابی تصمیم‌هاست. این کار به‌تنهایی تضمین نمی‌کند که نتیجه درست باشد؛ خروجی عامل همچنان باید با معیارها و آزمون‌های مناسب ارزیابی شود.</p></div>
+</section>
+
+<section class="section red" id="guardrails">
+<h2 class="section-title">🛡️ ۷. گاردریل‌ها؛ لایه‌های محافظتی عامل</h2>
+<p>برای درک گاردریل‌ها، ایمنی جاده را در نظر بگیرید. حفاظ کنار جاده مانع خروج خودرو از مسیر می‌شود، محدودیت سرعت احتمال از دست رفتن کنترل را کاهش می‌دهد، چراغ راهنمایی جریان خودروها را تنظیم می‌کند و تابلوها راننده را از خطرهای پیش‌رو آگاه می‌سازند. ایمنی جاده با یک ابزار واحد تأمین نمی‌شود؛ چند سازوکار تخصصی در کنار هم از خطرهای متفاوت جلوگیری می‌کنند.</p>
+<p>در طراحی عامل‌های هوش مصنوعی نیز باید از چند لایه محافظتی متناسب با ریسک‌های مختلف استفاده کنیم.</p>
+<h3>ریسک‌هایی که گاردریل‌ها باید پوشش دهند</h3>
+<div class="info-grid"><article class="info-card"><h4>امنیت اطلاعات (Information Security)</h4><p>عامل ممکن است ناخواسته اطلاعات حساس یا محرمانه را افشا کند. باید این خطر شناسایی شود و با کنترل‌های مناسب کاهش یابد.</p></article><article class="info-card"><h4>هم‌راستایی با برند (Brand Alignment)</h4><p>رفتار و لحن عامل باید با فرهنگ و هویت سازمان هماهنگ باشد. پاسخ نامتناسب می‌تواند به اعتبار برند آسیب بزند.</p></article><article class="info-card"><h4>دقت (Accuracy)</h4><p>گاردریل‌های دقت به کاهش پاسخ‌های ساختگی یا نادرست کمک می‌کنند و از ارائه اطلاعات نامطمئن جلوگیری می‌کنند.</p></article></div>
+<h3>سه راهنمای کلیدی برای طراحی گاردریل</h3>
+<ol><li><strong>حریم خصوصی داده و ایمنی محتوا را در اولویت قرار دهید.</strong> دسترسی‌ها و نوع محتوایی را که عامل می‌تواند پردازش یا ارائه کند، متناسب با نیاز و ریسک محدود کنید.</li><li><strong>بر اساس خطاها و حالت‌های مرزی واقعی، لایه‌های تازه اضافه کنید.</strong> تجربه محیط عملیاتی نشان می‌دهد چه سناریوهایی از ابتدا پیش‌بینی نشده‌اند.</li><li><strong>میان امنیت و تجربه کاربری تعادل برقرار کنید.</strong> گاردریل‌ها را با تکامل عامل و مشاهده رفتار واقعی آن به‌طور مستمر بازبینی و اصلاح کنید.</li></ol>
+<div class="key-takeaway"><div class="key-takeaway__icon" aria-hidden="true">🔐</div><div><h3>ایمنی، حاصل چند لایه مکمل است</h3><p>یک کنترل منفرد معمولاً برای پوشش همه خطرها کافی نیست. ترکیب کنترل‌های حریم خصوصی، ایمنی محتوا، دقت و انطباق با برند، سامانه‌ای مقاوم‌تر و قابل‌اعتمادتر ایجاد می‌کند.</p></div></div>
+</section>
+
+<section class="section orange" id="section-human">
+<h2 class="section-title">🙋 ۸. مداخله و نظارت انسانی</h2>
+<p>یکی از سازوکارهای مهم کاهش ریسک، حضور انسان در فرایند استفاده از عامل است؛ به‌ویژه در مراحل اولیه استقرار. انسان‌ها از شهود و درک متعارف برخوردارند و ممکن است شکست‌ها، موقعیت‌های خاص و فرصت‌های بهبود را تشخیص دهند؛ مواردی که آزمون‌های خودکار به‌تنهایی همیشه قادر به شناسایی آن‌ها نیستند.</p>
+<p>نظارت انسانی یک سازوکار بازخورد مهم است و به شناسایی خطاهای ظریف و نادرستی‌هایی کمک می‌کند که ممکن است در معیارهای کمی آشکار نشوند.</p>
+<h3>چه زمانی باید انسان وارد فرایند شود؟</h3>
+<p>توسعه‌دهندگان می‌توانند سازوکاری تعریف کنند که هرگاه عامل از درستی بهترین پاسخ ممکن مطمئن نیست یا با مسئله‌ای حساس و پیچیده روبه‌رو می‌شود، کنترل را به انسان واگذار کند.</p>
+<div class="info-grid"><article class="info-card"><h4>در خدمات مشتری</h4><p>درخواست یا مسئله‌ای که عامل نمی‌تواند با اطمینان حل کند، به کارشناس انسانی ارجاع داده می‌شود.</p></article><article class="info-card"><h4>در عامل برنامه‌نویسی</h4><p>عامل در صورت نیاز کنترل را به کاربر بازمی‌گرداند تا انسان تصمیم بگیرد یا مرحله بعدی را تأیید کند.</p></article></div>
+<div class="box important"><p>مداخله انسانی به معنی شکست عامل نیست؛ بخشی از طراحی مسئولانه سامانه است. باید از ابتدا مشخص باشد در چه شرایطی ارجاع انجام می‌شود و پس از آن چه کسی مسئول ادامه کار است.</p></div>
+</section>
+
+<section class="section green" id="evaluation">
+<h2 class="section-title">📊 ۹. ارزیابی عملکرد عامل هوش مصنوعی</h2>
+<p>برای اینکه بدانیم یک عامل واقعاً خوب و مؤثر است، باید چند معیار را هم‌زمان بررسی کنیم. پاسخ سریع به‌تنهایی کافی نیست؛ اگر پاسخ نادرست باشد، سرعت بالا ارزشی ندارد. همچنین ادب و رعایت اصول اخلاقی مهم‌اند، اما اگر عامل نتواند وظیفه‌ای را که برای آن ساخته شده انجام دهد، عملکرد مطلوبی نخواهد داشت.</p>
+<h3>پنج معیار اصلی ارزیابی</h3>
+<div class="concept-grid"><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🎯</div><h3>دقت (Accuracy)</h3><p>عامل تا چه اندازه پاسخ یا تصمیم درست ارائه می‌کند؟</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">⚡</div><h3>سرعت (Speed)</h3><p>عامل با چه سرعتی وظیفه را انجام می‌دهد و پاسخ می‌دهد؟</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🧩</div><h3>انسجام (Coherence)</h3><p>آیا پاسخ‌ها روشن، مرتبط و سازگار با زمینه مکالمه هستند؟</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">💰</div><h3>هزینه (Cost)</h3><p>اجرای عامل برای سازمان چه هزینه‌ای ایجاد می‌کند؟</p></article><article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🛡️</div><h3>ایمنی (Safety)</h3><p>آیا عامل در چارچوب محدودیت‌ها و سیاست‌های ایمن عمل می‌کند؟</p></article></div>
+<h3>معیارهای مهم با توجه به کاربرد تغییر می‌کنند</h3>
+<p>ارزیابی باید با هدف و زمینه استفاده از عامل هماهنگ باشد. اولویت‌های یک چت‌بات خدمات مشتری با یک عامل معامله‌گر خودکار یکسان نیست.</p>
+<div class="table-scroll"><table><thead><tr><th>نوع عامل</th><th>ویژگی‌های مهم‌تر</th><th>دلیل اولویت</th></tr></thead><tbody><tr><td>چت‌بات خدمات مشتری</td><td>انسجام و ایمنی</td><td>تعامل باید روشن، قابل‌فهم و ایمن باشد تا ارتباط مناسبی با مشتری شکل بگیرد.</td></tr><tr><td>عامل معامله‌گر خودکار</td><td>دقت و سرعت</td><td>عامل باید فرصت‌های بازار را درست تشخیص دهد و بتواند به‌موقع به آن‌ها واکنش نشان دهد.</td></tr></tbody></table></div>
+<h3>تجربه کاربری؛ چیزی فراتر از اعداد</h3>
+<p>فرض کنید یک چت‌بات املاک پاسخ‌های دقیقی ارائه می‌کند و اطلاعات را مستقیماً از فهرست املاک و منابع داده ساختاریافته دریافت می‌کند. از نظر فنی، سامانه درست کار می‌کند؛ اما در آزمون اولیه کاربران متوجه می‌شویم که مردم به چت‌بات اعتماد نمی‌کنند.</p>
+<p>مشکل، دقت پاسخ‌ها نیست؛ شیوه ارتباط عامل است. پاسخ‌ها رباتیک و تکراری به نظر می‌رسند و حس گفت‌وگو با یک کارمند خشک و اداری را منتقل می‌کنند. هیچ‌یک از معیارهای فنی موجود این ضعف ظریف را به‌خوبی نشان نداده است، اما این مسئله به‌وضوح بر عملکرد اثر گذاشته است.</p>
+<p>راه‌حل، افزایش دوباره دقت نبود؛ بلکه باید لحن، حافظه و آگاهی عامل از زمینه مکالمه بهبود پیدا می‌کرد. پس از این اصلاح‌ها، مشارکت و تعامل کاربران بهتر شد.</p>
+<div class="box note"><p>معیارهای کمی ضروری‌اند، اما همه مشکلات را آشکار نمی‌کنند. بازخورد دنیای واقعی و تجربه کاربر نیز برای ساخت عامل مؤثر و قابل‌اعتماد اهمیت دارند.</p></div>
+<h3>ارزیابی یک فرایند تکرارشونده است</h3>
+<p>ارزیابی نباید در پایان توسعه و پیش از استقرار نادیده گرفته شود. برای رسیدن به عملکرد مطلوب ممکن است چندین دور اصلاح در بخش‌های مختلف لازم باشد. تصمیم‌گیری مبتنی بر داده نقاط قوت را آشکار می‌کند، ضعف‌های پنهان را نشان می‌دهد و امکان تنظیم دقیق‌تر عامل را فراهم می‌سازد. با این حال، داده‌ها و معیارها باید در کنار بازخورد واقعی کاربران بررسی شوند؛ زیرا هیچ مجموعه‌ای از اعداد به‌تنهایی تمام ابعاد کیفیت یک تعامل را پوشش نمی‌دهد.</p>
+</section>
+
+<section class="section gold" id="section-summary">
+<h2 class="section-title">✅ ۱۰. جمع‌بندی و نکات کلیدی</h2>
+<ul class="checklist"><li>پیاده‌سازی عامل با تعریف هدف کسب‌وکار، شناخت داده‌های موردنیاز و انتخاب ساختار مناسب آغاز می‌شود.</li><li>انتخاب مدل باید بر اساس پیچیدگی وظیفه و موازنه دقت، سرعت، هزینه و مقیاس‌پذیری انجام شود.</li><li>ساخت نمونه اولیه با مدل توانمند و ثبت خط مبنا، راهی برای مقایسه مدل‌های کم‌هزینه‌تر است.</li><li>ابزارهای داده اطلاعات لازم را بازیابی می‌کنند؛ ابزارهای اقدام وظایف را اجرا می‌کنند و محیط را تغییر می‌دهند.</li><li>دستورالعمل مؤثر باید بر دانش معتبر تکیه کند، وظایف را خرد کند، اقدام‌ها را صریح سازد و حالت‌های مرزی را پوشش دهد.</li><li>در Zero-shot هیچ مثالی ارائه نمی‌شود؛ در One-shot یک مثال و در Few-shot چند مثال محدود ارائه می‌شود.</li><li>Fine-tuning فرایندی گسترده‌تر از افزودن چند نمونه به پرامپت است.</li><li>Chain of Thought می‌تواند مراحل استدلال را روشن‌تر کند و بررسی و اصلاح خطاها را آسان‌تر سازد.</li><li>گاردریل‌ها باید ریسک‌های امنیت اطلاعات، هم‌راستایی با برند و دقت را با چند لایه محافظتی پوشش دهند.</li><li>نظارت انسانی به شناسایی شکست‌ها و حالت‌های مرزی کمک می‌کند و در موقعیت‌های نامطمئن می‌تواند کنترل را در دست بگیرد.</li><li>ارزیابی عامل باید متناسب با کاربرد آن باشد و دقت، سرعت، انسجام، هزینه و ایمنی را در نظر بگیرد.</li><li>تجربه کاربری و بازخورد واقعی، مکمل معیارهای کمی هستند و در بهبود مستمر عامل نقش دارند.</li></ul>
+<div class="key-takeaway"><div class="key-takeaway__icon" aria-hidden="true">🚀</div><div><h3>اصل نهایی</h3><p>عامل موفق فقط مدلی قدرتمند نیست؛ مجموعه‌ای هماهنگ از هدف روشن، داده معتبر، ابزار مناسب، دستورالعمل دقیق، کنترل‌های ایمنی، نظارت انسانی و ارزیابی مستمر است.</p></div></div>
+</section>
+</div>
+
+<section class="section" id="quiz">
+<h2 class="section-title">📝 ۱۱. آزمون پایانی</h2>
+<p>با پاسخ به پرسش‌های زیر، میزان تسلط خود را بر انتخاب مدل، طراحی پرامپت، استدلال، گاردریل‌ها و ارزیابی عامل‌ها بررسی کنید.</p>
+<section class="quiz-container" data-quiz>
+<header class="quiz-header"><div><strong>آزمون پیاده‌سازی و ارزیابی عامل‌های هوش مصنوعی</strong><p>۶ پرسش · بازخورد و ارزیابی خودکار</p></div><span class="quiz-counter" data-quiz-counter>۰ سؤال پاسخ داده‌شده</span><span class="quiz-progress-label">پیشرفت آزمون</span></header>
+<div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="quiz-progress__bar" data-quiz-progress></div></div>
+
+<article class="quiz-item" data-type="single_select" data-correct="b" data-feedback-correct="درست است؛ ابتدا با توانمندترین مدل خط مبنای عملکرد را تعیین می‌کنیم و سپس مدل‌های دیگر را برای بهبود کارایی می‌سنجیم." data-feedback-incorrect="روش پیشنهادی این است که ابتدا با مدل توانمند، سطح عملکرد قابل‌قبول را مشخص کنید و پس از رسیدن به هدف، مدل‌های دیگر را از نظر کیفیت و کارایی مقایسه کنید.">
+<p class="quiz-question"><span class="quiz-question__number">۱</span> کدام گزینه، روش پیشنهادی برای انتخاب مدل زبانی یک عامل هوش مصنوعی را بهتر توصیف می‌کند؟</p>
+<div class="quiz-options"><button class="quiz-option" type="button" data-value="a">همیشه ارزان‌ترین مدل موجود را برای تمام وظایف انتخاب کنید.</button><button class="quiz-option" type="button" data-value="b">کار را با توانمندترین مدل آغاز کنید تا خط مبنای عملکرد مشخص شود؛ سپس مدل‌های دیگر را برای افزایش کارایی آزمایش کنید.</button><button class="quiz-option" type="button" data-value="c">صرف‌نظر از دقت، فقط از سریع‌ترین مدل‌ها استفاده کنید.</button><button class="quiz-option" type="button" data-value="d">برای هر کاربرد بدون سنجش و مقایسه، مدلی را به‌صورت تصادفی انتخاب کنید.</button></div><div class="quiz-feedback" aria-live="polite"></div></article>
+
+<article class="quiz-item" data-type="categorization" data-feedback-correct="دسته‌بندی درست است؛ چت‌بات خدمات مشتری به انسجام و ایمنی نیاز ویژه دارد، در حالی که دقت و سرعت برای عامل معامله‌گر خودکار اولویت بیشتری دارند." data-feedback-incorrect="به هدف هر عامل توجه کنید: چت‌بات باید تعامل روشن و ایمن با مشتری داشته باشد؛ عامل معامله‌گر باید فرصت‌ها را درست و سریع تشخیص دهد.">
+<p class="quiz-question"><span class="quiz-question__number">۲</span> ویژگی‌های زیر را بر اساس اینکه برای کدام نوع عامل اهمیت بیشتری دارند، دسته‌بندی کنید.</p>
+<div class="category-grid">
+<div class="category-row"><span class="category-term">دقت (Accuracy)</span><select class="quiz-control matching-select" data-answer="trading"><option value="">انتخاب دسته</option><option value="chatbot">چت‌بات خدمات مشتری</option><option value="trading">عامل معامله‌گر خودکار</option></select></div>
+<div class="category-row"><span class="category-term">ایمنی (Safety)</span><select class="quiz-control matching-select" data-answer="chatbot"><option value="">انتخاب دسته</option><option value="chatbot">چت‌بات خدمات مشتری</option><option value="trading">عامل معامله‌گر خودکار</option></select></div>
+<div class="category-row"><span class="category-term">سرعت (Speed)</span><select class="quiz-control matching-select" data-answer="trading"><option value="">انتخاب دسته</option><option value="chatbot">چت‌بات خدمات مشتری</option><option value="trading">عامل معامله‌گر خودکار</option></select></div>
+<div class="category-row"><span class="category-term">انسجام (Coherence)</span><select class="quiz-control matching-select" data-answer="chatbot"><option value="">انتخاب دسته</option><option value="chatbot">چت‌بات خدمات مشتری</option><option value="trading">عامل معامله‌گر خودکار</option></select></div>
+</div><div class="quiz-feedback" aria-live="polite"></div></article>
+
+<article class="quiz-item" data-type="single_select" data-correct="c" data-feedback-correct="درست است؛ Few-shot شامل ارائه دستورالعمل به همراه چند مثال محدود، معمولاً بین دو تا ده نمونه، است." data-feedback-incorrect="Few-shot نه بدون مثال است و نه آموزش گسترده چند هفته‌ای؛ در این روش دستورالعمل همراه با چند نمونه محدود ارائه می‌شود.">
+<p class="quiz-question"><span class="quiz-question__number">۳</span> کدام گزینه مفهوم <bdi dir="ltr" class="en">Few-shot Prompting</bdi> را در پیکربندی عامل‌های هوش مصنوعی بهتر توصیف می‌کند؟</p>
+<div class="quiz-options"><button class="quiz-option" type="button" data-value="a">ارائه دستورالعمل بدون هیچ مثالی</button><button class="quiz-option" type="button" data-value="b">آموزش مدل با صدها مثال در طول چند هفته</button><button class="quiz-option" type="button" data-value="c">ارائه دستورالعمل همراه با چند مثال، معمولاً بین دو تا ده نمونه</button><button class="quiz-option" type="button" data-value="d">واگذار کردن کامل کار به دانش و تجربه قبلی مدل، بدون ارائه نمونه</button></div><div class="quiz-feedback" aria-live="polite"></div></article>
+
+<article class="quiz-item" data-type="single_select" data-correct="b" data-feedback-correct="درست است؛ CoT به عامل کمک می‌کند مراحل استدلال خود را بیان کند و شفافیت را افزایش دهد تا شناسایی و اصلاح خطاها آسان‌تر شود." data-feedback-incorrect="مزیت اصلی مطرح‌شده برای CoT افزایش سرعت یا حذف نظارت نیست؛ این روش با آشکار کردن مراحل استدلال، بررسی تصمیم‌ها و یافتن خطاها را آسان‌تر می‌کند.">
+<p class="quiz-question"><span class="quiz-question__number">۴</span> کدام گزینه مهم‌ترین مزیت استفاده از استدلال زنجیره‌ای (<bdi dir="ltr" class="en">Chain of Thought - CoT</bdi>) را در طراحی عامل‌های هوش مصنوعی توصیف می‌کند؟</p>
+<div class="quiz-options"><button class="quiz-option" type="button" data-value="a">باعث می‌شود عامل در پاسخ به پرسش‌ها سریع‌تر عمل کند.</button><button class="quiz-option" type="button" data-value="b">عامل مراحل استدلال خود را بیان می‌کند؛ در نتیجه شفافیت افزایش می‌یابد و شناسایی و اصلاح خطاها آسان‌تر می‌شود.</button><button class="quiz-option" type="button" data-value="c">نیاز به نظارت مهندسان انسانی را به‌طور کامل از بین می‌برد.</button><button class="quiz-option" type="button" data-value="d">فقط برای پاسخ به پرسش‌های واقعی مانند تاریخ‌ها و پایتخت‌ها کاربرد دارد.</button></div><div class="quiz-feedback" aria-live="polite"></div></article>
+
+<article class="quiz-item" data-type="fill_select" data-feedback-correct="درست است؛ کاهش ریسک با چند سازوکار تخصصی انجام می‌شود و گاردریل‌ها با شناسایی حالت‌های مرزی در محیط واقعی به‌طور مستمر اصلاح می‌شوند." data-feedback-incorrect="به تشبیه ایمنی جاده توجه کنید: چند سازوکار تخصصی در کنار هم خطر را کاهش می‌دهند و تجربه عملی، حالت‌های مرزی تازه را آشکار می‌کند.">
+<p class="quiz-question"><span class="quiz-question__number">۵</span> جمله را با انتخاب گزینه‌های مناسب کامل کنید.</p>
+<p class="quiz-inline-sentence">کاهش مؤثر ریسک در عامل‌های هوش مصنوعی به <select class="quiz-control inline-select" data-answer="multiple"><option value="">انتخاب کنید</option><option value="single">یک سازوکار منفرد</option><option value="multiple">چند سازوکار تخصصی</option><option value="random">کنترل‌های تصادفی</option></select> نیاز دارد؛ این سازوکارها باید با شناسایی <select class="quiz-control inline-select" data-answer="edge"><option value="">انتخاب کنید</option><option value="edge">حالت‌های مرزی</option><option value="speed">سرعت پاسخ‌گویی</option><option value="cost">هزینه مدل</option></select> به‌طور مستمر اصلاح شوند.</p>
+<div class="quiz-feedback" aria-live="polite"></div></article>
+
+<article class="quiz-item" data-type="single_select" data-correct="a" data-feedback-correct="درست است؛ انسان‌ها با شهود و درک متعارف می‌توانند شکست‌ها و حالت‌های مرزی را تشخیص دهند که ممکن است از دید آزمون‌های خودکار پنهان بمانند." data-feedback-incorrect="نقش اصلی انسان در مراحل اولیه استقرار، جایگزین کردن کامل عامل یا افزایش سرعت محاسبات نیست؛ انسان می‌تواند خطاها و موقعیت‌های خاصی را تشخیص دهد که آزمون خودکار ممکن است از آن‌ها غافل شود.">
+<p class="quiz-question"><span class="quiz-question__number">۶</span> کدام گزینه یکی از دلایل مهم مشارکت انسان در مراحل اولیه استقرار یک عامل هوش مصنوعی را بهتر بیان می‌کند؟</p>
+<div class="quiz-options"><button class="quiz-option" type="button" data-value="a">انسان‌ها با شهود و درک متعارف می‌توانند شکست‌ها و حالت‌های مرزی را شناسایی کنند که ممکن است از دید عامل پنهان بمانند.</button><button class="quiz-option" type="button" data-value="b">انسان‌ها می‌توانند تمام وظایف عامل هوش مصنوعی را به‌طور کامل خودکار کنند.</button><button class="quiz-option" type="button" data-value="c">نظارت انسانی سرعت محاسباتی عامل را افزایش می‌دهد.</button><button class="quiz-option" type="button" data-value="d">پس از استقرار عامل، دیگر هیچ‌گاه نیازی به حضور انسان نیست.</button></div><div class="quiz-feedback" aria-live="polite"></div></article>
+
+<div class="quiz-submit-area quiz-actions"><button class="quiz-action quiz-action--secondary" type="button" data-quiz-reset>↻ شروع مجدد آزمون</button></div>
+<div class="quiz-result" data-quiz-result aria-live="polite"><strong>نتیجه آزمون</strong><span class="quiz-result__score" data-quiz-score></span><span data-quiz-result-detail></span></div>
+</section>
+</section>
+
+<section class="social"><h2>🌱 از طراحی تا بهبود مستمر</h2><p>برای یک کاربرد واقعی، هدف کسب‌وکار را مشخص کنید، ابزارهای داده و اقدام را از هم جدا کنید و معیارهایی متناسب با ریسک و تجربه کاربر در نظر بگیرید. سپس با مشاهده عملکرد واقعی، دستورالعمل‌ها و گاردریل‌ها را به‌تدریج بهبود دهید.</p><div class="buttons"><a class="btn telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">پیوستن به کانال تلگرام</a><a class="btn instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">صفحه اینستاگرام</a><a class="btn btn-blue" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">ارتباط در لینکدین</a></div></section>
+<nav class="lesson-navigation" aria-label="ناوبری جلسات"><a class="lesson-navigation__link" href="Lesson_05.html"><span><span class="lesson-navigation__label">بازگشت به جلسه قبل</span><span class="lesson-navigation__title">Lesson_05 · مبانی طراحی عامل‌ها</span></span><span class="lesson-navigation__arrow" aria-hidden="true">→</span></a><a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_07.html"><span><span class="lesson-navigation__label">ادامه مسیر یادگیری</span><span class="lesson-navigation__title">رفتن به جلسه هفتم</span></span><span class="lesson-navigation__arrow" aria-hidden="true">←</span></a></nav>
+<footer class="site-footer"><p>© MATCUB · یادداشت‌های آموزشی</p><p><a class="inline-link" href="#top">بازگشت به ابتدای صفحه</a></p></footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="درسنامه سوم دوره عامل‌های هوش مصنوعی؛ ویژگی‌های عامل‌ها و ساختارهای واکنشی، مدل‌محور، هدف‌محور، مبتنی بر مطلوبیت و یادگیرنده.">
+  <title>Lesson_03 | ویژگی‌ها و ساختارهای عامل‌های هوش مصنوعی</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="quiz-engine.js" defer></script>
+  <script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <main class="container">
+    <nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+      <a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span>
+      </a>
+    </nav>
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#top">MATCUB · Learning Notes</a>
+      <nav class="topbar__links" aria-label="ناوبری صفحه">
+        <a href="#overview">معرفی</a>
+        <a href="#content">درسنامه</a>
+        <a href="#structures">انواع عامل‌ها</a>
+        <a href="#quiz">آزمون</a>
+      </nav>
+    </header>
+
+    <header class="hero" id="overview">
+      <div class="hero-content">
+        <div class="hero-label">🤖 مبانی عامل‌های هوش مصنوعی</div>
+        <h1>ویژگی‌ها و ساختارهای <span>AI Agents</span></h1>
+        <p class="hero-subtitle">از عامل‌های واکنشی ساده تا سامانه‌های هدف‌محور، مبتنی بر مطلوبیت و یادگیرنده</p>
+        <div class="hero-badge">شناخت معماری عامل‌ها · مقایسه توانایی‌ها · انتخاب ساختار مناسب</div>
+      </div>
+    </header>
+
+    <div class="lesson-meta" aria-label="اطلاعات درس">
+      <span class="lesson-meta__item">🧭 <strong>Lesson_03</strong></span>
+      <span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی تا متوسط</strong></span>
+      <span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۲۰ دقیقه</strong></span>
+      <span class="lesson-meta__item">🧪 همراه با آزمون تعاملی</span>
+    </div>
+
+    <div class="badges" aria-label="موضوعات درس">
+      <span class="badge gold">ساختار عامل‌ها</span>
+      <span class="badge green">حافظه و یادگیری</span>
+      <span class="badge purple">استدلال و برنامه‌ریزی</span>
+      <span class="badge blue">عامل هدف‌محور</span>
+      <span class="badge orange">مطلوبیت و تصمیم‌گیری</span>
+    </div>
+
+    <section class="learning-intro" aria-labelledby="learning-intro-title">
+      <div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div>
+      <h2 id="learning-intro-title">مسیر یادگیری</h2>
+      <p>پس از آشنایی با اجزای اصلی یک عامل، اکنون می‌توانیم ساختارهای مختلف آن را بررسی کنیم. این ساختارها از واکنش‌های ساده مبتنی بر قانون تا تصمیم‌گیری چندمعیاره و یادگیری از تجربه پیش می‌روند.</p>
+      <ul class="learning-objectives">
+        <li>شناخت پنج ویژگی مهم عامل‌های پیشرفته</li>
+        <li>تمایز عامل ساده واکنشی از عامل مدل‌محور</li>
+        <li>درک برنامه‌ریزی در عامل‌های هدف‌محور</li>
+        <li>مقایسه هدف‌محوری و ارزیابی مطلوبیت</li>
+        <li>شناخت نقش یادگیری و بازخورد در بهبود عامل</li>
+      </ul>
+    </section>
+
+    <nav class="toc" aria-label="فهرست مطالب">
+      <h2>📑 فهرست مطالب</h2>
+      <ol>
+        <li><a href="#section-traits">پنج ویژگی کلیدی عامل‌های پیشرفته</a></li>
+        <li><a href="#section-reflex">عامل واکنشی ساده</a></li>
+        <li><a href="#section-model">عامل واکنشی مدل‌محور</a></li>
+        <li><a href="#section-goal">عامل هدف‌محور</a></li>
+        <li><a href="#section-utility">عامل مبتنی بر مطلوبیت</a></li>
+        <li><a href="#section-learning">عامل یادگیرنده</a></li>
+        <li><a href="#section-comparison">مقایسه ساختارهای عامل</a></li>
+        <li><a href="#section-summary">جمع‌بندی</a></li>
+        <li><a href="#quiz">آزمون پایانی</a></li>
+      </ol>
+    </nav>
+
+    <div id="content">
+      <section class="section gold" id="section-traits">
+        <h2 class="section-title">🧩 ۱. پنج ویژگی کلیدی عامل‌های پیشرفته</h2>
+        <p>عامل در ساده‌ترین تعریف، سامانه‌ای است که با کمک حسگرها محیط را درک می‌کند و با انجام عمل، بر آن اثر می‌گذارد. با پیچیده‌تر شدن عامل‌ها، قابلیت‌های آن‌ها می‌تواند فراتر از دریافت ورودی و اجرای واکنش مستقیم برود.</p>
+        <p>برای شناخت عامل‌های پیشرفته، پنج ویژگی مهم را بررسی می‌کنیم. توجه داشته باشید که وجود هر پنج ویژگی برای اینکه یک سامانه «عامل» محسوب شود الزامی نیست؛ داشتن چهار یا پنج ویژگی معمولاً در عامل‌های پیشرفته‌تر دیده می‌شود.</p>
+
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🎭</div>
+            <h3>۱. پروفایل و شخصیت</h3>
+            <p>نقش، تخصص، لحن ارتباطی، ارزش‌ها و دستورالعمل‌هایی را مشخص می‌کند که هویت و شیوه تعامل عامل را شکل می‌دهند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🧠</div>
+            <h3>۲. حافظه و دانش</h3>
+            <p>زمینه و اطلاعاتی را در اختیار عامل قرار می‌دهد تا پاسخ‌ها و اقداماتش با نیازها و شرایط کسب‌وکار هماهنگ باشند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🔎</div>
+            <h3>۳. استدلال</h3>
+            <p>توانایی استفاده از اطلاعات موجود برای نتیجه‌گیری، تحلیل موقعیت‌ها و حل مسئله است.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">⚙️</div>
+            <h3>۴. اقدامات</h3>
+            <p>گام‌هایی هستند که عامل برای رسیدن به هدف برمی‌دارد و از طریق آن‌ها محیط را تغییر می‌دهد.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">📈</div>
+            <h3>۵. قابلیت یادگیری</h3>
+            <p>به عامل امکان می‌دهد نتایج اقداماتش را بررسی کند و عملکرد آینده را بر اساس تجربه بهبود دهد.</p>
+          </article>
+        </div>
+
+        <h3>پروفایل و شخصیت؛ عامل چه نقشی دارد؟</h3>
+        <p>پروفایل و شخصیت معمولاً بخشی از <bdi dir="ltr" class="en">System Prompt</bdi> عامل هستند. این بخش روشن می‌کند که عامل چه نقشی دارد، برای چه منظوری ساخته شده و چگونه باید با کاربر تعامل کند. برای مثال، ممکن است عامل در نقش یک بازاریاب یا مهندس نرم‌افزار تعریف شود و در حوزه‌ای تخصصی مانند بهینه‌سازی موتور جست‌وجو فعالیت کند.</p>
+        <p>لحن و سبک ارتباطی، ارزش‌ها، دستورالعمل‌های لازم‌الاجرا و ویژگی‌های رفتاری نیز در همین توصیف مشخص می‌شوند.</p>
+
+        <h3>حافظه و دانش؛ چه زمینه‌ای در اختیار عامل قرار می‌گیرد؟</h3>
+        <p>فرض کنید عاملی مسئول برنامه‌ریزی انتشار محتوای شبکه‌های اجتماعی یک شرکت است. برای اینکه خروجی آن با هویت برند سازگار باشد، می‌توان راهنمای لحن برند را در قالب یک فایل <bdi dir="ltr" class="en">PDF</bdi> و نمونه پست‌های موفق گذشته را در یک پایگاه دانش در اختیارش گذاشت. این اطلاعات زمینه‌ای، تصمیم‌ها و محتوای تولیدشده را به نیازهای واقعی شرکت نزدیک‌تر می‌کنند.</p>
+
+        <h3>اقدام و یادگیری؛ چرخه بهبود</h3>
+        <p>عامل پس از آماده‌سازی یک پست، آن را منتشر می‌کند و به این ترتیب بر محیط اثر می‌گذارد. سپس می‌تواند میزان تعامل مخاطبان با پست را بررسی کند و بر اساس نتیجه، محتوای پست، زمان انتشار یا توضیحات آن را برای دفعات بعد تغییر دهد.</p>
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>دریافت زمینه</h3>
+            <p>نقش، دستورالعمل‌ها و دانش موردنیاز در اختیار عامل قرار می‌گیرد.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>تحلیل و استدلال</h3>
+            <p>عامل اطلاعات را بررسی می‌کند و درباره اقدام مناسب تصمیم می‌گیرد.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>اجرای اقدام</h3>
+            <p>محتوا منتشر می‌شود و محیط تحت تأثیر قرار می‌گیرد.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>بررسی بازخورد</h3>
+            <p>تعامل مخاطبان سنجیده می‌شود تا عملکرد آینده بهتر شود.</p>
+          </div>
+        </div>
+        <div class="box note">
+          <p>این پنج ویژگی یک چارچوب مفید برای توصیف قابلیت‌های عامل هستند؛ اما همه عامل‌ها الزاماً به حافظه، استدلال پیچیده یا یادگیری مجهز نیستند. نوع ساختار و میزان پیچیدگی موردنیاز به مسئله‌ای بستگی دارد که عامل باید حل کند.</p>
+        </div>
+      </section>
+
+      <section class="section blue" id="section-reflex">
+        <h2 class="section-title">⚡ ۲. عامل واکنشی ساده (Simple Reflex Agent)</h2>
+        <p>عامل واکنشی ساده مستقیماً بر اساس ادراک فعلی خود واکنش نشان می‌دهد. این عامل حافظه داخلی یا مدل استدلالی پیچیده‌ای ندارد و رفتار آن بر پایه مجموعه‌ای از قوانین از پیش تعیین‌شده است.</p>
+        <p>نمونه آشنا، ترموستاتی است که دمای محیط را اندازه‌گیری می‌کند و اگر دما از آستانه مشخصی پایین‌تر برود، سیستم گرمایش را فعال می‌کند. در مثال مطرح‌شده، قانون دستگاه چنین است: اگر دما کمتر از ۲ درجه سانتی‌گراد شد، گرمایش را روشن کن.</p>
+
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>ورودی و ادراک</h4>
+            <p>حسگر، دمای فعلی محیط را اندازه‌گیری می‌کند.</p>
+          </article>
+          <article class="info-card">
+            <h4>قانون واکنش</h4>
+            <p>اگر دما کمتر از ۲ درجه باشد، فرمان روشن شدن گرمایش صادر می‌شود.</p>
+          </article>
+          <article class="info-card">
+            <h4>عملگر</h4>
+            <p>دستگاه گرمایشی فرمان را اجرا می‌کند و بر دمای محیط اثر می‌گذارد.</p>
+          </article>
+          <article class="info-card">
+            <h4>محدودیت</h4>
+            <p>عامل از تجربه یاد نمی‌گیرد و رفتار آن با گذشت زمان بهبود پیدا نمی‌کند.</p>
+          </article>
+        </div>
+
+        <div class="box example">
+          <p><strong>مثال قانون واکنش:</strong> اگر دمای خوانده‌شده کمتر از ۲ درجه سانتی‌گراد باشد، گرمایش فعال شود. در غیر این صورت، این قانون فرمان فعال‌سازی گرمایش را صادر نمی‌کند.</p>
+        </div>
+
+        <h3>چرا ترموستات یک عامل ساده است، نه یک عامل هوش مصنوعی پیشرفته؟</h3>
+        <p>ترموستات محیط را دریافت می‌کند و با عملگر خود آن را تغییر می‌دهد؛ بنابراین در تعریف عمومی، یک عامل است. با این حال، صرفاً از یک قانون ثابت پیروی می‌کند، حافظه و استدلال درونی ندارد و نمی‌تواند از تجربه یاد بگیرد یا روش مصرف برق خود را بر اساس زمان‌های مختلف بهینه کند. به همین دلیل، در چارچوب این درس آن را یک عامل ساده می‌دانیم، نه یک عامل هوش مصنوعی.</p>
+        <div class="box warning">
+          <p>داشتن حسگر و عملگر به‌تنهایی به معنی هوشمند یا یادگیرنده بودن عامل نیست. باید بررسی کنیم که سامانه چگونه تصمیم می‌گیرد و آیا می‌تواند از تجربه برای تغییر رفتار خود استفاده کند یا خیر.</p>
+        </div>
+      </section>
+
+      <section class="section purple" id="section-model">
+        <h2 class="section-title">🗺️ ۳. عامل واکنشی مدل‌محور (Model-Based Reflex Agent)</h2>
+        <p>عامل مدل‌محور نیز محیط را ادراک می‌کند و بر اساس آن اقدام انجام می‌دهد؛ اما برخلاف عامل واکنشی ساده، یک حافظه یا بازنمایی داخلی از محیط نگه می‌دارد. این بازنمایی به عامل کمک می‌کند وضعیت محیط را بهتر دنبال کند؛ حتی وقتی تمام اطلاعات موردنیاز در یک لحظه مستقیماً در ورودی حسگرها دیده نمی‌شوند.</p>
+
+        <h3>مثال: جاروبرقی رباتیک</h3>
+        <p>جاروبرقی رباتیک هنگام تمیز کردن اتاق می‌تواند نقشه‌ای از فضا و موانعی مانند مبلمان بسازد. سپس از این نقشه استفاده می‌کند تا تشخیص دهد کدام قسمت‌ها را قبلاً تمیز کرده و چگونه از گیر کردن به اشیا جلوگیری کند.</p>
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>دریافت داده</h3>
+            <p>حسگرها وضعیت اتاق و موانع را ثبت می‌کنند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>به‌روزرسانی مدل</h3>
+            <p>نقشه داخلی با اطلاعات تازه محیط اصلاح می‌شود.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>انتخاب حرکت</h3>
+            <p>عامل از نقشه برای تشخیص مسیر و نواحی تمیزشده استفاده می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>ادامه کار</h3>
+            <p>جاروبرقی حرکت می‌کند و داده‌های تازه‌ای از محیط می‌گیرد.</p>
+          </div>
+        </div>
+
+        <h3>آیا مدل‌محور بودن به معنی یادگیری واقعی است؟</h3>
+        <p>خیر. نگهداری و به‌روزرسانی مدل داخلی لزوماً به معنی یادگیری از تجربه نیست. ممکن است ربات فقط بر اساس قواعد ثابت، نقشه را با ورودی حسگرها به‌روز کند و نواحی تمیزشده را به خاطر بسپارد؛ اما راهبرد خود را با توجه به تجربه‌های قبلی بهبود ندهد.</p>
+        <p>برای مثال، اگر جاروبرقی در دفعات متعدد متوجه شود که کف آشپزخانه سریع‌تر از راهرو کثیف می‌شود، یک سامانه واقعاً یادگیرنده می‌تواند در دفعات بعد اولویت بیشتری به آشپزخانه بدهد. در مقابل، عامل مدل‌محوری که صرفاً نقشه را به‌روز می‌کند، الزاماً چنین الگویی را از تجربه استخراج نمی‌کند.</p>
+
+        <div class="box important">
+          <p>تفاوت اصلی را به خاطر بسپارید: عامل مدل‌محور وضعیت محیط را در یک مدل داخلی نگه می‌دارد؛ اما عامل یادگیرنده می‌تواند از تجربه برای اصلاح عملکرد و راهبرد خود استفاده کند. به‌روزرسانی اطلاعات با یادگیری و بهبود راهبرد یکسان نیست.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="section-goal">
+        <h2 class="section-title">🎯 ۴. عامل هدف‌محور (Goal-Based Agent)</h2>
+        <p>عامل هدف‌محور فقط به وضعیت فعلی واکنش نشان نمی‌دهد؛ بلکه می‌کوشد دنباله‌ای از اقدامات را پیدا کند که آن را به هدف مشخصی برساند. برای این کار، گزینه‌های مختلف را بررسی و اقدامات آینده را برنامه‌ریزی می‌کند.</p>
+        <h3>مثال: مسیریابی با نقشه‌های آنلاین</h3>
+        <p>برنامه‌های مسیریابی مانند <bdi dir="ltr" class="en">Google Maps</bdi> و <bdi dir="ltr" class="en">Waze</bdi> می‌توانند زمان تقریبی رسیدن از مسیرهای مختلف را مقایسه و مسیر سریع‌تر را پیشنهاد کنند. فرض کنید پس از انتخاب مسیر، خودرویی در میانه راه خراب شود و در یکی از مسیرها ترافیک ایجاد کند.</p>
+        <p>اطلاعات تازه حسگرها و داده‌های ترافیکی نشان می‌دهد شرایط محیط تغییر کرده است. مدل داخلی این تغییر را در نظر می‌گیرد و سامانه دوباره بررسی می‌کند که آیا مسیر سریع‌تری برای رسیدن به مقصد وجود دارد یا خیر. هدف اصلی در این مثال، کمینه کردن زمان سفر است؛ بنابراین پیشنهاد اولیه ممکن است با مسیر بهینه جدید جایگزین شود.</p>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">🧭</div>
+          <div>
+            <h3>نکته کلیدی</h3>
+            <p>عامل هدف‌محور به دنبال توالی اقداماتی است که هدف را محقق کنند؛ به همین دلیل، جست‌وجو و برنامه‌ریزی در آن نقش مهمی دارد.</p>
+          </div>
+        </div>
+
+        <h3>محدودیت عامل هدف‌محور</h3>
+        <p>تمرکز صرف بر تکمیل هدف می‌تواند باعث نادیده گرفتن برخی ظرافت‌های عملی شود. برای نمونه، ممکن است سامانه مسیری را پیشنهاد کند که از نظر زمان تخمینی کوتاه‌تر است، اما خیابان‌های آن بیش از حد باریک، دشوار یا نامناسب برای رانندگی باشند. در چنین شرایطی، هدف بهینه شده است، اما راحتی یا شرایط واقعی کاربر به اندازه کافی در تصمیم لحاظ نشده است.</p>
+      </section>
+
+      <section class="section orange" id="section-utility">
+        <h2 class="section-title">⚖️ ۵. عامل مبتنی بر مطلوبیت (Utility-Based Agent)</h2>
+        <p>عامل مبتنی بر مطلوبیت از عامل هدف‌محور پیچیده‌تر است؛ زیرا فقط نمی‌پرسد «آیا به هدف می‌رسم؟»، بلکه چندین معیار را هم‌زمان ارزیابی می‌کند تا بسنجد کدام گزینه در مجموع ارزشمندتر است.</p>
+        <p>برای درک تفاوت، سرمایه‌گذاری را در نظر بگیرید. اگر هدف صرفاً یافتن اوراق بهاداری با بازده سالانه بیش از ۵ درصد باشد، با یک معیار هدف‌محور روبه‌رو هستیم. اما بازده به‌تنهایی تصویر کاملی از جذابیت سرمایه‌گذاری ارائه نمی‌دهد.</p>
+
+        <h3>چرا یک معیار کافی نیست؟</h3>
+        <p>یک مشاور سرمایه‌گذاری علاوه بر بازده مورد انتظار، عواملی مانند نوسان‌پذیری، نقدشوندگی و ریسک نکول را نیز در نظر می‌گیرد. این عوامل بر مطلوبیت کلی سرمایه‌گذاری اثر می‌گذارند.</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>معیار</th>
+                <th>پرسش اصلی</th>
+                <th>اهمیت در ارزیابی</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>بازده مورد انتظار</td>
+                <td>چه میزان بازدهی پیش‌بینی می‌شود؟</td>
+                <td>سود بالقوه سرمایه‌گذاری</td>
+              </tr>
+              <tr>
+                <td>نوسان‌پذیری</td>
+                <td>بازده تا چه اندازه تغییر می‌کند؟</td>
+                <td>میزان بی‌ثباتی و ریسک</td>
+              </tr>
+              <tr>
+                <td>نقدشوندگی</td>
+                <td>دارایی با چه سهولتی به پول نقد تبدیل می‌شود؟</td>
+                <td>انعطاف‌پذیری دسترسی به سرمایه</td>
+              </tr>
+              <tr>
+                <td>ریسک نکول</td>
+                <td>احتمال انجام نشدن تعهدات چقدر است؟</td>
+                <td>ریسک از دست رفتن اصل یا پرداخت‌های مورد انتظار</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>گزینه اول</h4>
+            <p>بازده مورد انتظار ۷٪، اما نوسان زیاد، نقدشوندگی محدود و ریسک نکول قابل‌توجه.</p>
+          </article>
+          <article class="info-card">
+            <h4>گزینه دوم</h4>
+            <p>بازده مورد انتظار ۶٪، همراه با نقدشوندگی بیشتر، نوسان کمتر و وضعیت ریسک مناسب‌تر.</p>
+          </article>
+        </div>
+        <p>با وجود بازده بالاتر گزینه اول، ممکن است مطلوبیت کلی گزینه دوم بیشتر باشد؛ زیرا ارزیابی فقط به یک عدد محدود نمی‌شود. عامل مبتنی بر مطلوبیت، پیامدهای احتمالی و معیارهای مختلف را هم‌زمان می‌سنجد و گزینه‌ای را انتخاب می‌کند که ارزش مورد انتظار بیشتری دارد.</p>
+        <div class="box note">
+          <p><strong>تفاوت مهم:</strong> عامل هدف‌محور بر رسیدن به یک وضعیت مطلوب مشخص تمرکز می‌کند؛ عامل مبتنی بر مطلوبیت، کیفیت گزینه‌ها و بده‌بستان میان چند معیار را نیز ارزیابی می‌کند.</p>
+        </div>
+      </section>
+
+      <section class="section gold" id="section-learning">
+        <h2 class="section-title">📈 ۶. عامل یادگیرنده (Learning Agent)</h2>
+        <p>عامل یادگیرنده قابلیت‌های عامل‌های هدف‌محور و مبتنی بر مطلوبیت را می‌تواند داشته باشد، اما ویژگی متمایز آن توانایی یادگیری است. تجربه‌های جدید به دانش اولیه عامل افزوده می‌شوند و با افزایش تجربه، عملکرد آن در محیط‌های ناآشنا نیز می‌تواند بهتر شود.</p>
+        <p>در این ساختار، علاوه بر اجزایی مانند محیط، حسگرها، مدل داخلی، منطق تصمیم‌گیری و عملگرها، یک عنصر یادگیری نیز وجود دارد. این عنصر با استفاده از بازخورد، مدل یا عملکرد عامل را در گذر زمان بهبود می‌دهد.</p>
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>عملکرد اولیه</h3>
+            <p>عامل با دانش و قابلیت‌های فعلی خود وظیفه را انجام می‌دهد.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>دریافت تجربه</h3>
+            <p>نتیجه اقدامات و اطلاعات تازه به دست می‌آیند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>یادگیری از بازخورد</h3>
+            <p>عامل عملکرد خود را با توجه به تجربه ارزیابی می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>بهبود عملکرد</h3>
+            <p>مدل یا راهبرد اصلاح می‌شود تا در دفعات بعد بهتر عمل کند.</p>
+          </div>
+        </div>
+        <p>در نتیجه، عامل یادگیرنده صرفاً اطلاعات محیط را ثبت نمی‌کند؛ بلکه از تجربه برای اصلاح توانایی‌ها و رفتار آینده خود بهره می‌گیرد. این ویژگی به آن اجازه می‌دهد در طول زمان سازگارتر و کارآمدتر شود.</p>
+        <div class="box important">
+          <p>یادگیری، ویژگی متمایزکننده عامل یادگیرنده است. وجود حافظه یا مدل داخلی به‌تنهایی برای اثبات یادگیری کافی نیست؛ باید بتوانیم بهبود رفتار یا عملکرد بر اثر تجربه را مشاهده کنیم.</p>
+        </div>
+      </section>
+
+      <section class="section blue" id="section-comparison">
+        <h2 class="section-title">📊 ۷. مقایسه ساختارهای مختلف عامل</h2>
+        <p>ساختارهای بررسی‌شده را می‌توان بر اساس نوع اطلاعاتی که نگه می‌دارند، شیوه تصمیم‌گیری و توانایی یادگیری از یکدیگر متمایز کرد. این جدول یک نمای کلی برای انتخاب ساختار مناسب فراهم می‌کند.</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>نوع عامل</th>
+                <th>ویژگی اصلی</th>
+                <th>برنامه‌ریزی برای هدف</th>
+                <th>یادگیری از تجربه</th>
+                <th>نمونه</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>واکنشی ساده</td>
+                <td>واکنش مستقیم بر اساس قانون ثابت</td>
+                <td>خیر</td>
+                <td>خیر</td>
+                <td>ترموستات ساده</td>
+              </tr>
+              <tr>
+                <td>واکنشی مدل‌محور</td>
+                <td>نگهداری مدل داخلی از محیط</td>
+                <td>در ساختار توصیف‌شده، خیر</td>
+                <td>الزاماً خیر</td>
+                <td>جاروبرقی رباتیک نقشه‌ساز</td>
+              </tr>
+              <tr>
+                <td>هدف‌محور</td>
+                <td>جست‌وجو و برنامه‌ریزی برای رسیدن به هدف</td>
+                <td>بله</td>
+                <td>ویژگی ضروری آن نیست</td>
+                <td>مسیریاب با هدف کمینه‌کردن زمان</td>
+              </tr>
+              <tr>
+                <td>مبتنی بر مطلوبیت</td>
+                <td>ارزیابی چند معیار و پیامد</td>
+                <td>بله، همراه با سنجش مطلوبیت</td>
+                <td>ویژگی ضروری آن نیست</td>
+                <td>سامانه ارزیابی سرمایه‌گذاری</td>
+              </tr>
+              <tr>
+                <td>یادگیرنده</td>
+                <td>بهبود عملکرد با استفاده از تجربه و بازخورد</td>
+                <td>می‌تواند داشته باشد</td>
+                <td>بله</td>
+                <td>عامل سازگارشونده با تجربه‌های جدید</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="box warning">
+          <p>این ساختارها را نباید صرفاً به‌عنوان برچسب‌هایی کاملاً جدا از هم در نظر گرفت. عامل یادگیرنده می‌تواند قابلیت‌های هدف‌محوری یا ارزیابی مطلوبیت را نیز در خود داشته باشد. جدول بالا ویژگی برجسته هر ساختار را نشان می‌دهد، نه تمام ترکیب‌های ممکن را.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="section-summary">
+        <h2 class="section-title">✅ ۸. جمع‌بندی و نکات کلیدی</h2>
+        <ul class="checklist">
+          <li>پنج ویژگی مهم عامل‌های پیشرفته عبارت‌اند از پروفایل و شخصیت، حافظه، استدلال، اقدام و یادگیری.</li>
+          <li>عامل واکنشی ساده با قوانین از پیش تعیین‌شده و بر اساس ادراک فعلی واکنش نشان می‌دهد.</li>
+          <li>عامل مدل‌محور یک بازنمایی داخلی از محیط نگه می‌دارد؛ اما لزوماً از تجربه یاد نمی‌گیرد.</li>
+          <li>عامل هدف‌محور برای رسیدن به هدف، دنباله‌ای از اقدامات را جست‌وجو و برنامه‌ریزی می‌کند.</li>
+          <li>عامل مبتنی بر مطلوبیت چند معیار و پیامد را هم‌زمان می‌سنجد و بهترین گزینه را بر اساس مطلوبیت مورد انتظار انتخاب می‌کند.</li>
+          <li>عامل یادگیرنده با استفاده از تجربه و بازخورد، عملکرد خود را در گذر زمان بهبود می‌دهد.</li>
+        </ul>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">💡</div>
+          <div>
+            <h3>اصل راهنما برای انتخاب ساختار</h3>
+            <p>برای انتخاب نوع عامل، ابتدا ببینید مسئله فقط به واکنش سریع نیاز دارد، به مدل داخلی از محیط وابسته است، هدف و برنامه‌ریزی می‌خواهد، چند معیار را باید با هم بسنجد یا به یادگیری از تجربه نیاز دارد.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" id="quiz">
+      <h2 class="section-title">📝 ۹. آزمون پایانی</h2>
+      <p>به پرسش‌های زیر پاسخ دهید تا میزان تسلط خود را بر ویژگی‌ها و ساختارهای عامل‌های هوش مصنوعی ارزیابی کنید. در سؤال تطبیقی، هر مفهوم را با توصیف درست آن مرتبط کنید.</p>
+
+      <section class="quiz-container" data-quiz>
+        <header class="quiz-header">
+          <div>
+            <strong>آزمون ساختارهای عامل‌های هوش مصنوعی</strong>
+            <p>۳ پرسش · بازخورد و ارزیابی خودکار</p>
+          </div>
+          <span class="quiz-counter" data-quiz-counter>۰ سؤال پاسخ داده‌شده</span>
+          <span class="quiz-progress-label">پیشرفت آزمون</span>
+        </header>
+        <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="quiz-progress__bar" data-quiz-progress></div>
+        </div>
+
+        <article class="quiz-item" data-type="single_select" data-correct="b" data-feedback-correct="درست است؛ عامل واکنشی ساده با قوانین از پیش تعیین‌شده و بدون استدلال داخلی پیچیده واکنش نشان می‌دهد." data-feedback-incorrect="به نبود حافظه و استدلال داخلی و اتکای این عامل به قوانین از پیش تعریف‌شده توجه کنید.">
+          <p class="quiz-question"><span class="quiz-question__number">۱</span> کدام گزینه عامل واکنشی ساده را به‌درستی توصیف می‌کند؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">از حافظه داخلی استفاده می‌کند و در طول زمان اقدامات خود را بهبود می‌دهد.</button>
+            <button class="quiz-option" type="button" data-value="b">با استفاده از قوانین از پیش تعریف‌شده و بدون استدلال داخلی به محیط واکنش نشان می‌دهد.</button>
+            <button class="quiz-option" type="button" data-value="c">با مدل‌های پیشرفته، رویدادهای آینده را پیش‌بینی می‌کند.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="true_false" data-correct="false" data-feedback-correct="درست است؛ ترموستات مثال یک عامل ساده است، اما چون یادگیری یا سازگاری هوشمندانه ندارد، در چارچوب این درس عامل هوش مصنوعی محسوب نمی‌شود." data-feedback-incorrect="ترموستات فقط از یک قانون ثابت پیروی می‌کند و از تجربه یاد نمی‌گیرد؛ بنابراین در این درس یک عامل ساده، نه عامل هوش مصنوعی، در نظر گرفته می‌شود.">
+          <p class="quiz-question"><span class="quiz-question__number">۲</span> ترموستاتی که در دمای کمتر از ۲ درجه سانتی‌گراد گرمایش را فعال می‌کند و توانایی یادگیری یا سازگاری ندارد، یک عامل هوش مصنوعی محسوب می‌شود.</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="true">درست</button>
+            <button class="quiz-option" type="button" data-value="false">نادرست</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="matching" data-feedback-correct="آفرین؛ هر چهار مفهوم با توصیف درست خود تطبیق داده شده‌اند." data-feedback-incorrect="به تفاوت به‌روزرسانی مدل محیط، شرایط بیرونی، بهینه‌سازی و برنامه‌ریزی برای هدف توجه کنید.">
+          <p class="quiz-question"><span class="quiz-question__number">۳</span> اصطلاحات هوش مصنوعی را با توصیف مناسب آن‌ها تطبیق دهید.</p>
+          <div class="matching-grid">
+            <div class="matching-row">
+              <span class="matching-term">عامل مدل‌محور</span>
+              <select class="quiz-control matching-select" data-answer="model">
+                <option value="">انتخاب توصیف</option>
+                <option value="model">مدل داخلی خود را با استفاده از تغییرات محیط به‌روزرسانی می‌کند، اما ممکن است فاقد برنامه‌ریزی باشد.</option>
+                <option value="external">عوامل واقعی و متغیر مانند ترافیک یا تصادف که بر تصمیم عامل اثر می‌گذارند.</option>
+                <option value="optimization">فرایند یافتن بهترین اقدام برای دستیابی به یک هدف، مانند کمینه کردن زمان سفر.</option>
+                <option value="goal">دنباله اقداماتی را که به یک هدف مشخص می‌رسند جست‌وجو می‌کند و برای آن‌ها برنامه می‌ریزد.</option>
+              </select>
+            </div>
+            <div class="matching-row">
+              <span class="matching-term">شرایط بیرونی</span>
+              <select class="quiz-control matching-select" data-answer="external">
+                <option value="">انتخاب توصیف</option>
+                <option value="model">مدل داخلی خود را با استفاده از تغییرات محیط به‌روزرسانی می‌کند، اما ممکن است فاقد برنامه‌ریزی باشد.</option>
+                <option value="external">عوامل واقعی و متغیر مانند ترافیک یا تصادف که بر تصمیم عامل اثر می‌گذارند.</option>
+                <option value="optimization">فرایند یافتن بهترین اقدام برای دستیابی به یک هدف، مانند کمینه کردن زمان سفر.</option>
+                <option value="goal">دنباله اقداماتی را که به یک هدف مشخص می‌رسند جست‌وجو می‌کند و برای آن‌ها برنامه می‌ریزد.</option>
+              </select>
+            </div>
+            <div class="matching-row">
+              <span class="matching-term">بهینه‌سازی</span>
+              <select class="quiz-control matching-select" data-answer="optimization">
+                <option value="">انتخاب توصیف</option>
+                <option value="model">مدل داخلی خود را با استفاده از تغییرات محیط به‌روزرسانی می‌کند، اما ممکن است فاقد برنامه‌ریزی باشد.</option>
+                <option value="external">عوامل واقعی و متغیر مانند ترافیک یا تصادف که بر تصمیم عامل اثر می‌گذارند.</option>
+                <option value="optimization">فرایند یافتن بهترین اقدام برای دستیابی به یک هدف، مانند کمینه کردن زمان سفر.</option>
+                <option value="goal">دنباله اقداماتی را که به یک هدف مشخص می‌رسند جست‌وجو می‌کند و برای آن‌ها برنامه می‌ریزد.</option>
+              </select>
+            </div>
+            <div class="matching-row">
+              <span class="matching-term">عامل هدف‌محور</span>
+              <select class="quiz-control matching-select" data-answer="goal">
+                <option value="">انتخاب توصیف</option>
+                <option value="model">مدل داخلی خود را با استفاده از تغییرات محیط به‌روزرسانی می‌کند، اما ممکن است فاقد برنامه‌ریزی باشد.</option>
+                <option value="external">عوامل واقعی و متغیر مانند ترافیک یا تصادف که بر تصمیم عامل اثر می‌گذارند.</option>
+                <option value="optimization">فرایند یافتن بهترین اقدام برای دستیابی به یک هدف، مانند کمینه کردن زمان سفر.</option>
+                <option value="goal">دنباله اقداماتی را که به یک هدف مشخص می‌رسند جست‌وجو می‌کند و برای آن‌ها برنامه می‌ریزد.</option>
+              </select>
+            </div>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <div class="quiz-submit-area quiz-actions">
+          <button class="quiz-action quiz-action--secondary" type="button" data-quiz-reset>↻ شروع مجدد آزمون</button>
+        </div>
+        <div class="quiz-result" data-quiz-result aria-live="polite">
+          <strong>نتیجه آزمون</strong>
+          <span class="quiz-result__score" data-quiz-score></span>
+          <span data-quiz-result-detail></span>
+        </div>
+      </section>
+    </section>
+
+    <section class="social">
+      <h2>🌱 یادگیری با تمرین ادامه پیدا می‌کند</h2>
+      <p>برای تثبیت تفاوت ساختارها، نمونه‌های واقعی را بررسی کنید و از خود بپرسید هر عامل چه چیزی را از محیط دریافت می‌کند، چگونه تصمیم می‌گیرد و آیا از تجربه می‌آموزد یا خیر.</p>
+      <div class="buttons">
+        <a class="btn telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">پیوستن به کانال تلگرام</a>
+        <a class="btn instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">صفحه اینستاگرام</a>
+        <a class="btn btn-blue" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">ارتباط در لینکدین</a>
+      </div>
+    </section>
+
+    <nav class="lesson-navigation" aria-label="ناوبری جلسات">
+      <a class="lesson-navigation__link" href="Lesson_02.html">
+        <span><span class="lesson-navigation__label">بازگشت به جلسه قبل</span><span class="lesson-navigation__title">Lesson_02 · اجزای عامل هوش مصنوعی</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_04.html">
+        <span><span class="lesson-navigation__label">ادامه مسیر یادگیری</span><span class="lesson-navigation__title">رفتن به جلسه چهارم</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <footer class="site-footer">
+      <p>© MATCUB · یادداشت‌های آموزشی</p>
+      <p><a class="inline-link" href="#top">بازگشت به ابتدای صفحه</a></p>
+    </footer>
+  </main>
+</body>
+</html>

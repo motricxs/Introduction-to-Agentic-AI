@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+
+<html dir="rtl" lang="fa">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="#08111f" name="theme-color"/>
+<meta content="درسنامه جامع آزمون نهایی هوش مصنوعی عامل‌محور؛ بررسی معماری ایجنت‌ها، حسگرها، عملگرها، انواع Agent و ویژگی‌های آن‌ها" name="description"/>
+<title>جلسه ۱۰ | آزمون نهایی معماری و انواع ایجنت‌ها</title>
+<link href="https://cdn.jsdelivr.net" rel="preconnect"/>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"/>
+<link href="style.css" rel="stylesheet"/>
+
+<script defer="True" src="quiz-engine.js"></script><script defer="True" src="syntax-highlighter.js"></script></head>
+<body id="top">
+<div aria-hidden="true" class="reading-progress"><span></span></div>
+<div class="container"><nav aria-label="شبکه‌های اجتماعی" class="profile-socials"><a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" rel="noopener noreferrer" target="_blank"><span aria-hidden="true" class="profile-socials__icon">◎</span><span>Instagram</span></a><a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" rel="noopener noreferrer" target="_blank"><span aria-hidden="true" class="profile-socials__icon">➤</span><span>Telegram</span></a><a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" rel="noopener noreferrer" target="_blank"><span aria-hidden="true" class="profile-socials__icon">in</span><span>LinkedIn</span></a></nav>
+<nav aria-label="ناوبری سریع درسنامه" class="topbar">
+<a class="topbar__brand" href="#top">📘 مبانی Agentic Work</a>
+<div class="topbar__links">
+<a href="#toc">🗺️ فهرست</a>
+<a href="#final-summary">📌 جمع‌بندی</a>
+<a href="#footer">⬇️ پایین صفحه</a>
+</div>
+</nav>
+<div id="top"></div>
+<!-- HERO -->
+<section class="hero">
+<div class="hero-content">
+<div class="hero-label">🧠 آزمون نهایی • معماری و انواع ایجنت‌ها</div>
+<h1>آزمون نهایی <span>AI Agents</span></h1>
+<p class="hero-subtitle">
+                از شناخت محیط و اجزای معماری ایجنت تا تشخیص انواع عامل‌های هوشمند، ساختار تصمیم‌گیری و قابلیت یادگیری آن‌ها.
+            </p>
+<div class="hero-badge">
+                ۱۲ سؤال • ۲ مطالعه موردی • پاسخ‌گویی تعاملی • تحلیل آموزشی
+            </div>
+</div>
+</section><div aria-label="اطلاعات درس" class="lesson-meta"><span class="lesson-meta__item">🧭 جلسه: ۱۰</span><span class="lesson-meta__item">📝 نوع جلسه: آزمون نهایی</span><span class="lesson-meta__item">⏱️ زمان پیشنهادی: ۳۰ تا ۴۵ دقیقه</span><span class="lesson-meta__item">🎯 ۱۲ سؤال · ۲ مطالعه موردی</span></div>
+<!-- INTRO -->
+<section class="section blue" id="introduction">
+<h2 class="section-title">🎯 مقدمه آزمون نهایی</h2>
+<p>
+            در این آزمون قرار است مفاهیمی را که درباره معماری و انواع
+            <span class="en">AI Agents</span>
+            آموخته‌ایم، در قالب دو مطالعه موردی به کار ببریم.
+            هدف صرفاً حفظ کردن تعریف‌ها نیست؛ بلکه باید بتوانیم با بررسی رفتار یک سیستم تشخیص دهیم چه نوع ایجنتی است، چگونه اطلاعات دریافت می‌کند، چطور تصمیم می‌گیرد و چه قابلیت‌هایی دارد.
+        </p>
+<p>
+            آزمون از دو سناریوی اصلی تشکیل شده است:
+        </p>
+<div class="info-grid">
+<div class="info-card">
+<h4>🚗 مطالعه موردی اول</h4>
+<p>
+                    طراحی معماری برای یک خودروی خودران و یک دستیار خرید هوشمند؛ با تمرکز بر محیط، حسگرها، مدل، منطق تصمیم‌گیری و عملگرها.
+                </p>
+</div>
+<div class="info-card">
+<h4>🤖 مطالعه موردی دوم</h4>
+<p>
+                    طبقه‌بندی پنج ایجنت با سطوح مختلف پیچیدگی؛ از سیستم‌های واکنشی ساده تا ایجنت‌های هدف‌محور، مطلوبیت‌محور و یادگیرنده.
+                </p>
+</div>
+</div>
+<div class="box important">
+<p>
+<strong>روش مطالعه:</strong>
+                ابتدا سناریوی هر مطالعه موردی را بخوانید. سپس سؤال‌ها را به ترتیب پاسخ دهید. پس از انتخاب هر گزینه، پاسخ صحیح با رنگ سبز و پاسخ اشتباه با رنگ قرمز مشخص می‌شود و توضیح آموزشی همان سؤال نمایش داده خواهد شد.
+            </p>
+</div>
+<div class="box note">
+<p>
+                در این آزمون، اصطلاحات تخصصی انگلیسی در کنار معادل فارسی آن‌ها آمده‌اند تا هم مفهوم را به‌درستی یاد بگیرید و هم هنگام مواجهه با سؤال‌های انگلیسی بتوانید اصطلاحات کلیدی را سریع تشخیص دهید.
+            </p>
+</div>
+</section>
+<!-- TOC -->
+<section class="toc" id="toc">
+<h2>🗺️ فهرست مطالب</h2>
+<ol>
+<li><a href="#case-one">🚗 مطالعه موردی اول: طراحی معماری دو ایجنت</a></li>
+<li><a href="#q1">سؤال ۱: مفهوم محیط در دستیار خرید</a></li>
+<li><a href="#q2">سؤال ۲: شناسایی Sensors</a></li>
+<li><a href="#q3">سؤال ۳: محیط پویا در خودروی خودران</a></li>
+<li><a href="#q4">سؤال ۴: لایه منطق تصمیم‌گیری</a></li>
+<li><a href="#q5">سؤال ۵: ادغام منطق تصمیم‌گیری در LLM</a></li>
+<li><a href="#q6">سؤال ۶: نقش Actuators</a></li>
+<li><a href="#case-two">🤖 مطالعه موردی دوم: طبقه‌بندی پنج ایجنت</a></li>
+<li><a href="#q7">سؤال ۷: Simple Reflex Agent</a></li>
+<li><a href="#q8">سؤال ۸: Model-Based Reflex Agent</a></li>
+<li><a href="#q9">سؤال ۹: Utility-Based Agent</a></li>
+<li><a href="#q10">سؤال ۱۰: Goal-Based Agent</a></li>
+<li><a href="#q11">سؤال ۱۱: Learning Agent</a></li>
+<li><a href="#q12">سؤال ۱۲: ویژگی‌های پنج‌گانه ایجنت</a></li>
+<li><a href="#final-summary">📌 جمع‌بندی نهایی</a></li>
+</ol>
+</section>
+<!-- CASE 1 -->
+
+<!-- QUESTION 1 -->
+
+<!-- QUESTION 2 -->
+
+<!-- QUESTION 3 -->
+
+<!-- QUESTION 4 -->
+
+<!-- QUESTION 5 -->
+
+<!-- QUESTION 6 -->
+
+<!-- CASE 2 -->
+
+<!-- QUESTION 7 -->
+
+<!-- QUESTION 8 -->
+
+<!-- QUESTION 9 -->
+
+<!-- QUESTION 10 -->
+
+<!-- QUESTION 11 -->
+
+<!-- QUESTION 12 -->
+
+<!-- FINAL SUMMARY -->
+<section class="quiz-container" data-quiz="" id="final-quiz"><header class="quiz-header"><div><strong>آزمون نهایی معماری و انواع ایجنت‌ها</strong><p>۱۲ پرسش چهارگزینه‌ای در دو مطالعه موردی · بازخورد فوری و امتیازدهی خودکار</p></div><span class="quiz-counter" data-quiz-counter="">۰ سؤال پاسخ داده‌شده</span></header><div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="quiz-progress" role="progressbar"><div class="quiz-progress__bar" data-quiz-progress=""></div></div><section class="section blue" id="case-one">
+<h2 class="section-title">🚗 ۱. مطالعه موردی اول: طراحی معماری دو ایجنت</h2>
+<div class="case-intro">
+<h3>Case 1 | طراحی سیستم‌های هوشمند برای دو محیط متفاوت</h3>
+<p>
+                اولیویا مدیر محصول یک شرکت فناوری است که روی توسعه ایجنت‌های هوشمند برای کاربردهای واقعی کار می‌کند. تیم او در حال ساخت دو نمونه اولیه است:
+            </p>
+<div class="case-list">
+<div class="case-item">
+<strong>۱. خودروی خودران (Self-Driving Car)</strong>
+<p>
+                        ایجنتی که باید در خیابان‌ها حرکت کند، خودروهای دیگر و عابران پیاده را تشخیص دهد، علائم رانندگی را بخواند و با توجه به شرایط لحظه‌ای جاده تصمیم بگیرد.
+                    </p>
+</div>
+<div class="case-item">
+<strong>۲. دستیار خرید هوشمند (AI-Powered Shopping Assistant)</strong>
+<p>
+                        ایجنتی که اطلاعات محصولات را بررسی می‌کند، ترجیحات کاربران را می‌شناسد، قیمت‌ها را مقایسه می‌کند و با در نظر گرفتن شرایط مختلف، پیشنهادهای خرید مناسبی ارائه می‌دهد.
+                    </p>
+</div>
+</div>
+<p>
+                این دو ایجنت در محیط‌های متفاوتی فعالیت می‌کنند؛ بنابراین معماری و اجزای موردنیاز آن‌ها نیز باید متناسب با نوع فعالیتشان طراحی شود.
+            </p>
+<p>
+                تیم اولیویا برای طراحی صحیح این سیستم‌ها، شش موضوع اصلی را بررسی می‌کند:
+            </p>
+<ul>
+<li>نوع محیطی که ایجنت در آن فعالیت می‌کند.</li>
+<li>حسگرهایی که اطلاعات محیط را جمع‌آوری می‌کنند.</li>
+<li>مدلی که داده‌ها را تفسیر می‌کند.</li>
+<li>ضرورت وجود یک لایه مستقل برای منطق تصمیم‌گیری.</li>
+<li>عملگرهایی که اقدامات ایجنت را اجرا می‌کنند.</li>
+<li>نحوه طراحی حلقه بازخورد برای یادگیری و بهبود عملکرد.</li>
+</ul>
+<p>
+                علاوه بر این، تیم باید سازوکارهای ایمنی مانند اعتبارسنجی خارجی را در نظر بگیرد تا ایجنت نتواند اقداماتی خارج از سیاست‌ها یا محدودیت‌های تعیین‌شده انجام دهد.
+            </p>
+</div>
+<h3>🧩 قبل از پاسخ به سؤال‌ها، معماری را بشناسیم</h3>
+<p>
+            برای درک بهتر شش موضوع بالا، ابتدا باید مسیر حرکت اطلاعات در یک ایجنت را بشناسیم. ایجنت ابتدا اطلاعاتی از محیط دریافت می‌کند، سپس آن‌ها را تحلیل می‌کند، تصمیم می‌گیرد و در نهایت اقدامی انجام می‌دهد. پس از اجرا نیز نتیجه اقدامات را بررسی می‌کند.
+        </p>
+<div class="concept-flow">
+<div><strong>Environment</strong><span>محیط</span></div>
+<div><strong>Sensors</strong><span>دریافت داده</span></div>
+<div><strong>Model</strong><span>تحلیل داده</span></div>
+<div><strong>Decision</strong><span>انتخاب اقدام</span></div>
+<div><strong>Actuators</strong><span>اجرای اقدام</span></div>
+</div>
+<div class="box important">
+<p>
+                فراموش نکنید که این اجزا مسئولیت‌های متفاوتی دارند. حسگر اطلاعات را جمع‌آوری می‌کند، مدل آن را تحلیل می‌کند، لایه تصمیم‌گیری اقدام مناسب را انتخاب می‌کند و عملگر آن اقدام را اجرا می‌کند. بازخورد نیز نتیجه را به چرخه بازمی‌گرداند.
+            </p>
+</div>
+</section><section class="section blue" id="q1">
+<article class="quiz-item" data-correct="c" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۳ است. محیط یا Environment تمام شرایط و اطلاعاتی است که ایجنت در آن فعالیت می‌کند و از آن‌ها برای درک موقعیت و تصمیم‌گیری استفاده می‌کند. در دستیار خرید، محیط فقط صفحه فروشگاه نیست. اطلاعات محصول، قیمت، موجودی، سلیقه مشتری، آب‌وهوا و فصل سال نیز می‌توانند بخشی از محیط باشند. برای مثال، یک دستیار خرید لباس ممکن است در زمستان پیشنهاد خرید پالتو بدهد و در تابستان لباس‌های خنک را در اولویت قرار دهد. نکته امتحانی: محیط را با ابزار، رابط کاربری یا مدل تصمیم‌گیری اشتباه نگیرید. محیط فضایی است که ایجنت در آن فعالیت می‌کند و از آن اطلاعات دریافت می‌کند." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۳ است. محیط یا Environment تمام شرایط و اطلاعاتی است که ایجنت در آن فعالیت می‌کند و از آن‌ها برای درک موقعیت و تصمیم‌گیری استفاده می‌کند. در دستیار خرید، محیط فقط صفحه فروشگاه نیست. اطلاعات محصول، قیمت، موجودی، سلیقه مشتری، آب‌وهوا و فصل سال نیز می‌توانند بخشی از محیط باشند. برای مثال، یک دستیار خرید لباس ممکن است در زمستان پیشنهاد خرید پالتو بدهد و در تابستان لباس‌های خنک را در اولویت قرار دهد. نکته امتحانی: محیط را با ابزار، رابط کاربری یا مدل تصمیم‌گیری اشتباه نگیرید. محیط فضایی است که ایجنت در آن فعالیت می‌کند و از آن اطلاعات دریافت می‌کند." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">1</span>
+                Which of the following best defines the "environment" for the AI-powered shopping assistant?
+            </p>
+<p class="quiz-question">
+                کدام گزینه مفهوم «محیط» را برای دستیار خرید هوشمند بهتر تعریف می‌کند؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button">
+
+<span>یک رابط فروشگاه مجازی که کاربران از طریق آن محصولات را مشاهده می‌کنند.</span>
+</button>
+<button class="quiz-option" data-value="b" type="button">
+
+<span>مجموعه‌ای از رابط‌های برنامه‌نویسی و صفحات وب که ایجنت برای تعامل با کاربران استفاده می‌کند.</span>
+</button>
+<button class="quiz-option" data-value="c" type="button">
+
+<span>مجموعه ورودی‌های دیجیتال و واقعی مانند ترجیحات کاربران، اطلاعات محصولات، وضعیت آب‌وهوا و روندهای فصلی.</span>
+</button>
+<button class="quiz-option" data-value="d" type="button">
+
+<span>الگوریتمی که ایجنت برای تصمیم‌گیری درباره خرید استفاده می‌کند.</span>
+</button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section blue" id="q2">
+<article class="quiz-item" data-correct="d" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۴، یعنی Sensors است. حسگرها در معماری ایجنت وظیفه دریافت اطلاعات از محیط را بر عهده دارند. در سیستم‌های نرم‌افزاری، حسگر لزوماً یک قطعه سخت‌افزاری نیست؛ یک ابزار نرم‌افزاری یا اتصال به یک سرویس اطلاعاتی نیز می‌تواند نقش حسگر را ایفا کند. Web Scraper اطلاعات محصولات و قیمت‌ها را از صفحات وب استخراج می‌کند. Weather API اطلاعات آب‌وهوا را از یک سرویس خارجی دریافت می‌کند. User History اطلاعات مربوط به رفتار و سوابق کاربر را در اختیار ایجنت قرار می‌دهد. نکته امتحانی: هر چیزی که وظیفه جمع‌آوری یا دریافت داده از محیط را داشته باشد، می‌تواند در نقش Sensor قرار بگیرد." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۴، یعنی Sensors است. حسگرها در معماری ایجنت وظیفه دریافت اطلاعات از محیط را بر عهده دارند. در سیستم‌های نرم‌افزاری، حسگر لزوماً یک قطعه سخت‌افزاری نیست؛ یک ابزار نرم‌افزاری یا اتصال به یک سرویس اطلاعاتی نیز می‌تواند نقش حسگر را ایفا کند. Web Scraper اطلاعات محصولات و قیمت‌ها را از صفحات وب استخراج می‌کند. Weather API اطلاعات آب‌وهوا را از یک سرویس خارجی دریافت می‌کند. User History اطلاعات مربوط به رفتار و سوابق کاربر را در اختیار ایجنت قرار می‌دهد. نکته امتحانی: هر چیزی که وظیفه جمع‌آوری یا دریافت داده از محیط را داشته باشد، می‌تواند در نقش Sensor قرار بگیرد." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">2</span>
+                Olivia’s team decides to use web scrapers, weather APIs, and user history data as inputs for the shopping assistant. These components are best described as:
+            </p>
+<p class="quiz-question">
+                تیم اولیویا تصمیم می‌گیرد از ابزارهای استخراج اطلاعات وب، رابط‌های دریافت آب‌وهوا و داده‌های تاریخچه کاربران به‌عنوان ورودی دستیار خرید استفاده کند. این اجزا در کدام دسته قرار می‌گیرند؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>Actuators – عملگرها</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>Decision Layers – لایه‌های تصمیم‌گیری</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>Environments – محیط‌ها</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>Sensors – حسگرها</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section blue" id="q3">
+<article class="quiz-item" data-correct="c" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۳ است: Highly Dynamic Environment . محیط خودروی خودران دائماً در حال تغییر است. موقعیت خودروهای دیگر، حرکت عابران، وضعیت جاده، شرایط جوی و تصادف‌های احتمالی ممکن است در هر لحظه شرایط را تغییر دهند. برای مثال، فرض کنید خودرو در یک مسیر مستقیم حرکت می‌کند، اما ناگهان خودروی جلویی ترمز می‌کند. سیستم باید این تغییر را از طریق حسگرها تشخیص دهد، وضعیت جدید را تحلیل کند و در زمان مناسب سرعت را کاهش دهد. نکته تکمیلی: LiDAR با استفاده از پرتوهای لیزری، اطلاعاتی درباره فاصله و موقعیت اشیا به دست می‌دهد. دوربین‌ها نیز اطلاعات تصویری محیط را دریافت می‌کنند و GPS موقعیت جغرافیایی خودرو را مشخص می‌کند. نکته امتحانی: خودروی خودران در یک محیط پویا فعالیت می‌کند؛ بنابراین به دریافت اطلاعات و سازگاری لحظه‌ای نیاز دارد." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۳ است: Highly Dynamic Environment . محیط خودروی خودران دائماً در حال تغییر است. موقعیت خودروهای دیگر، حرکت عابران، وضعیت جاده، شرایط جوی و تصادف‌های احتمالی ممکن است در هر لحظه شرایط را تغییر دهند. برای مثال، فرض کنید خودرو در یک مسیر مستقیم حرکت می‌کند، اما ناگهان خودروی جلویی ترمز می‌کند. سیستم باید این تغییر را از طریق حسگرها تشخیص دهد، وضعیت جدید را تحلیل کند و در زمان مناسب سرعت را کاهش دهد. نکته تکمیلی: LiDAR با استفاده از پرتوهای لیزری، اطلاعاتی درباره فاصله و موقعیت اشیا به دست می‌دهد. دوربین‌ها نیز اطلاعات تصویری محیط را دریافت می‌کنند و GPS موقعیت جغرافیایی خودرو را مشخص می‌کند. نکته امتحانی: خودروی خودران در یک محیط پویا فعالیت می‌کند؛ بنابراین به دریافت اطلاعات و سازگاری لحظه‌ای نیاز دارد." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">3</span>
+                The self-driving car uses cameras, LiDAR, GPS, and cloud data access. What challenge does Olivia need to consider based on the nature of this environment?
+            </p>
+<p class="quiz-question">
+                خودروی خودران از دوربین، لیدار، موقعیت‌یاب ماهواره‌ای و دسترسی به داده‌های ابری استفاده می‌کند. با توجه به ماهیت محیط فعالیت این خودرو، اولیویا باید چه چالشی را در نظر بگیرد؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>ممکن است مدل خودرو ظرفیت کافی برای ذخیره تمام نقشه‌های جاده‌ای نداشته باشد.</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>محیط نسبتاً ثابت است و پیش‌بینی آن آسان است.</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>ایجنت در محیطی بسیار پویا فعالیت می‌کند و باید بتواند در لحظه خود را با تغییرات سازگار کند.</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>تنها نگرانی، میزان استحکام لایه منطق تصمیم‌گیری است.</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section blue" id="q4">
+<article class="quiz-item" data-correct="b" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۲، یعنی Decision Logic Layer است. این لایه وظیفه دارد خروجی تحلیل مدل را با قوانین و محدودیت‌های از پیش تعیین‌شده مقایسه کند. فرض کنید مدل یک سرمایه‌گذاری را بررسی کرده و به این نتیجه رسیده است که بازده مورد انتظار آن ۸ درصد و نوسان آن ۱۲ درصد است. لایه تصمیم‌گیری هر دو مقدار را با معیارهای تعیین‌شده مقایسه می‌کند: بازده بیشتر از ۷ درصد است؟ بله. ریسک کمتر از ۱۵ درصد است؟ بله. در نتیجه، سرمایه‌گذاری از این دو شرط عبور می‌کند و می‌تواند برای مرحله اجرای معامله تأیید شود. البته در سیستم واقعی، معیارهای مالی باید دقیق تعریف شوند؛ مثلاً مشخص شود منظور از ریسک، نوسان تاریخی است یا معیار دیگری. همچنین اعتبارسنجی نهایی و محدودیت‌های امنیتی باید مستقل و قابل‌اعتماد باشند. نکته امتحانی: مدل تحلیل می‌کند، منطق تصمیم‌گیری قوانین را اعمال می‌کند و عملگر اقدام را اجرا می‌کند." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۲، یعنی Decision Logic Layer است. این لایه وظیفه دارد خروجی تحلیل مدل را با قوانین و محدودیت‌های از پیش تعیین‌شده مقایسه کند. فرض کنید مدل یک سرمایه‌گذاری را بررسی کرده و به این نتیجه رسیده است که بازده مورد انتظار آن ۸ درصد و نوسان آن ۱۲ درصد است. لایه تصمیم‌گیری هر دو مقدار را با معیارهای تعیین‌شده مقایسه می‌کند: بازده بیشتر از ۷ درصد است؟ بله. ریسک کمتر از ۱۵ درصد است؟ بله. در نتیجه، سرمایه‌گذاری از این دو شرط عبور می‌کند و می‌تواند برای مرحله اجرای معامله تأیید شود. البته در سیستم واقعی، معیارهای مالی باید دقیق تعریف شوند؛ مثلاً مشخص شود منظور از ریسک، نوسان تاریخی است یا معیار دیگری. همچنین اعتبارسنجی نهایی و محدودیت‌های امنیتی باید مستقل و قابل‌اعتماد باشند. نکته امتحانی: مدل تحلیل می‌کند، منطق تصمیم‌گیری قوانین را اعمال می‌کند و عملگر اقدام را اجرا می‌کند." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">4</span>
+                Olivia wants to ensure that a financial AI agent only executes trades that meet strict investment criteria (e.g., returns &gt;7%, risk &lt;15%). What system should she rely on to enforce this rule?
+            </p>
+<p class="quiz-question">
+                اولیویا می‌خواهد مطمئن شود ایجنت مالی فقط معاملاتی را اجرا می‌کند که معیارهای سخت‌گیرانه سرمایه‌گذاری را داشته باشند؛ مثلاً بازده بیشتر از ۷ درصد و ریسک کمتر از ۱۵ درصد. برای اعمال این قوانین باید از چه سیستمی استفاده کند؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>حسگرهای ایجنت (Agent’s Sensors)</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>لایه منطق تصمیم‌گیری (Decision Logic Layer)</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>عملگر (Actuator)</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>لایه مدل (Model Layer)</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section blue" id="q5">
+<article class="quiz-item" data-correct="a" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۱ است. در برخی معماری‌ها، می‌توان بخشی از وظایف تصمیم‌گیری را به خود مدل زبانی سپرد. در این حالت، به‌جای اینکه یک لایه مستقل تمام تصمیم‌ها را بررسی کند، مدل با کمک دستورالعمل‌ها و فرایند استدلال خود اقدام مناسب را انتخاب می‌کند. Prompt Engineering دستورالعمل‌های دقیق برای تعیین نقش، محدودیت‌ها و شیوه رفتار مدل. Chain of Thought هدایت مدل به بررسی مراحل و جنبه‌های مختلف یک مسئله پیش از انتخاب پاسخ یا اقدام. برای مثال، مدل می‌تواند با توجه به بودجه کاربر، ترجیحات او و شرایط خرید، گزینه‌های مختلف را بررسی کند و محصول مناسب‌تری پیشنهاد دهد. حذف لایه مستقل تصمیم‌گیری به معنای حذف کنترل‌های ایمنی نیست. در عملیات حساس، مانند پرداخت یا تراکنش مالی، اعتبارسنجی خارجی و محدودیت‌های اجرایی همچنان ضروری‌اند. همچنین خروجی استدلال مدل نباید به‌تنهایی تضمین‌کننده صحت تصمیم تلقی شود. نکته امتحانی: وقتی لایه تصمیم‌گیری مستقل وجود ندارد و خود LLM با دستورالعمل و استدلال تصمیم می‌گیرد، منطق تصمیم‌گیری در فرایند استدلال مدل ادغام شده است." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۱ است. در برخی معماری‌ها، می‌توان بخشی از وظایف تصمیم‌گیری را به خود مدل زبانی سپرد. در این حالت، به‌جای اینکه یک لایه مستقل تمام تصمیم‌ها را بررسی کند، مدل با کمک دستورالعمل‌ها و فرایند استدلال خود اقدام مناسب را انتخاب می‌کند. Prompt Engineering دستورالعمل‌های دقیق برای تعیین نقش، محدودیت‌ها و شیوه رفتار مدل. Chain of Thought هدایت مدل به بررسی مراحل و جنبه‌های مختلف یک مسئله پیش از انتخاب پاسخ یا اقدام. برای مثال، مدل می‌تواند با توجه به بودجه کاربر، ترجیحات او و شرایط خرید، گزینه‌های مختلف را بررسی کند و محصول مناسب‌تری پیشنهاد دهد. حذف لایه مستقل تصمیم‌گیری به معنای حذف کنترل‌های ایمنی نیست. در عملیات حساس، مانند پرداخت یا تراکنش مالی، اعتبارسنجی خارجی و محدودیت‌های اجرایی همچنان ضروری‌اند. همچنین خروجی استدلال مدل نباید به‌تنهایی تضمین‌کننده صحت تصمیم تلقی شود. نکته امتحانی: وقتی لایه تصمیم‌گیری مستقل وجود ندارد و خود LLM با دستورالعمل و استدلال تصمیم می‌گیرد، منطق تصمیم‌گیری در فرایند استدلال مدل ادغام شده است." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">5</span>
+                In developing the shopping assistant, Olivia’s team decides to let the LLM make decisions without a separate logic layer, but uses prompt engineering and chain-of-thought reasoning. What does this imply?
+            </p>
+<p class="quiz-question">
+                تیم اولیویا تصمیم می‌گیرد در دستیار خرید، بدون استفاده از یک لایه منطق مستقل، تصمیم‌گیری را به خود مدل زبانی بسپارد و از مهندسی پرامپت و استدلال زنجیره‌ای استفاده کند. این تصمیم چه مفهومی دارد؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>منطق تصمیم‌گیری در فرایند استدلال خود مدل ادغام شده است.</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>مدل دیگر به حسگر نیاز ندارد.</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>ایجنت دیگر نمی‌تواند بر محیط تأثیر بگذارد.</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>سیستم توانایی پردازش داده‌های چندرسانه‌ای را از دست می‌دهد.</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section blue" id="q6">
+<article class="quiz-item" data-correct="d" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۴، یعنی Actuators است. عملگرها سازوکارهایی هستند که تصمیم ایجنت را به اقدام تبدیل می‌کنند. به کمک آن‌ها، ایجنت می‌تواند وضعیت محیط را تغییر دهد. خودروی خودران فرمان، ترمز و کنترل شتاب خودرو. ایجنت معاملاتی ارسال دستور خرید یا فروش از طریق API. فیلتر ایمیل انتقال ایمیل به پوشه هرزنامه. دستیار خرید ثبت سفارش یا افزودن محصول به سبد خرید. نکته امتحانی: Sensors اطلاعات را دریافت می‌کنند؛ Actuators اقدامات را اجرا می‌کنند." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۴، یعنی Actuators است. عملگرها سازوکارهایی هستند که تصمیم ایجنت را به اقدام تبدیل می‌کنند. به کمک آن‌ها، ایجنت می‌تواند وضعیت محیط را تغییر دهد. خودروی خودران فرمان، ترمز و کنترل شتاب خودرو. ایجنت معاملاتی ارسال دستور خرید یا فروش از طریق API. فیلتر ایمیل انتقال ایمیل به پوشه هرزنامه. دستیار خرید ثبت سفارش یا افزودن محصول به سبد خرید. نکته امتحانی: Sensors اطلاعات را دریافت می‌کنند؛ Actuators اقدامات را اجرا می‌کنند." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">6</span>
+                What role do actuators play in the AI agents Olivia’s team is building?
+            </p>
+<p class="quiz-question">
+                عملگرها در ایجنت‌هایی که تیم اولیویا می‌سازد چه نقشی دارند؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>به ایجنت اجازه می‌دهند اطلاعات ورودی را از محیط جمع‌آوری کند.</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>داده‌های پیچیده را تفسیر می‌کنند و پیش‌بینی ارائه می‌دهند.</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>اجزای ثابت محیط ایجنت را تعریف می‌کنند.</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>به ایجنت امکان می‌دهند اقداماتی انجام دهد که محیط را تحت تأثیر قرار می‌دهد یا تغییر می‌دهد.</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section purple" id="case-two">
+<h2 class="section-title">🤖 ۲. مطالعه موردی دوم: طبقه‌بندی پنج ایجنت</h2>
+<div class="case-intro">
+<h3>Case 2 | بررسی پنج نمونه از ایجنت‌های هوشمند</h3>
+<p>
+                شرکت نرم‌افزاری <span class="en">NeuroSoft AI</span> مجموعه‌ای از ایجنت‌های هوشمند را برای کاربردهای مختلف توسعه داده است. تیم محصول این شرکت پنج نمونه اولیه طراحی کرده که هرکدام از نظر ساختار، قابلیت‌ها و سطح پیچیدگی با دیگری تفاوت دارند.
+            </p>
+<div class="case-list">
+<div class="case-item">
+<strong>۱. ThermoBot – کنترل‌کننده دمای خانه</strong>
+<p>
+                        وقتی دمای داخل خانه از ۲۰ درجه سانتی‌گراد پایین‌تر می‌رود، سیستم گرمایشی را روشن می‌کند.
+                    </p>
+</div>
+<div class="case-item">
+<strong>۲. Sweepy – جاروبرقی رباتیک</strong>
+<p>
+                        نقشه اتاق را ایجاد می‌کند، موانع را شناسایی می‌کند و هنگام نظافت از برخورد با آن‌ها جلوگیری می‌کند.
+                    </p>
+</div>
+<div class="case-item">
+<strong>۳. RouteMaster – دستیار مسیریابی</strong>
+<p>
+                        با توجه به شرایط لحظه‌ای ترافیک، مسیر پیشنهادی را به‌روزرسانی می‌کند.
+                    </p>
+</div>
+<div class="case-item">
+<strong>۴. FinWise – مشاور مالی هوشمند</strong>
+<p>
+                        فرصت‌های سرمایه‌گذاری را بر اساس بازده مورد انتظار، ریسک، نقدشوندگی و احتمال نکول ارزیابی می‌کند.
+                    </p>
+</div>
+<div class="case-item">
+<strong>۵. MarketLearner – برنامه‌ریز محتوای شبکه‌های اجتماعی</strong>
+<p>
+                        عملکرد پست‌های قبلی را تحلیل می‌کند و با توجه به میزان تعامل کاربران، استراتژی محتواهای آینده را تغییر می‌دهد.
+                    </p>
+</div>
+</div>
+<p>
+                تیم محصول باید مشخص کند هر ایجنت به کدام نوع ساختار تعلق دارد و تا چه اندازه ویژگی‌های اصلی ایجنت‌های پیشرفته را داراست.
+            </p>
+<p>
+                این پنج ویژگی عبارت‌اند از:
+            </p>
+<ul>
+<li><strong>Persona:</strong> نقش، هویت و شیوه تعامل ایجنت.</li>
+<li><strong>Memory:</strong> توانایی نگهداری اطلاعات و زمینه‌های قبلی.</li>
+<li><strong>Reasoning:</strong> توانایی تحلیل اطلاعات و حل مسئله.</li>
+<li><strong>Actions:</strong> توانایی انجام اقدام برای رسیدن به هدف.</li>
+<li><strong>Learning:</strong> توانایی یادگیری از تجربه و بهبود عملکرد.</li>
+</ul>
+</div>
+<h3>🧭 پنج نوع اصلی ساختار ایجنت</h3>
+<p>
+            برای پاسخ به سؤال‌های این مطالعه موردی، باید تفاوت پنج نوع ساختار را به‌خوبی بشناسیم. این ساختارها از واکنش ساده به ورودی محیط شروع می‌شوند و به سیستم‌هایی می‌رسند که می‌توانند از تجربه یاد بگیرند.
+        </p>
+<div class="comparison-scroll">
+<table>
+<thead>
+<tr>
+<th>نوع ایجنت</th>
+<th>ویژگی اصلی</th>
+<th>نمونه این مطالعه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="en">Simple Reflex</span></td>
+<td>واکنش بر اساس قوانین ثابت و ورودی فعلی</td>
+<td><span class="en">ThermoBot</span></td>
+</tr>
+<tr>
+<td><span class="en">Model-Based Reflex</span></td>
+<td>نگهداری مدل داخلی از وضعیت محیط</td>
+<td><span class="en">Sweepy</span></td>
+</tr>
+<tr>
+<td><span class="en">Goal-Based</span></td>
+<td>برنامه‌ریزی برای رسیدن به هدف مشخص</td>
+<td><span class="en">RouteMaster</span></td>
+</tr>
+<tr>
+<td><span class="en">Utility-Based</span></td>
+<td>ارزیابی چند معیار و انتخاب مطلوب‌ترین گزینه</td>
+<td><span class="en">FinWise</span></td>
+</tr>
+<tr>
+<td><span class="en">Learning Agent</span></td>
+<td>یادگیری از تجربه و بهبود عملکرد آینده</td>
+<td><span class="en">MarketLearner</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="box important">
+<p>
+                ترتیب این ساختارها نشان‌دهنده افزایش قابلیت‌ها و پیچیدگی است؛ اما در عمل ممکن است یک ایجنت ترکیبی از چند ویژگی باشد. برای طبقه‌بندی، باید قابلیت غالب و نحوه تصمیم‌گیری آن را بررسی کنیم.
+            </p>
+</div>
+</section><section class="section purple" id="q7">
+<article class="quiz-item" data-correct="b" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۲، یعنی ThermoBot است. Simple Reflex Agent ساده‌ترین نوع ایجنت است. این ساختار به ورودی فعلی محیط واکنش نشان می‌دهد و برای انتخاب اقدام از قوانین از پیش تعریف‌شده استفاده می‌کند. قانون ThermoBot: اگر دمای محیط کمتر از ۲۰ درجه باشد، سیستم گرمایشی را روشن کن. در غیر این صورت، نیازی به فعال کردن گرمایش نیست. این سیستم لازم نیست بداند دیروز دمای خانه چقدر بوده یا در هفته گذشته چه الگویی از مصرف انرژی وجود داشته است. فقط ورودی فعلی را بررسی می‌کند و مطابق قانون واکنش نشان می‌دهد. بررسی سایر گزینه‌ها: Sweepy: مدل داخلی محیط دارد. FinWise: چند معیار را برای انتخاب مطلوب‌ترین سرمایه‌گذاری بررسی می‌کند. RouteMaster: برای رسیدن به مقصد، مسیرهای مختلف را ارزیابی و برنامه‌ریزی می‌کند. نکته امتحانی: واکنش مستقیم بر اساس قانون ثابت، بدون حافظه و یادگیری، نشانه اصلی Simple Reflex Agent است." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۲، یعنی ThermoBot است. Simple Reflex Agent ساده‌ترین نوع ایجنت است. این ساختار به ورودی فعلی محیط واکنش نشان می‌دهد و برای انتخاب اقدام از قوانین از پیش تعریف‌شده استفاده می‌کند. قانون ThermoBot: اگر دمای محیط کمتر از ۲۰ درجه باشد، سیستم گرمایشی را روشن کن. در غیر این صورت، نیازی به فعال کردن گرمایش نیست. این سیستم لازم نیست بداند دیروز دمای خانه چقدر بوده یا در هفته گذشته چه الگویی از مصرف انرژی وجود داشته است. فقط ورودی فعلی را بررسی می‌کند و مطابق قانون واکنش نشان می‌دهد. بررسی سایر گزینه‌ها: Sweepy: مدل داخلی محیط دارد. FinWise: چند معیار را برای انتخاب مطلوب‌ترین سرمایه‌گذاری بررسی می‌کند. RouteMaster: برای رسیدن به مقصد، مسیرهای مختلف را ارزیابی و برنامه‌ریزی می‌کند. نکته امتحانی: واکنش مستقیم بر اساس قانون ثابت، بدون حافظه و یادگیری، نشانه اصلی Simple Reflex Agent است." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">7</span>
+                Which of NeuroSoft’s agents is most accurately described as a simple reflex agent, and why?
+            </p>
+<p class="quiz-question">
+                کدام‌یک از ایجنت‌های شرکت NeuroSoft دقیق‌ترین نمونه از یک ایجنت واکنشی ساده است و دلیل آن چیست؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>Sweepy، زیرا می‌تواند نقشه اتاق را ایجاد کند و از موانع دوری کند.</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>ThermoBot، زیرا بدون حافظه یا استدلال، مستقیماً بر اساس اندازه‌گیری دما واکنش نشان می‌دهد.</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>FinWise، زیرا چندین معیار سرمایه‌گذاری را ارزیابی می‌کند.</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>RouteMaster، زیرا مسیرها را بر اساس ترافیک تغییر می‌دهد.</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section purple" id="q8">
+<article class="quiz-item" data-correct="a" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۱، یعنی Sweepy است. Sweepy هنگام نظافت، نقشه‌ای از محیط می‌سازد و موقعیت موانع و بخش‌هایی را که تمیز کرده است، در مدل داخلی خود نگهداری می‌کند. این ویژگی باعث می‌شود Sweepy نسبت به یک ایجنت واکنشی ساده پیشرفته‌تر باشد؛ زیرا فقط به ورودی لحظه‌ای واکنش نشان نمی‌دهد، بلکه از اطلاعات داخلی درباره وضعیت محیط نیز استفاده می‌کند. تفاوت به‌روزرسانی مدل و یادگیری واقعی فرض کنید جاروبرقی نقشه اتاق را با استفاده از داده‌های حسگر به‌روزرسانی می‌کند. این کار به معنای یادگیری واقعی نیست؛ زیرا ممکن است صرفاً اطلاعات جدید محیط را در مدل خود ثبت کرده باشد. حالا فرض کنید جاروبرقی پس از چندین بار نظافت متوجه شود آشپزخانه سریع‌تر از راهرو کثیف می‌شود و در دفعات بعدی زمان بیشتری برای تمیز کردن آشپزخانه اختصاص دهد. این رفتار نمونه‌ای از یادگیری و بهبود است. تفاوت کلیدی: به‌روزرسانی اطلاعات محیط با استفاده از حسگرها لزوماً به معنای یادگیری نیست. یادگیری زمانی مطرح می‌شود که تجربه‌های قبلی باعث بهبود رفتار یا راهبرد آینده شوند. نکته امتحانی: Model-Based یعنی داشتن مدل داخلی از محیط؛ Learning یعنی استفاده از تجربه برای بهبود عملکرد." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۱، یعنی Sweepy است. Sweepy هنگام نظافت، نقشه‌ای از محیط می‌سازد و موقعیت موانع و بخش‌هایی را که تمیز کرده است، در مدل داخلی خود نگهداری می‌کند. این ویژگی باعث می‌شود Sweepy نسبت به یک ایجنت واکنشی ساده پیشرفته‌تر باشد؛ زیرا فقط به ورودی لحظه‌ای واکنش نشان نمی‌دهد، بلکه از اطلاعات داخلی درباره وضعیت محیط نیز استفاده می‌کند. تفاوت به‌روزرسانی مدل و یادگیری واقعی فرض کنید جاروبرقی نقشه اتاق را با استفاده از داده‌های حسگر به‌روزرسانی می‌کند. این کار به معنای یادگیری واقعی نیست؛ زیرا ممکن است صرفاً اطلاعات جدید محیط را در مدل خود ثبت کرده باشد. حالا فرض کنید جاروبرقی پس از چندین بار نظافت متوجه شود آشپزخانه سریع‌تر از راهرو کثیف می‌شود و در دفعات بعدی زمان بیشتری برای تمیز کردن آشپزخانه اختصاص دهد. این رفتار نمونه‌ای از یادگیری و بهبود است. تفاوت کلیدی: به‌روزرسانی اطلاعات محیط با استفاده از حسگرها لزوماً به معنای یادگیری نیست. یادگیری زمانی مطرح می‌شود که تجربه‌های قبلی باعث بهبود رفتار یا راهبرد آینده شوند. نکته امتحانی: Model-Based یعنی داشتن مدل داخلی از محیط؛ Learning یعنی استفاده از تجربه برای بهبود عملکرد." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">8</span>
+                Which agent exhibits model-based reflex behavior but does not demonstrate genuine learning?
+            </p>
+<p class="quiz-question">
+                کدام ایجنت رفتار واکنشی مبتنی بر مدل دارد، اما یادگیری واقعی را نشان نمی‌دهد؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>Sweepy</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>ThermoBot</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>MarketLearner</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>RouteMaster</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section purple" id="q9">
+<article class="quiz-item" data-correct="c" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۳، یعنی Utility-Based Agent است. ایجنت مطلوبیت‌محور فقط به دنبال رسیدن به یک هدف ساده نیست؛ بلکه چندین معیار را هم‌زمان بررسی می‌کند تا بهترین گزینه را با توجه به شرایط انتخاب کند. Expected Return بازده مورد انتظار از سرمایه‌گذاری. Volatility میزان نوسان قیمت یا بازده دارایی. Liquidity سرعت و سهولت تبدیل دارایی به پول نقد. Risk احتمال وقوع زیان یا نتیجه نامطلوب. برای مثال، یک سرمایه‌گذاری با بازده ۷ درصد ممکن است ریسک و نوسان بسیار زیادی داشته باشد. در مقابل، سرمایه‌گذاری دیگری با بازده ۶ درصد ممکن است نقدشوندگی بیشتر و ریسک کمتری داشته باشد. ایجنت مطلوبیت‌محور هر دو گزینه را از جنبه‌های مختلف ارزیابی می‌کند. تفاوت Goal-Based و Utility-Based نوع سؤال اصلی Goal-Based آیا به هدف مشخص‌شده می‌رسیم؟ Utility-Based کدام گزینه در مجموع مطلوبیت بیشتری دارد؟ نکته امتحانی: عباراتی مانند Multiple Criteria ، Trade-offs و Expected Utility نشانه‌های مهم ایجنت مطلوبیت‌محور هستند." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۳، یعنی Utility-Based Agent است. ایجنت مطلوبیت‌محور فقط به دنبال رسیدن به یک هدف ساده نیست؛ بلکه چندین معیار را هم‌زمان بررسی می‌کند تا بهترین گزینه را با توجه به شرایط انتخاب کند. Expected Return بازده مورد انتظار از سرمایه‌گذاری. Volatility میزان نوسان قیمت یا بازده دارایی. Liquidity سرعت و سهولت تبدیل دارایی به پول نقد. Risk احتمال وقوع زیان یا نتیجه نامطلوب. برای مثال، یک سرمایه‌گذاری با بازده ۷ درصد ممکن است ریسک و نوسان بسیار زیادی داشته باشد. در مقابل، سرمایه‌گذاری دیگری با بازده ۶ درصد ممکن است نقدشوندگی بیشتر و ریسک کمتری داشته باشد. ایجنت مطلوبیت‌محور هر دو گزینه را از جنبه‌های مختلف ارزیابی می‌کند. تفاوت Goal-Based و Utility-Based نوع سؤال اصلی Goal-Based آیا به هدف مشخص‌شده می‌رسیم؟ Utility-Based کدام گزینه در مجموع مطلوبیت بیشتری دارد؟ نکته امتحانی: عباراتی مانند Multiple Criteria ، Trade-offs و Expected Utility نشانه‌های مهم ایجنت مطلوبیت‌محور هستند." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">9</span>
+                FinWise evaluates investment options based on expected return, volatility, liquidity, and risk. What type of agent is this?
+            </p>
+<p class="quiz-question">
+                FinWise گزینه‌های سرمایه‌گذاری را بر اساس بازده مورد انتظار، نوسان، نقدشوندگی و ریسک ارزیابی می‌کند. این ایجنت از چه نوعی است؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>Simple Reflex Agent – ایجنت واکنشی ساده</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>Goal-Based Agent – ایجنت هدف‌محور</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>Utility-Based Agent – ایجنت مبتنی بر مطلوبیت</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>Learning Agent – ایجنت یادگیرنده</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section purple" id="q10">
+<article class="quiz-item" data-correct="c" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۳ است. RouteMaster یک Goal-Based Agent است؛ زیرا هدف مشخصی دارد و برای رسیدن به آن، مسیرهای مختلف را بررسی و برنامه‌ریزی می‌کند. هدف این ایجنت، رساندن کاربر به مقصد در کمترین زمان ممکن است. فرایند تصمیم‌گیری RouteMaster دریافت موقعیت فعلی کاربر و مقصد. دریافت اطلاعات ترافیک و وضعیت مسیرها. بررسی مسیرهای جایگزین و زمان تقریبی رسیدن. انتخاب مسیری که با هدف سیستم سازگارتر است. در صورت تغییر شرایط، بررسی دوباره مسیرها و ارائه پیشنهاد جدید. فرض کنید مسیر اصلی به دلیل تصادف مسدود شده باشد. RouteMaster اطلاعات جدید را دریافت می‌کند، گزینه‌های جایگزین را بررسی می‌کند و مسیر دیگری پیشنهاد می‌دهد تا کاربر با کمترین تأخیر به مقصد برسد. نکته مهم این است که داشتن مدل داخلی به‌تنهایی RouteMaster را هدف‌محور نمی‌کند؛ ویژگی اصلی آن جست‌وجو و برنامه‌ریزی برای رسیدن به هدف است. نکته امتحانی: عباراتی مانند Planning ، Search for Action Sequences و Minimize Travel Time به ساختار هدف‌محور اشاره دارند." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۳ است. RouteMaster یک Goal-Based Agent است؛ زیرا هدف مشخصی دارد و برای رسیدن به آن، مسیرهای مختلف را بررسی و برنامه‌ریزی می‌کند. هدف این ایجنت، رساندن کاربر به مقصد در کمترین زمان ممکن است. فرایند تصمیم‌گیری RouteMaster دریافت موقعیت فعلی کاربر و مقصد. دریافت اطلاعات ترافیک و وضعیت مسیرها. بررسی مسیرهای جایگزین و زمان تقریبی رسیدن. انتخاب مسیری که با هدف سیستم سازگارتر است. در صورت تغییر شرایط، بررسی دوباره مسیرها و ارائه پیشنهاد جدید. فرض کنید مسیر اصلی به دلیل تصادف مسدود شده باشد. RouteMaster اطلاعات جدید را دریافت می‌کند، گزینه‌های جایگزین را بررسی می‌کند و مسیر دیگری پیشنهاد می‌دهد تا کاربر با کمترین تأخیر به مقصد برسد. نکته مهم این است که داشتن مدل داخلی به‌تنهایی RouteMaster را هدف‌محور نمی‌کند؛ ویژگی اصلی آن جست‌وجو و برنامه‌ریزی برای رسیدن به هدف است. نکته امتحانی: عباراتی مانند Planning ، Search for Action Sequences و Minimize Travel Time به ساختار هدف‌محور اشاره دارند." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">10</span>
+                Why does RouteMaster qualify as a goal-based agent rather than a simple reflex or model-based agent?
+            </p>
+<p class="quiz-question">
+                چرا RouteMaster یک ایجنت هدف‌محور محسوب می‌شود، نه یک ایجنت واکنشی ساده یا مبتنی بر مدل؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>فقط اطلاعات GPS را جمع‌آوری می‌کند و نقشه را به کاربران نمایش می‌دهد.</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>از مسیرهای از پیش تعیین‌شده و ثابت، بدون تغییرات لحظه‌ای استفاده می‌کند.</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>یک مدل داخلی از محیط ایجاد می‌کند و مسیرها را برای به حداقل رساندن زمان سفر به‌روزرسانی می‌کند.</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>از یادگیری ماشین برای طبقه‌بندی شرایط جاده بر اساس ویدئو استفاده می‌کند.</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section purple" id="q11">
+<article class="quiz-item" data-correct="d" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۴ است. MarketLearner یک Learning Agent است؛ زیرا از بازخورد و تجربه‌های قبلی برای بهبود تصمیم‌های آینده استفاده می‌کند. یادگیری در MarketLearner چگونه انجام می‌شود؟ انتشار: یک پست در شبکه اجتماعی منتشر می‌شود. جمع‌آوری داده: میزان لایک، نظر، اشتراک‌گذاری و سایر نشانه‌های تعامل ثبت می‌شود. تحلیل: عملکرد محتواهای مختلف با یکدیگر مقایسه می‌شود. یادگیری: الگوهای موفق و ناموفق از تجربه‌ها استخراج می‌شوند. سازگاری: استراتژی محتوا، زمان انتشار یا شیوه نگارش برای انتشارهای بعدی تغییر می‌کند. برای مثال، اگر سیستم متوجه شود پست‌های آموزشی در ساعت ۸ شب تعامل بیشتری دارند، می‌تواند این الگو را در برنامه‌ریزی انتشارهای بعدی در نظر بگیرد. تفاوت Memory و Learning Memory: اطلاعات و تجربه‌های قبلی را نگهداری می‌کند. Learning: از اطلاعات و تجربه‌های قبلی استفاده می‌کند تا عملکرد آینده را بهبود دهد. نکته امتحانی: هرجا در سؤال عبارت‌هایی مانند Learn from Experience ، Adapt Over Time یا Improve Future Performance مشاهده کردید، به Learning Agent فکر کنید." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۴ است. MarketLearner یک Learning Agent است؛ زیرا از بازخورد و تجربه‌های قبلی برای بهبود تصمیم‌های آینده استفاده می‌کند. یادگیری در MarketLearner چگونه انجام می‌شود؟ انتشار: یک پست در شبکه اجتماعی منتشر می‌شود. جمع‌آوری داده: میزان لایک، نظر، اشتراک‌گذاری و سایر نشانه‌های تعامل ثبت می‌شود. تحلیل: عملکرد محتواهای مختلف با یکدیگر مقایسه می‌شود. یادگیری: الگوهای موفق و ناموفق از تجربه‌ها استخراج می‌شوند. سازگاری: استراتژی محتوا، زمان انتشار یا شیوه نگارش برای انتشارهای بعدی تغییر می‌کند. برای مثال، اگر سیستم متوجه شود پست‌های آموزشی در ساعت ۸ شب تعامل بیشتری دارند، می‌تواند این الگو را در برنامه‌ریزی انتشارهای بعدی در نظر بگیرد. تفاوت Memory و Learning Memory: اطلاعات و تجربه‌های قبلی را نگهداری می‌کند. Learning: از اطلاعات و تجربه‌های قبلی استفاده می‌کند تا عملکرد آینده را بهبود دهد. نکته امتحانی: هرجا در سؤال عبارت‌هایی مانند Learn from Experience ، Adapt Over Time یا Improve Future Performance مشاهده کردید، به Learning Agent فکر کنید." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">11</span>
+                MarketLearner adjusts future content strategy based on how users interacted with previous posts. What makes this agent more advanced than the others?
+            </p>
+<p class="quiz-question">
+                MarketLearner استراتژی محتوای آینده را بر اساس نحوه تعامل کاربران با پست‌های قبلی تغییر می‌دهد. چه چیزی این ایجنت را از سایر نمونه‌ها پیشرفته‌تر می‌کند؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>با استفاده از عملگرها اقدامات فیزیکی انجام می‌دهد.</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>اطلاعات جلسات نظافت قبلی را ذخیره می‌کند.</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>امتیازهای مطلوبیت را بر اساس مبادله میان معیارهای سرمایه‌گذاری محاسبه می‌کند.</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>از یک مؤلفه یادگیری استفاده می‌کند تا در طول زمان رفتار خود را با شرایط جدید تطبیق دهد.</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><section class="section purple" id="q12">
+<article class="quiz-item" data-correct="c" data-feedback-correct="آفرین! پاسخ شما صحیح است. پاسخ صحیح گزینه ۳، یعنی Learning and Reasoning است. ThermoBot یک ایجنت واکنشی ساده است. این سیستم دما را اندازه‌گیری می‌کند و بر اساس یک قانون از پیش تعیین‌شده، سیستم گرمایشی را روشن یا خاموش می‌کند. بررسی پنج ویژگی اصلی در ThermoBot ویژگی وضعیت توضیح Persona محدود وظیفه مشخصی برای کنترل دما دارد. Memory نیاز ندارد برای واکنش به دمای فعلی به تاریخچه تجربیات نیاز ندارد. Reasoning ندارد فقط شرط از پیش تعیین‌شده را بررسی می‌کند. Actions دارد سیستم گرمایشی را روشن یا خاموش می‌کند. Learning ندارد از تجربه برای بهبود رفتار آینده استفاده نمی‌کند. چرا گزینه‌های دیگر صحیح نیستند؟ گزینه ۱: ThermoBot برای دریافت دما به Sensor و برای کنترل سیستم گرمایشی به Actuator نیاز دارد. گزینه ۲: ThermoBot برای وظیفه ساده خود نیازی به نقشه داخلی محیط ندارد. گزینه ۴: این ایجنت با روشن کردن سیستم گرمایشی، دمای محیط را تغییر می‌دهد. نکته مهم: ThermoBot فاقد یادگیری و استدلال پیچیده است، اما همچنان یک Agent محسوب می‌شود؛ زیرا محیط را از طریق حسگر دریافت می‌کند و با استفاده از عملگر بر آن اثر می‌گذارد. نکته امتحانی: وجود حسگر و عملگر برای یک ایجنت ساده کافی است؛ اما داشتن این دو ویژگی به معنای برخورداری از یادگیری و استدلال پیشرفته نیست." data-feedback-incorrect="پاسخ شما صحیح نیست. پاسخ صحیح با رنگ سبز مشخص شده است. پاسخ صحیح گزینه ۳، یعنی Learning and Reasoning است. ThermoBot یک ایجنت واکنشی ساده است. این سیستم دما را اندازه‌گیری می‌کند و بر اساس یک قانون از پیش تعیین‌شده، سیستم گرمایشی را روشن یا خاموش می‌کند. بررسی پنج ویژگی اصلی در ThermoBot ویژگی وضعیت توضیح Persona محدود وظیفه مشخصی برای کنترل دما دارد. Memory نیاز ندارد برای واکنش به دمای فعلی به تاریخچه تجربیات نیاز ندارد. Reasoning ندارد فقط شرط از پیش تعیین‌شده را بررسی می‌کند. Actions دارد سیستم گرمایشی را روشن یا خاموش می‌کند. Learning ندارد از تجربه برای بهبود رفتار آینده استفاده نمی‌کند. چرا گزینه‌های دیگر صحیح نیستند؟ گزینه ۱: ThermoBot برای دریافت دما به Sensor و برای کنترل سیستم گرمایشی به Actuator نیاز دارد. گزینه ۲: ThermoBot برای وظیفه ساده خود نیازی به نقشه داخلی محیط ندارد. گزینه ۴: این ایجنت با روشن کردن سیستم گرمایشی، دمای محیط را تغییر می‌دهد. نکته مهم: ThermoBot فاقد یادگیری و استدلال پیچیده است، اما همچنان یک Agent محسوب می‌شود؛ زیرا محیط را از طریق حسگر دریافت می‌کند و با استفاده از عملگر بر آن اثر می‌گذارد. نکته امتحانی: وجود حسگر و عملگر برای یک ایجنت ساده کافی است؛ اما داشتن این دو ویژگی به معنای برخورداری از یادگیری و استدلال پیشرفته نیست." data-type="single_select">
+
+<p class="quiz-question" dir="ltr"><span class="quiz-question__number">12</span>
+                Based on the five core characteristics (persona, memory, reasoning, actions, and learning), which of the following would most likely be missing from ThermoBot?
+            </p>
+<p class="quiz-question">
+                با توجه به پنج ویژگی اصلی ایجنت‌های پیشرفته (پرسونا، حافظه، استدلال، اقدامات و یادگیری)، کدام ویژگی به احتمال زیاد در ThermoBot وجود ندارد؟
+            </p>
+<div class="quiz-options">
+<button class="quiz-option" data-value="a" type="button"><span>حسگرها و عملگرها (Sensors and Actuators)</span></button>
+<button class="quiz-option" data-value="b" type="button"><span>نقشه داخلی مبتنی بر مدل (Model-Based Internal Map)</span></button>
+<button class="quiz-option" data-value="c" type="button"><span>یادگیری و استدلال (Learning and Reasoning)</span></button>
+<button class="quiz-option" data-value="d" type="button"><span>توانایی تغییر محیط (Ability to Change the Environment)</span></button>
+</div>
+
+
+<div aria-live="polite" class="quiz-feedback"></div></article>
+</section><div class="quiz-submit-area quiz-actions"><button class="quiz-action quiz-action--secondary" data-quiz-reset="" type="button">↻ شروع مجدد آزمون</button></div><div aria-live="polite" class="quiz-result" data-quiz-result=""><strong>نتیجه آزمون</strong><span class="quiz-result__score" data-quiz-score=""></span><span data-quiz-result-detail=""></span></div></section><section class="section green" id="final-summary">
+<h2 class="section-title">📌 ۳. جمع‌بندی نهایی آزمون</h2>
+<p>
+            در این آزمون دو موضوع اصلی را بررسی کردیم: نخست اجزای معماری یک ایجنت و سپس انواع ساختارهای ایجنت بر اساس سطح پیچیدگی و قابلیت‌های آن‌ها.
+        </p>
+<h3>الف) اجزای اصلی معماری ایجنت</h3>
+<div class="comparison-scroll">
+<table>
+<thead>
+<tr>
+<th>جزء</th>
+<th>مسئولیت</th>
+<th>مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="en">Environment</span></td>
+<td>محیط و شرایطی که ایجنت در آن فعالیت می‌کند.</td>
+<td>جاده، فروشگاه آنلاین، داده‌های آب‌وهوا</td>
+</tr>
+<tr>
+<td><span class="en">Sensors</span></td>
+<td>دریافت اطلاعات از محیط.</td>
+<td>دوربین، API، Web Scraper</td>
+</tr>
+<tr>
+<td><span class="en">Model</span></td>
+<td>تفسیر و تحلیل اطلاعات.</td>
+<td>الگوریتم یادگیری ماشین یا LLM</td>
+</tr>
+<tr>
+<td><span class="en">Decision Logic</span></td>
+<td>اعمال قوانین و انتخاب اقدام مناسب.</td>
+<td>بررسی محدودیت ریسک معامله</td>
+</tr>
+<tr>
+<td><span class="en">Actuators</span></td>
+<td>اجرای اقدامات و تغییر محیط.</td>
+<td>ارسال ایمیل، ثبت سفارش، کنترل ترمز</td>
+</tr>
+<tr>
+<td><span class="en">Feedback</span></td>
+<td>بررسی نتیجه اقدامات و کمک به بهبود عملکرد.</td>
+<td>بررسی واکنش کاربران یا نتیجه معامله</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>ب) پنج نوع اصلی ایجنت</h3>
+<div class="comparison-scroll">
+<table>
+<thead>
+<tr>
+<th>نوع ایجنت</th>
+<th>منطق اصلی</th>
+<th>نمونه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="en">Simple Reflex</span></td>
+<td>واکنش به ورودی فعلی با قوانین ثابت.</td>
+<td>ThermoBot</td>
+</tr>
+<tr>
+<td><span class="en">Model-Based Reflex</span></td>
+<td>استفاده از مدل داخلی برای شناخت محیط.</td>
+<td>Sweepy</td>
+</tr>
+<tr>
+<td><span class="en">Goal-Based</span></td>
+<td>برنامه‌ریزی برای رسیدن به هدف مشخص.</td>
+<td>RouteMaster</td>
+</tr>
+<tr>
+<td><span class="en">Utility-Based</span></td>
+<td>ارزیابی چند معیار و انتخاب مطلوب‌ترین نتیجه.</td>
+<td>FinWise</td>
+</tr>
+<tr>
+<td><span class="en">Learning Agent</span></td>
+<td>یادگیری از تجربه و بهبود عملکرد آینده.</td>
+<td>MarketLearner</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>ج) پاسخ‌نامه آزمون</h3>
+<div class="comparison-scroll">
+<table>
+<thead>
+<tr>
+<th>سؤال</th>
+<th>گزینه صحیح</th>
+<th>مفهوم کلیدی</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>۱</td><td>۳</td><td>Environment</td></tr>
+<tr><td>۲</td><td>۴</td><td>Sensors</td></tr>
+<tr><td>۳</td><td>۳</td><td>Dynamic Environment</td></tr>
+<tr><td>۴</td><td>۲</td><td>Decision Logic Layer</td></tr>
+<tr><td>۵</td><td>۱</td><td>Embedded Decision Logic</td></tr>
+<tr><td>۶</td><td>۴</td><td>Actuators</td></tr>
+<tr><td>۷</td><td>۲</td><td>Simple Reflex Agent</td></tr>
+<tr><td>۸</td><td>۱</td><td>Model-Based Reflex Agent</td></tr>
+<tr><td>۹</td><td>۳</td><td>Utility-Based Agent</td></tr>
+<tr><td>۱۰</td><td>۳</td><td>Goal-Based Agent</td></tr>
+<tr><td>۱۱</td><td>۴</td><td>Learning Agent</td></tr>
+<tr><td>۱۲</td><td>۳</td><td>Learning and Reasoning</td></tr>
+</tbody>
+</table>
+</div>
+<div class="box success">
+<p>
+<strong>جمع‌بندی مفهومی:</strong>
+                برای تحلیل یک ایجنت، ابتدا بررسی کنید در چه محیطی فعالیت می‌کند و چه اطلاعاتی دریافت می‌کند. سپس ببینید چگونه این اطلاعات را تحلیل می‌کند، چه منطقی برای انتخاب اقدام دارد و چگونه تصمیم خود را اجرا می‌کند. در نهایت مشخص کنید آیا فقط به ورودی فعلی واکنش نشان می‌دهد یا از تجربه‌های گذشته برای بهبود رفتار آینده نیز استفاده می‌کند.
+            </p>
+</div>
+<div class="box note">
+<p>
+                یک نکته مهم را به خاطر داشته باشید: هر سیستم واکنشی لزوماً یک ایجنت هوش مصنوعی پیشرفته نیست؛ اما یک سیستم ساده نیز می‌تواند در تعریف پایه، Agent باشد؛ به شرط آنکه محیط را دریافت کند و بر اساس آن اقدامی انجام دهد.
+            </p>
+</div>
+</section>
+<!-- QUIZ SCORE -->
+
+<!-- NEXT LESSON -->
+<nav aria-label="ناوبری جلسات" class="lesson-navigation"><a class="lesson-navigation__link" href="Lesson_09.html"><span><span class="lesson-navigation__label">بازگشت به جلسه قبل</span><span class="lesson-navigation__title">جلسه ۰۹ · ارزش کسب‌وکاری عامل‌های هوش مصنوعی</span></span><span aria-hidden="true" class="lesson-navigation__arrow">→</span></a><a class="lesson-navigation__link lesson-navigation__link--next" href="#top"><span><span class="lesson-navigation__label">پایان دوره</span><span class="lesson-navigation__title">بازگشت به ابتدای آزمون</span></span><span aria-hidden="true" class="lesson-navigation__arrow">↑</span></a></nav>
+<section class="social">
+<h2>🌐 با ما همراه باشید</h2>
+<p>برای دریافت آخرین مطالب، پرسش و پاسخ و اطلاع از رویدادهای مرتبط، ما را در شبکه‌های اجتماعی دنبال کنید.</p>
+<div class="buttons">
+<a class="btn telegram" href="https://t.me/matcub" rel="noopener" target="_blank">📱 تلگرام</a>
+<a class="btn instagram" href="https://www.instagram.com/matcub_official/" rel="noopener" target="_blank">📸 اینستاگرام</a>
+<a class="btn btn-blue" href="https://www.linkedin.com/in/mohammadfallah1373/" rel="noopener" target="_blank">🔗 لینکدین</a>
+</div>
+</section>
+<footer class="site-footer" id="footer">
+        📘 مبانی Agentic Work • آزمون نهایی معماری و انواع AI Agents
+    </footer>
+</div>
+
+</body>
+</html>

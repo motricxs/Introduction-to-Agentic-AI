@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="آشنایی با عامل‌های هوش مصنوعی، تفاوت آن‌ها با استفاده معمول از مدل‌های زبانی بزرگ و تأثیرشان بر آینده کسب‌وکارها.">
+  <title>Lesson_01 | مقدمه‌ای بر عامل‌های هوش مصنوعی</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="quiz-engine.js" defer></script>
+  <script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <main class="container">
+    <nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+      <a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span>
+      </a>
+    </nav>
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#top">MATCUB · Learning Notes</a>
+      <nav class="topbar__links" aria-label="ناوبری صفحه">
+        <a href="#overview">معرفی</a>
+        <a href="#content">محتوای درس</a>
+        <a href="#business-impact">تأثیر کسب‌وکار</a>
+        <a href="#quiz">آزمون</a>
+      </nav>
+    </header>
+
+    <header class="hero" id="overview">
+      <div class="hero-content">
+        <div class="hero-label">🤖 جلسه اول · شروع مسیر یادگیری</div>
+        <h1>مقدمه‌ای بر <span>عامل‌های هوش مصنوعی</span></h1>
+        <p class="hero-subtitle">از دستیارهای مبتنی بر مدل‌های زبانی تا سامانه‌هایی که می‌توانند با ابزارها کار کنند، تصمیم بگیرند، وظایف چندمرحله‌ای را پیش ببرند و بر اساس بازخورد عملکرد خود را بهبود دهند.</p>
+        <div class="hero-badge">نگاه فنی و کسب‌وکاری به عصر هوش مصنوعی عامل‌محور</div>
+      </div>
+    </header>
+
+    <div class="lesson-meta" aria-label="اطلاعات درس">
+      <span class="lesson-meta__item">🧭 <strong>Lesson_01</strong></span>
+      <span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی</strong></span>
+      <span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۱۲ تا ۱۵ دقیقه</strong></span>
+      <span class="lesson-meta__item">🧪 همراه با آزمون تعاملی</span>
+    </div>
+
+    <div class="badges" aria-label="موضوعات درس">
+      <span class="badge gold">مبانی عامل‌های هوشمند</span>
+      <span class="badge green">مدل‌های زبانی بزرگ</span>
+      <span class="badge purple">خودکارسازی وظایف</span>
+      <span class="badge orange">تحول کسب‌وکار</span>
+      <span class="badge blue">هوش مصنوعی چندوجهی</span>
+    </div>
+
+    <section class="learning-intro" aria-labelledby="learning-intro-title">
+      <div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div>
+      <h2 id="learning-intro-title">نقشه راه جلسه</h2>
+      <p>هوش مصنوعی فقط ابزاری برای تولید متن یا پاسخ‌دادن به پرسش‌ها نیست. با ترکیب توانایی استدلال مدل‌های جدید و اتصال آن‌ها به ابزارهای نرم‌افزاری، می‌توان سامانه‌هایی ساخت که بخشی از یک فرایند کاری را به‌صورت مستقل پیش ببرند. در این جلسه با ایده اصلی این تحول و پیامدهای آن آشنا می‌شویم.</p>
+      <ul class="learning-objectives">
+        <li>درک نقش مدل‌های زبانی بزرگ در موج جدید هوش مصنوعی</li>
+        <li>تشخیص تفاوت یک درخواست مستقل با عملکرد یک عامل هوشمند</li>
+        <li>شناخت نقش ابزارها، داده‌ها و بازخورد در عملکرد عامل‌ها</li>
+        <li>آشنایی با هوش مصنوعی چندوجهی و کاربردهای آن</li>
+        <li>بررسی فرصت‌ها و تغییرات احتمالی عامل‌ها در محیط کار</li>
+        <li>شناخت مهارت‌های لازم برای فعالیت در عصر هوش مصنوعی</li>
+      </ul>
+    </section>
+
+    <nav class="toc" aria-label="فهرست مطالب">
+      <h2>📑 فهرست مطالب</h2>
+      <ol>
+        <li><a href="#section-ai-shift">چرا هوش مصنوعی به اولویت کسب‌وکارها تبدیل شد؟</a></li>
+        <li><a href="#section-llm">مدل‌های زبانی بزرگ؛ مغز توانمند هوش مصنوعی</a></li>
+        <li><a href="#section-agents">عامل هوش مصنوعی چیست؟</a></li>
+        <li><a href="#section-workflow">تفاوت درخواست ساده با گردش‌کار عامل‌محور</a></li>
+        <li><a href="#section-multimodal">ابزارها و قابلیت چندوجهی</a></li>
+        <li><a href="#business-impact">سرمایه‌گذاری و اثر عامل‌ها بر کسب‌وکار</a></li>
+        <li><a href="#section-future">آینده عامل‌ها و آمادگی برای آن</a></li>
+        <li><a href="#section-summary">جمع‌بندی</a></li>
+        <li><a href="#quiz">آزمون پایان جلسه</a></li>
+      </ol>
+    </nav>
+
+    <section class="section blue" id="section-ai-shift">
+      <h2 class="section-title">🌍 ۱. چرا هوش مصنوعی به اولویت کسب‌وکارها تبدیل شد؟</h2>
+      <p>از زمان فراگیرشدن <bdi dir="ltr" class="en">ChatGPT</bdi> در سال ۲۰۲۳، مدیران بسیاری از شرکت‌ها و فعالان فناوری متوجه شدند که استفاده درست از <bdi dir="ltr" class="en">LLM</bdi>ها می‌تواند بهره‌وری کارکنان را به شکل چشمگیری افزایش دهد. این فناوری انجام بسیاری از فعالیت‌های دانشی را سریع‌تر و ساده‌تر کرده است.</p>
+      <div class="concept-grid">
+        <article class="concept-card">
+          <div class="concept-card__icon" aria-hidden="true">✉️</div>
+          <h3>تولید و بهبود محتوا</h3>
+          <p>تهیه یک ایمیل باکیفیت که پیش‌تر ممکن بود حدود ۳۰ دقیقه زمان ببرد، می‌تواند در چند دقیقه انجام شود.</p>
+        </article>
+        <article class="concept-card">
+          <div class="concept-card__icon" aria-hidden="true">🔎</div>
+          <h3>پژوهش و بررسی اطلاعات</h3>
+          <p>بررسی اولیه یک موضوع که شاید چند روز طول می‌کشید، می‌تواند در چند ساعت به نتیجه‌ای قابل استفاده برسد.</p>
+        </article>
+        <article class="concept-card">
+          <div class="concept-card__icon" aria-hidden="true">💡</div>
+          <h3>ایده‌پردازی</h3>
+          <p>تولید ایده، بررسی گزینه‌ها و شروع فرایند طوفان فکری سریع‌تر و در دسترس‌تر شده است.</p>
+        </article>
+        <article class="concept-card">
+          <div class="concept-card__icon" aria-hidden="true">☑️</div>
+          <h3>راستی‌آزمایی اولیه</h3>
+          <p>کمک‌گرفتن برای بازبینی متن‌ها و بررسی ادعاها آسان‌تر شده است؛ البته خروجی هوش مصنوعی همچنان به ارزیابی انسانی نیاز دارد.</p>
+        </article>
+      </div>
+      <div class="box note">
+        <p>این نمونه‌ها نشان می‌دهند که هوش مصنوعی می‌تواند زمان انجام وظایف را کاهش دهد؛ اما سرعت بیشتر به‌تنهایی به معنی صحت قطعی یا کیفیت تضمین‌شده نیست. خروجی‌ها باید متناسب با حساسیت کار بررسی شوند.</p>
+      </div>
+      <p>با وجود این پیشرفت، داستان به تولید متن و پاسخ‌گویی محدود نمی‌شود. گام مهم بعدی زمانی شکل می‌گیرد که هوش مصنوعی بتواند از توانایی تحلیل و استدلال خود برای پیشبرد مجموعه‌ای از کارها استفاده کند.</p>
+    </section>
+
+    <section class="section purple" id="section-llm">
+      <h2 class="section-title">🧠 ۲. مدل‌های زبانی بزرگ؛ مغز توانمند هوش مصنوعی</h2>
+      <div class="definition">
+        <span class="definition__term"><bdi dir="ltr" class="en">Large Language Model (LLM)</bdi> · مدل زبانی بزرگ</span>
+        <p>مدلی از هوش مصنوعی است که با یادگیری الگوهای موجود در حجم زیادی از داده‌های زبانی، می‌تواند متن را پردازش و تولید کند، به پرسش‌ها پاسخ دهد و در انجام برخی وظایف تحلیلی و استدلالی کمک کند.</p>
+      </div>
+      <p>مدل‌های زبانی بزرگ را می‌توان بخش شناختی یا «مغز» بسیاری از سامانه‌های هوش مصنوعی جدید در نظر گرفت. آن‌ها فقط عبارت بعدی را تولید نمی‌کنند؛ مدل‌های توانمندتر می‌توانند اطلاعات مسئله را بررسی کنند، میان گزینه‌ها ارتباط برقرار کنند و برای رسیدن به یک پاسخ یا راه‌حل، مراحل استدلالی را طی کنند.</p>
+      <p>همین توانایی‌ها زمینه را برای ساخت سامانه‌هایی فراهم می‌کند که فراتر از پاسخ‌گویی به یک پیام عمل می‌کنند. با این حال، خود مدل زبانی به‌تنهایی لزوماً به داده‌های داخلی شرکت یا ابزارهای اجرایی دسترسی ندارد. برای انجام کارهای واقعی، باید در یک سامانه بزرگ‌تر به ابزارها و منابع مناسب متصل شود.</p>
+      <div class="key-takeaway">
+        <div class="key-takeaway__icon" aria-hidden="true">🧩</div>
+        <div><h3>نکته کلیدی</h3><p>مدل زبانی توانایی فهم و تولید محتوا و کمک به استدلال را فراهم می‌کند؛ اتصال به ابزارها و طراحی گردش‌کار است که این توانایی را به انجام وظایف عملی گسترش می‌دهد.</p></div>
+      </div>
+    </section>
+
+    <section class="section green" id="section-agents">
+      <h2 class="section-title">🤖 ۳. عامل هوش مصنوعی چیست؟</h2>
+      <div class="definition">
+        <span class="definition__term"><bdi dir="ltr" class="en">AI Agent</bdi> · عامل هوش مصنوعی</span>
+        <p>سامانه‌ای مبتنی بر هوش مصنوعی است که می‌تواند برای رسیدن به یک هدف، اطلاعات را دریافت و تحلیل کند، با ابزارهای مختلف تعامل داشته باشد، درباره گام‌های بعدی تصمیم بگیرد و در چند مرحله اقدام کند. عامل می‌تواند از نتایج و بازخوردهای به‌دست‌آمده برای اصلاح ادامه کار استفاده کند.</p>
+      </div>
+      <p>تفاوت اصلی عامل با یک دستیار ساده در این است که عامل فقط منتظر یک پرسش و سپس ارائه یک پاسخ نیست. ممکن است هدفی به آن سپرده شود و خودش مجموعه‌ای از فعالیت‌های مرتبط را برنامه‌ریزی و اجرا کند؛ البته دامنه استقلال آن به طراحی سامانه، ابزارهای در دسترس و محدودیت‌های تعیین‌شده بستگی دارد.</p>
+      <div class="box example">
+        <p><strong>مثال ساده:</strong> تصور کنید به یک سامانه می‌گویید «برای افزایش فروش، کمپین ایمیلی مشتریان را بهبود بده». یک عامل می‌تواند اطلاعات مشتریان را بررسی کند، گروه‌های مختلف را تشخیص دهد، برای هر گروه پیام متناسب تهیه کند، کمپین را از طریق ابزار ایمیل اجرا کند و نتایج آن را برای پیشنهاد تغییرات بعدی تحلیل کند.</p>
+      </div>
+      <p>بنابراین عامل هوش مصنوعی را می‌توان همکار نرم‌افزاری‌ای تصور کرد که به‌صورت مستمر در دسترس است، می‌تواند از ابزارهای سازمان استفاده کند و وظایف تعریف‌شده را در چارچوب دسترسی‌ها و سیاست‌های مشخص پیش ببرد.</p>
+    </section>
+
+    <section class="section gold" id="section-workflow">
+      <h2 class="section-title">🔄 ۴. تفاوت درخواست ساده با گردش‌کار عامل‌محور</h2>
+      <p>درخواست از یک <bdi dir="ltr" class="en">LLM</bdi> برای نوشتن یک ایمیل، معمولاً یک وظیفه مستقل و محدود است: کاربر درخواست را مطرح می‌کند و مدل متن پیشنهادی را برمی‌گرداند. اما یک عامل می‌تواند کل فرایند مرتبط با یک کمپین ایمیلی را به‌صورت چندمرحله‌ای مدیریت کند.</p>
+      <div class="table-scroll">
+        <table dir="rtl">
+          <thead>
+            <tr><th>معیار</th><th>استفاده معمول از مدل زبانی</th><th>استفاده از عامل هوش مصنوعی</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>نوع وظیفه</td><td>یک درخواست محدود، مانند نوشتن ایمیل</td><td>مجموعه‌ای از وظایف مرتبط برای رسیدن به یک هدف</td></tr>
+            <tr><td>دسترسی به ابزارها</td><td>ممکن است فقط متن ورودی و خروجی را پردازش کند</td><td>می‌تواند به پایگاه داده، ایمیل و سامانه مدیریت مشتری متصل شود</td></tr>
+            <tr><td>تصمیم‌گیری</td><td>معمولاً پاسخ همان درخواست را تولید می‌کند</td><td>می‌تواند بر اساس نتایج هر مرحله، گام بعدی را انتخاب کند</td></tr>
+            <tr><td>استفاده از بازخورد</td><td>اغلب به تعامل بعدی کاربر وابسته است</td><td>می‌تواند نتایج را پایش و راهبرد اقدام‌های بعدی را اصلاح کند</td></tr>
+            <tr><td>خروجی</td><td>یک پاسخ یا محتوای پیشنهادی</td><td>پیشبرد یک گردش‌کار چندمرحله‌ای و بهبود تدریجی آن</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>نمونه گردش‌کار یک عامل برای کمپین ایمیلی</h3>
+      <div class="path-flow">
+        <article class="path-flow__step"><h3>دریافت هدف</h3><p>هدف کمپین، مانند افزایش نرخ تبدیل، مشخص می‌شود.</p></article>
+        <article class="path-flow__step"><h3>تحلیل مشتریان</h3><p>عامل به پایگاه داده متصل می‌شود و پروفایل‌ها را بررسی می‌کند.</p></article>
+        <article class="path-flow__step"><h3>بخش‌بندی و تصمیم</h3><p>مشتریان را گروه‌بندی و پیام مناسب هر گروه را تعیین می‌کند.</p></article>
+        <article class="path-flow__step"><h3>تولید و ارسال</h3><p>ایمیل‌ها را آماده می‌کند و از سرویس ایمیل برای ارسال کمک می‌گیرد.</p></article>
+        <article class="path-flow__step"><h3>پایش نتایج</h3><p>نرخ بازشدن، کلیک و پاسخ مشتریان را بررسی می‌کند.</p></article>
+        <article class="path-flow__step"><h3>اصلاح راهبرد</h3><p>از بازخوردها برای بهبود کمپین‌های بعدی استفاده می‌کند.</p></article>
+      </div>
+      <div class="box important">
+        <p>عامل در این مثال صرفاً متن ایمیل تولید نمی‌کند؛ بلکه داده را بررسی می‌کند، از ابزارهای اجرایی کمک می‌گیرد، نتایج را می‌سنجد و اقدام‌های بعدی را بر اساس اطلاعات تازه تنظیم می‌کند. ارسال واقعی پیام‌ها و دسترسی به داده‌های حساس باید تحت مجوزها و کنترل‌های سازمانی انجام شود.</p>
+      </div>
+    </section>
+
+    <section class="section blue" id="section-multimodal">
+      <h2 class="section-title">🎙️ ۵. ابزارها و قابلیت چندوجهی</h2>
+      <p>عامل‌ها برای انجام کارهای واقعی می‌توانند به ابزارهای نرم‌افزاری متصل شوند. ابزار، راهی برای تعامل عامل با یک منبع داده یا یک سرویس بیرونی است؛ برای مثال، پایگاه داده اطلاعات را در اختیار عامل قرار می‌دهد و سرویس ایمیل امکان ارسال پیام را فراهم می‌کند.</p>
+      <div class="info-grid cols-3">
+        <article class="info-card">
+          <h4>🗄️ پایگاه داده</h4>
+          <p>دریافت و تحلیل اطلاعات مشتریان، سفارش‌ها یا سوابق سازمانی.</p>
+        </article>
+        <article class="info-card">
+          <h4>✉️ سرویس ایمیل</h4>
+          <p>تهیه، ارسال و پیگیری پیام‌های ارتباطی با مشتریان.</p>
+        </article>
+        <article class="info-card">
+          <h4>👥 سامانه مدیریت مشتری</h4>
+          <p>دسترسی به پروفایل‌ها، گروه‌بندی مشتریان و سوابق تعامل با آن‌ها.</p>
+        </article>
+      </div>
+      <p>از سوی دیگر، مدل‌های پایه جدید می‌توانند با انواع مختلفی از داده و رسانه کار کنند. به این توانایی <bdi dir="ltr" class="en">Multimodality</bdi> یا چندوجهی‌بودن گفته می‌شود.</p>
+      <div class="concept-grid">
+        <article class="concept-card"><div class="concept-card__icon" aria-hidden="true">📝</div><h3>متن</h3><p>خواندن، تحلیل و تولید محتوای نوشتاری.</p></article>
+        <article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🎧</div><h3>صوت و گفتار</h3><p>کار با ورودی یا خروجی صوتی و تعامل مبتنی بر صدا.</p></article>
+        <article class="concept-card"><div class="concept-card__icon" aria-hidden="true">🎬</div><h3>ویدئو</h3><p>پردازش اطلاعات دیداری و محتوای ویدئویی، در مدل‌های پشتیبانی‌کننده.</p></article>
+        <article class="concept-card"><div class="concept-card__icon" aria-hidden="true">💻</div><h3>کد</h3><p>درک، تولید و کمک به بررسی قطعه‌کدهای برنامه‌نویسی.</p></article>
+      </div>
+      <div class="box note">
+        <p>چندوجهی‌بودن به معنای توانایی کار با بیش از یک نوع رسانه است. همه مدل‌ها تمام این ورودی‌ها و خروجی‌ها را پشتیبانی نمی‌کنند؛ قابلیت دقیق به مدل و ابزارهای متصل به آن بستگی دارد.</p>
+      </div>
+    </section>
+
+    <section class="section purple" id="business-impact">
+      <h2 class="section-title">📈 ۶. سرمایه‌گذاری و اثر عامل‌ها بر کسب‌وکار</h2>
+      <p>عامل‌های هوش مصنوعی توجه مدیران شرکت‌های بزرگ فناوری را به خود جلب کرده‌اند. این توجه تنها به سخنرانی‌ها و پیش‌بینی‌ها محدود نیست و در قالب توسعه پلتفرم‌ها و سرمایه‌گذاری روی ابزارهای ساخت عامل نیز دیده می‌شود.</p>
+      <div class="info-grid">
+        <article class="info-card">
+          <h4><bdi dir="ltr" class="en">Google Gemini 2.0</bdi></h4>
+          <p>به‌عنوان مدلی چندوجهی معرفی شد که برای دوره جدید سامانه‌های عامل‌محور طراحی شده است.</p>
+        </article>
+        <article class="info-card">
+          <h4><bdi dir="ltr" class="en">NVIDIA NeMo</bdi></h4>
+          <p>پلتفرمی برای کمک به کسب‌وکارها در ساخت و توسعه عامل‌ها و دستیارهای خودکار سازمانی.</p>
+        </article>
+        <article class="info-card">
+          <h4><bdi dir="ltr" class="en">Salesforce Agentforce</bdi></h4>
+          <p>پلتفرم هوش مصنوعی عامل‌محور که با خدمات و محیط کاری Salesforce یکپارچه شده است.</p>
+        </article>
+        <article class="info-card">
+          <h4>سرمایه‌گذاری گسترده صنعت</h4>
+          <p>شرکت‌های بزرگ فناوری در حال توسعه محصولات و زیرساخت‌هایی برای ساخت و به‌کارگیری عامل‌ها هستند.</p>
+        </article>
+      </div>
+      <div class="box example">
+        <p>در یک نظرسنجی مشترک از سوی <bdi dir="ltr" class="en">IBM</bdi> و <bdi dir="ltr" class="en">Morning Consult</bdi> که در محتوای این جلسه به آن اشاره شده، ۹۹ درصد از یک‌هزار توسعه‌دهنده هوش مصنوعی سازمانی گفته‌اند که به‌طور فعال در حال بررسی یا ساخت عامل‌های هوش مصنوعی هستند. این عدد نشان‌دهنده میزان توجه گروه مورد بررسی است و نباید آن را معادل میزان استفاده عملی همه شرکت‌ها دانست.</p>
+      </div>
+      <p>این روند می‌تواند بر صنایع مختلف اثر بگذارد و محدود به شرکت‌های فناوری نیست. در برخی پیش‌بینی‌های صنعتی مطرح شده است که عامل‌های هوش مصنوعی ممکن است طی ده سال آینده تا ۷۰ درصد از فعالیت‌های اداری را خودکار کنند. این رقم یک پیش‌بینی درباره آینده است، نه نتیجه‌ای قطعی یا تضمین‌شده.</p>
+    </section>
+
+    <section class="section orange" id="section-future">
+      <h2 class="section-title">🔭 ۷. آینده عامل‌ها و آمادگی برای آن</h2>
+      <p>گسترش عامل‌های هوش مصنوعی می‌تواند شکل تقسیم کار در سازمان‌ها را تغییر دهد. بخشی از وظایف تکراری یا زمان‌بر ممکن است به سامانه‌های خودکار سپرده شود و در نتیجه، زمان بیشتری برای فعالیت‌های ارزش‌آفرین، حل مسائل واقعی کسب‌وکار و بهبود محصولات باقی بماند.</p>
+      <p>در مقابل، برخی سازمان‌ها ممکن است برای افزایش بهره‌وری با تعداد کمتری نیروی انسانی فعالیت کنند و از افراد متخصصی کمک بگیرند که توانایی طراحی، نظارت و مدیریت گردش‌کارهای عامل‌محور را دارند. از همین رو، نقش‌هایی مانند <bdi dir="ltr" class="en">AI Agent Manager</bdi> یا مدیر عامل‌های هوش مصنوعی به‌عنوان یکی از نقش‌های احتمالی آینده مطرح شده‌اند.</p>
+      <div class="box note">
+        <p>تأثیر عامل‌ها بر اشتغال برای همه مشاغل و صنایع یکسان نخواهد بود. نتیجه به نوع وظایف، کیفیت فناوری، شیوه پیاده‌سازی، مقررات و تصمیم‌های سازمان‌ها بستگی دارد. در کنار خودکارسازی برخی فعالیت‌ها، نیاز به مهارت‌های تازه نیز شکل می‌گیرد.</p>
+      </div>
+
+      <h3>عامل‌ها هنوز در ابتدای مسیر تکامل‌اند</h3>
+      <p>عامل‌های امروزی را باید نسل‌های اولیه این فناوری دانست. همان‌طور که نرم‌افزارها و برنامه‌های موبایل در گذر زمان به‌سرعت پیشرفت کردند، انتظار می‌رود عامل‌ها نیز با به‌روزرسانی مدل‌ها، ابزارها و روش‌های طراحی، توانمندتر و پیچیده‌تر شوند.</p>
+      <p>برای درک بزرگی این تغییر می‌توان به اینترنت نگاه کرد. اینترنت پس از عبور از مراحل ابتدایی، شیوه ارتباط، کار، خرید، آموزش و مصرف سرگرمی را متحول کرد. هوش مصنوعی نیز می‌تواند در این دهه و دهه‌های بعدی، بخش‌های مهمی از زندگی و فعالیت اقتصادی را دگرگون کند.</p>
+
+      <h3>چگونه برای این تحول آماده شویم؟</h3>
+      <ol class="checklist">
+        <li><span class="step-number">۱</span>مفاهیم پایه هوش مصنوعی و مدل‌های زبانی را به‌درستی یاد بگیرید.</li>
+        <li><span class="step-number">۲</span>تفاوت پاسخ‌گویی یک مدل با اجرای یک گردش‌کار عامل‌محور را بشناسید.</li>
+        <li><span class="step-number">۳</span>با ابزارهای سازمانی، منابع داده و کاربردهای عملی هوش مصنوعی آشنا شوید.</li>
+        <li><span class="step-number">۴</span>نگاه باز و نقادانه داشته باشید و خروجی سامانه‌ها را ارزیابی کنید.</li>
+        <li><span class="step-number">۵</span>توانایی تعریف مسئله، تعیین هدف و نظارت بر فرایندهای خودکار را تقویت کنید.</li>
+      </ol>
+      <div class="key-takeaway">
+        <div class="key-takeaway__icon" aria-hidden="true">🚀</div>
+        <div><h3>فرصت اصلی</h3><p>مزیت مهم در عصر هوش مصنوعی فقط استفاده از یک ابزار نیست؛ توانایی تشخیص مسئله مناسب، طراحی فرایند درست و همکاری مؤثر با سامانه‌های هوشمند است.</p></div>
+      </div>
+    </section>
+
+    <section class="section green" id="section-summary">
+      <h2 class="section-title">✅ ۸. جمع‌بندی درس</h2>
+      <ul>
+        <li>مدل‌های زبانی بزرگ با پردازش زبان و توانایی‌های تحلیلی، بهره‌وری بسیاری از فعالیت‌های دانشی را افزایش داده‌اند.</li>
+        <li>استفاده معمول از یک مدل اغلب به یک درخواست محدود می‌شود؛ اما عامل می‌تواند چندین مرحله مرتبط را برای رسیدن به یک هدف پیش ببرد.</li>
+        <li>عامل‌ها با ابزارهایی مانند پایگاه داده، سرویس ایمیل و سامانه مدیریت مشتری تعامل می‌کنند.</li>
+        <li>عامل می‌تواند نتایج اقدام‌ها را بررسی کند و با استفاده از بازخورد، تصمیم‌ها و فعالیت‌های بعدی را اصلاح کند.</li>
+        <li>قابلیت چندوجهی مدل‌های جدید، کار با متن، صوت، ویدئو و کد را ممکن می‌کند؛ البته پشتیبانی دقیق به مدل وابسته است.</li>
+        <li>گسترش عامل‌ها فرصت‌های بهره‌وری و در عین حال تغییراتی در نقش‌ها و مهارت‌های موردنیاز بازار کار ایجاد می‌کند.</li>
+      </ul>
+      <div class="key-takeaway">
+        <div class="key-takeaway__icon" aria-hidden="true">🎯</div>
+        <div><h3>پیام اصلی جلسه</h3><p>عامل هوش مصنوعی از پاسخ‌گویی صرف فراتر می‌رود: برای رسیدن به هدف، از مدل، ابزارها و اطلاعات تازه استفاده می‌کند و می‌تواند مسیر اقدام خود را بر اساس نتایج اصلاح کند.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="quiz">
+      <h2 class="section-title">📝 ۹. آزمون پایان جلسه</h2>
+      <p>به دو پرسش زیر پاسخ دهید تا میزان درک خود از تفاوت مدل زبانی و عامل هوش مصنوعی و همچنین قابلیت تعامل عامل‌ها با ابزارها و رسانه‌های مختلف را ارزیابی کنید.</p>
+
+      <section class="quiz-container" data-quiz>
+        <header class="quiz-header">
+          <div><strong>آزمون مقدمه‌ای بر عامل‌های هوش مصنوعی</strong><p>۲ پرسش · ارزیابی خودکار و بازخورد فوری</p></div>
+          <span class="quiz-counter" data-quiz-counter>۰ سؤال پاسخ داده‌شده</span>
+          <span class="quiz-progress-label">پیشرفت آزمون</span>
+        </header>
+        <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="quiz-progress__bar" data-quiz-progress></div></div>
+
+        <article class="quiz-item" data-type="single_select" data-correct="b" data-correct-label="عامل‌های هوش مصنوعی" data-feedback-correct="درست است. عامل می‌تواند با اتصال به ابزارهای مختلف، چند مرحله از یک فرایند را به‌صورت مستقل پیش ببرد و با استفاده از بازخورد، اقدام‌های بعدی را بهبود دهد." data-feedback-incorrect="به تفاوت یک پاسخ محدود با اجرای یک گردش‌کار چندمرحله‌ای توجه کنید. عامل‌ها می‌توانند از ابزارها استفاده کنند، نتایج را پایش کنند و بر اساس اطلاعات تازه تصمیم‌های بعدی را اصلاح کنند.">
+          <p class="quiz-question"><span class="quiz-question__number">۱</span>تفاوت کلیدی استفاده از یک مدل زبانی بزرگ مانند <bdi dir="ltr" class="en">ChatGPT</bdi> برای یک وظیفه مستقل با به‌کارگیری یک عامل هوش مصنوعی در محیط کار چیست؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">مدل‌های زبانی می‌توانند به پایگاه داده و سامانه‌های مدیریت مشتری متصل شوند، اما عامل‌های هوش مصنوعی چنین قابلیتی ندارند.</button>
+            <button class="quiz-option" type="button" data-value="b">عامل‌های هوش مصنوعی می‌توانند با اتصال به ابزارهای مختلف، مجموعه‌ای از وظایف را به‌صورت مستقل انجام دهند و با یادگیری از بازخورد، عملکرد خود را اصلاح کنند.</button>
+            <button class="quiz-option" type="button" data-value="c">مدل‌های زبانی بزرگ به‌تنهایی و بدون هیچ ورودی یا نظارتی می‌توانند تمام مراحل یک کمپین را مدیریت کنند.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="true_false" data-correct="true" data-feedback-correct="درست است. عامل‌ها می‌توانند از طریق ابزارهایی مانند پایگاه داده، سرویس ایمیل و سامانه مدیریت مشتری کار کنند و مدل‌های چندوجهی نیز امکان تعامل با متن، صوت، ویدئو و کد را فراهم می‌کنند." data-feedback-incorrect="این گزاره درست است. عامل‌ها می‌توانند به ابزارهای گوناگون متصل شوند و مدل‌های چندوجهی امکان کار با انواع مختلف رسانه را فراهم می‌کنند.">
+          <p class="quiz-question"><span class="quiz-question__number">۲</span>برخلاف استفاده سنتی از مدل‌های زبانی بزرگ، عامل‌های هوش مصنوعی می‌توانند با ابزارهای مختلف و قالب‌های رسانه‌ای گوناگون مانند پایگاه داده، سرویس ایمیل، سامانه مدیریت مشتری، متن، صوت، ویدئو و کد تعامل داشته باشند.</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="true">درست</button>
+            <button class="quiz-option" type="button" data-value="false">نادرست</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <div class="quiz-submit-area quiz-actions">
+          <button class="quiz-action quiz-action--secondary" type="button" data-quiz-reset>↻ شروع مجدد آزمون</button>
+        </div>
+        <div class="quiz-result" data-quiz-result aria-live="polite">
+          <strong>نتیجه آزمون</strong>
+          <span class="quiz-result__score" data-quiz-score></span>
+          <span data-quiz-result-detail></span>
+        </div>
+      </section>
+    </section>
+
+    <section class="social">
+      <h2>🌱 یادگیری را ادامه دهید</h2>
+      <p>برای تثبیت مفاهیم، تفاوت یک درخواست ساده با یک گردش‌کار عامل‌محور را در مثال‌های کاری روزمره جست‌وجو کنید و ببینید چه بخش‌هایی از فرایند را می‌توان با ابزارهای هوشمند پشتیبانی کرد.</p>
+      <div class="buttons">
+        <a class="btn telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">پیوستن به کانال تلگرام</a>
+        <a class="btn instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">صفحه اینستاگرام</a>
+      </div>
+    </section>
+
+    <nav class="lesson-navigation" aria-label="ناوبری جلسات">
+      <a class="lesson-navigation__link" href="Lesson_0.html">
+        <span><span class="lesson-navigation__label">بازگشت</span><span class="lesson-navigation__title">صفحه مرجع دوره</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_02.html">
+        <span><span class="lesson-navigation__label">ادامه مسیر یادگیری</span><span class="lesson-navigation__title">رفتن به Lesson_02</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <footer class="site-footer">
+      <p>© MATCUB · درسنامه آموزشی عامل‌های هوش مصنوعی</p>
+      <p><a class="inline-link" href="#top">بازگشت به ابتدای صفحه</a></p>
+    </footer>
+  </main>
+</body>
+</html>

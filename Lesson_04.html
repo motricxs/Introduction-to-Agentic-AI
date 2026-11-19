@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="درسنامه چهارم دوره عامل‌های هوش مصنوعی؛ یادگیری از عامل‌های دیگر، اطلاعات بیرونی و نقش انسان در چرخه عمر عامل‌ها.">
+  <title>Lesson_04 | یادگیری عامل‌های هوش مصنوعی از منابع بیرونی و عامل‌های دیگر</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="quiz-engine.js" defer></script>
+  <script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <main class="container">
+    <nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+      <a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span>
+      </a>
+    </nav>
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#top">MATCUB · Learning Notes</a>
+      <nav class="topbar__links" aria-label="ناوبری صفحه">
+        <a href="#overview">معرفی</a>
+        <a href="#content">درسنامه</a>
+        <a href="#human-loop">نقش انسان</a>
+        <a href="#quiz">آزمون</a>
+      </nav>
+    </header>
+
+    <header class="hero" id="overview">
+      <div class="hero-content">
+        <div class="hero-label">🤖 مبانی عامل‌های هوش مصنوعی</div>
+        <h1>یادگیری عامل‌ها از <span>منابع بیرونی</span> و عامل‌های دیگر</h1>
+        <p class="hero-subtitle">آشنایی با یادگیری مشارکتی، اتصال به اطلاعات خارجی و نقش انسان در چرخه عمر عامل‌های هوشمند</p>
+        <div class="hero-badge">از دانش پراکنده تا تصمیم‌گیری آگاهانه · همراه با مثال کاربردی</div>
+      </div>
+    </header>
+
+    <div class="lesson-meta" aria-label="اطلاعات درس">
+      <span class="lesson-meta__item">🧭 <strong>Lesson_04</strong></span>
+      <span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی تا متوسط</strong></span>
+      <span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۱۸ دقیقه</strong></span>
+      <span class="lesson-meta__item">🧪 همراه با آزمون تعاملی</span>
+    </div>
+
+    <div class="badges" aria-label="موضوعات درس">
+      <span class="badge gold">Human in the Loop</span>
+      <span class="badge green">یادگیری چندعاملی</span>
+      <span class="badge purple">منابع اطلاعاتی بیرونی</span>
+      <span class="badge blue">API و جست‌وجوی وب</span>
+    </div>
+
+    <section class="learning-intro" aria-labelledby="learning-intro-title">
+      <div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div>
+      <h2 id="learning-intro-title">مسیر یادگیری</h2>
+      <p>عامل‌های هوش مصنوعی برای تصمیم‌گیری بهتر فقط به دانش اولیه مدل خود متکی نیستند. آن‌ها می‌توانند از تجربه عامل‌های دیگر، سامانه‌های اطلاعاتی بیرونی و بازخورد انسان‌ها بهره بگیرند. در این جلسه، نقش انسان در چرخه عمر عامل را مرور می‌کنیم و سپس بر دو مسیر یادگیری از عامل‌های دیگر و اطلاعات خارجی تمرکز خواهیم کرد.</p>
+      <ul class="learning-objectives">
+        <li>درک مفهوم حضور انسان در چرخه (HITL)</li>
+        <li>شناخت نقش انسان در توسعه، استقرار و بهره‌برداری</li>
+        <li>توضیح یادگیری مشارکتی عامل‌به‌عامل</li>
+        <li>شناخت منابع اطلاعاتی بیرونی مانند داده‌ها، وب و API</li>
+        <li>درک ترکیب اطلاعات برای استدلال و پیش‌بینی</li>
+      </ul>
+    </section>
+
+    <nav class="toc" aria-label="فهرست مطالب">
+      <h2>📑 فهرست مطالب</h2>
+      <ol>
+        <li><a href="#section-learning-sources">منابع یادگیری عامل‌های هوش مصنوعی</a></li>
+        <li><a href="#human-loop">حضور انسان در چرخه (Human in the Loop)</a></li>
+        <li><a href="#section-agents">یادگیری از عامل‌های دیگر</a></li>
+        <li><a href="#section-external">یادگیری از اطلاعات بیرونی</a></li>
+        <li><a href="#section-example">مثال: انتخاب زمان مناسب سفر موج‌سواری</a></li>
+        <li><a href="#section-summary">جمع‌بندی</a></li>
+        <li><a href="#quiz">آزمون پایانی</a></li>
+      </ol>
+    </nav>
+
+    <div id="content">
+      <section class="section gold" id="section-learning-sources">
+        <h2 class="section-title">🧠 ۱. عامل‌ها دانش خود را از کجا به دست می‌آورند؟</h2>
+        <p>یکی از قابلیت‌های مهم عامل‌های هوش مصنوعی، امکان یادگیری و بهبود مستمر در طول زمان است. برای گسترش دانش و اصلاح عملکرد، عامل‌ها می‌توانند از سه منبع اصلی بهره بگیرند:</p>
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🤝</div>
+            <h3>یادگیری از عامل‌های دیگر</h3>
+            <p>عامل‌ها می‌توانند راه‌حل‌ها و تجربه‌های مفید را با یکدیگر به اشتراک بگذارند و از نتایج کار یکدیگر استفاده کنند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🌐</div>
+            <h3>یادگیری از اطلاعات بیرونی</h3>
+            <p>اتصال به مجموعه‌داده‌ها، جست‌وجوی وب و رابط‌های برنامه‌نویسی امکان دریافت اطلاعات تازه را فراهم می‌کند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">👥</div>
+            <h3>یادگیری از انسان‌ها</h3>
+            <p>بازخورد کاربران، متخصصان و ناظران انسانی به ارزیابی و اصلاح عملکرد عامل کمک می‌کند.</p>
+          </article>
+        </div>
+        <p>این منابع می‌توانند مکمل یکدیگر باشند. با این حال، تمرکز اصلی این جلسه بر یادگیری از عامل‌های دیگر و اتصال به منابع اطلاعاتی بیرونی است. نقش بازخورد انسانی را نیز برای درک چرخه کامل یادگیری و نظارت بررسی می‌کنیم؛ جزئیات تعامل و یادگیری از انسان‌ها موضوع جلسه بعد خواهد بود.</p>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">💡</div>
+          <div>
+            <h3>نکته کلیدی</h3>
+            <p>عامل می‌تواند دانش خود را از محیط و ابزارهای بیرونی، از عامل‌های همکار و از بازخورد انسان‌ها گسترش دهد؛ اما هر منبع سازوکار و هزینه‌های خاص خود را دارد.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section blue" id="human-loop">
+        <h2 class="section-title">👤 ۲. حضور انسان در چرخه (Human in the Loop - HITL)</h2>
+        <p>عامل‌های هوش مصنوعی می‌توانند در فرایند تصمیم‌گیری خودکار عمل کنند، اما اهداف و قواعد اولیه آن‌ها معمولاً به‌وسیله انسان‌ها تعیین می‌شود. مفهوم <bdi dir="ltr" class="en">Human in the Loop (HITL)</bdi> بر مشارکت پیوسته انسان در آموزش، نظارت و اصلاح سامانه‌های هوش مصنوعی تأکید دارد.</p>
+        <p>برای درک این مفهوم، یک چت‌بات پشتیبانی مشتریان را در نظر بگیرید. نقش انسان تنها به زمان ساخت محصول محدود نیست؛ در استقرار و استفاده عملی نیز ادامه پیدا می‌کند.</p>
+
+        <h3>مرحله اول: توسعه (Development)</h3>
+        <p>در مرحله توسعه، شرکت سازنده و متخصصان انسانی مسئولیت‌های مهمی بر عهده دارند:</p>
+        <ul>
+          <li>انتخاب، گردآوری و پالایش داده‌های آموزشی</li>
+          <li>طراحی الگوریتم‌ها و معماری چت‌بات</li>
+          <li>تعیین دستورالعمل‌های اخلاقی و محدودیت‌های رفتاری</li>
+          <li>تعریف اهداف مشخص، مانند افزایش رضایت مشتری</li>
+          <li>تعیین معیارهای قابل‌اندازه‌گیری، مانند امتیاز رضایت مشتری</li>
+        </ul>
+
+        <h3>مرحله دوم: استقرار (Deployment)</h3>
+        <p>پس از آماده شدن محصول، کارکنان سازمان استفاده‌کننده آن را در فرایندهای عملیاتی خود مستقر و یکپارچه می‌کنند. آن‌ها با دستورالعمل‌های روشن و تنظیمات عملیاتی، رفتار چت‌بات را با نیازهای سازمان هماهنگ می‌سازند.</p>
+        <p>برای نمونه، کارشناسان پشتیبانی می‌توانند پایگاه دانش چت‌بات را با سیاست‌های جدید شرکت، رویه‌های اختصاصی و اطلاعات تازه به‌روزرسانی کنند.</p>
+
+        <h3>مرحله سوم: بهره‌برداری و نظارت (Production)</h3>
+        <p>در محیط عملیاتی، چت‌بات با کاربران واقعی تعامل می‌کند. این تعامل‌ها داده‌های ارزشمندی تولید می‌کنند که کارشناسان انسانی می‌توانند آن‌ها را بررسی کنند. ناظران و متخصصان پشتیبانی به‌طور مستمر عملکرد سامانه را پایش می‌کنند، خطاها را اصلاح می‌کنند و پاسخ‌ها را با ارائه بازخورد مستقیم بهبود می‌دهند.</p>
+        <p>کاربران نهایی نیز به‌صورت غیرمستقیم بر عملکرد عامل اثر می‌گذارند: پرسش‌های آن‌ها، واکنش مثبت یا منفی و نشانه‌هایی که درباره نقاط ضعف پاسخ‌ها ارائه می‌کنند، اطلاعات مفیدی برای شناسایی فرصت‌های بهبود فراهم می‌سازد.</p>
+
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>توسعه</h3>
+            <p>انسان داده‌ها، معماری، اهداف و محدودیت‌های سامانه را تعیین می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>استقرار</h3>
+            <p>سازمان عامل را وارد گردش کار می‌کند و دانش اختصاصی را به‌روزرسانی می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>بهره‌برداری</h3>
+            <p>عامل با کاربران واقعی تعامل می‌کند و داده‌های عملکردی تولید می‌شود.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>نظارت و اصلاح</h3>
+            <p>انسان نتایج را بررسی می‌کند، خطاها را اصلاح می‌کند و بازخورد می‌دهد.</p>
+          </div>
+        </div>
+
+        <h3>مزیت و محدودیت بازخورد انسانی</h3>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>ارزش بازخورد</h4>
+            <p>انسان می‌تواند خطاها و پاسخ‌های نامناسب را شناسایی کند و مسیر اصلاح رفتار عامل را مشخص سازد.</p>
+          </article>
+          <article class="info-card">
+            <h4>هزینه دریافت بازخورد</h4>
+            <p>جمع‌آوری و بررسی بازخورد انسانی ممکن است زمان‌بر و پرهزینه باشد؛ به‌ویژه زمانی که تعامل‌ها در مقیاس بزرگ انجام می‌شوند.</p>
+          </article>
+        </div>
+        <p>در مثال چت‌بات، مکالمه‌های ثبت‌شده، ارزیابی کاربران از کیفیت خدمات و ترجیحات فردی آن‌ها می‌توانند به عامل کمک کنند تا در گذر زمان سازگارتر شود. با این حال، یادگیری از انسان‌ها معمولاً به زمان و تلاش قابل‌توجهی نیاز دارد.</p>
+        <div class="box warning">
+          <p>خودکار بودن تصمیم‌گیری عامل به معنی حذف نقش انسان نیست. انسان‌ها همچنان می‌توانند اهداف، قواعد، دانش سازمانی و سازوکارهای نظارت و اصلاح را تعیین کنند.</p>
+        </div>
+      </section>
+
+      <section class="section purple" id="section-agents">
+        <h2 class="section-title">🤝 ۳. یادگیری از عامل‌های دیگر (Agent-to-Agent Learning)</h2>
+        <p>یکی از روش‌های جالب گسترش دانش در یک سامانه چندعاملی، اتصال عامل‌ها به یکدیگر و استفاده از تجربه‌های همکاران است. این روش به‌ویژه زمانی مفید است که چند عامل برای یک کاربرد مشابه فعالیت می‌کنند.</p>
+        <p>بازخورد میان چند عامل می‌تواند نیاز به راهنمایی مستقیم کاربران انسانی را کاهش دهد و انتقال راه‌حل‌های موفق را سریع‌تر کند.</p>
+
+        <h3>مثال: چند عامل پشتیبانی در مناطق مختلف</h3>
+        <p>فرض کنید یک شرکت در مناطق جغرافیایی مختلف، چند عامل پشتیبانی مشتریان را به‌طور هم‌زمان به کار گرفته است. یکی از عامل‌ها با مسئله دشواری روبه‌رو می‌شود؛ مثلاً کاربری برای نخستین بار خطایی را گزارش می‌کند. عامل با تعامل با مشتری راه‌حل مؤثری پیدا می‌کند.</p>
+        <p>اگر این راه‌حل با عامل‌های متصل دیگر به اشتراک گذاشته شود، آن‌ها نیز می‌توانند در مواجهه با پرسشی مشابه از تجربه موفق قبلی استفاده کنند. در نتیجه، لازم نیست هر عامل مسئله را از ابتدا حل کند یا برای هر مورد مشابه منتظر مداخله انسان بماند.</p>
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>برخورد با مسئله جدید</h3>
+            <p>یکی از عامل‌ها با پرسش یا خطایی ناآشنا روبه‌رو می‌شود.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>یافتن راه‌حل</h3>
+            <p>عامل از طریق تعامل با کاربر راه‌حل مؤثری پیدا می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>اشتراک تجربه</h3>
+            <p>راه‌حل با عامل‌های همکار و متصل به اشتراک گذاشته می‌شود.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>استفاده مجدد</h3>
+            <p>عامل دیگر در مواجهه با مسئله مشابه از راه‌حل قبلی بهره می‌گیرد.</p>
+          </div>
+        </div>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">⚡</div>
+          <div>
+            <h3>نتیجه یادگیری عامل‌به‌عامل</h3>
+            <p>اشتراک راه‌حل‌های موفق می‌تواند زمان پاسخ‌گویی را کاهش دهد و از تکرار حل یک مسئله مشابه توسط عامل‌های متعدد جلوگیری کند.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section green" id="section-external">
+        <h2 class="section-title">🌐 ۴. یادگیری از اطلاعات بیرونی (External Information)</h2>
+        <p>عامل‌ها می‌توانند علاوه بر دانش اولیه مدل خود، از منابع اطلاعاتی خارج از مدل نیز داده دریافت کنند. این منابع به عامل کمک می‌کنند اطلاعاتی را به دست آورد که در دانش اولیه آن وجود ندارد یا برای تصمیم فعلی به داده‌های تازه‌تری نیاز دارد.</p>
+        <h3>منابع متداول اطلاعات بیرونی</h3>
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🗃️</div>
+            <h3>مجموعه‌داده‌های خارجی</h3>
+            <p>پایگاه‌ها و مجموعه‌داده‌هایی که اطلاعات ساختاریافته یا تاریخی در اختیار عامل قرار می‌دهند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🔍</div>
+            <h3>جست‌وجوی وب</h3>
+            <p>صفحه‌ها و وب‌سایت‌های تخصصی می‌توانند اطلاعات تکمیلی و زمینه‌ای فراهم کنند.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🔌</div>
+            <h3>رابط‌های برنامه‌نویسی (API)</h3>
+            <p>رابط‌های برنامه‌نویسی پلی برای دریافت داده یا استفاده از قابلیت‌های یک سامانه خارجی ایجاد می‌کنند.</p>
+          </article>
+        </div>
+        <p>پس از بازیابی اطلاعات از این ابزارها، عامل می‌تواند دانش یا زمینه در دسترس خود را به‌روزرسانی کند و سپس با استفاده از اطلاعات تازه، استدلال عامل‌محور انجام دهد.</p>
+        <div class="box note">
+          <p>اتصال به منبع بیرونی صرفاً به معنی دریافت داده نیست؛ عامل باید اطلاعات بازیابی‌شده را در ارتباط با مسئله و هدف کاربر تفسیر و ترکیب کند تا بتواند از آن‌ها در تصمیم‌گیری استفاده کند.</p>
+        </div>
+      </section>
+
+      <section class="section orange" id="section-example">
+        <h2 class="section-title">🏄 ۵. مثال کاربردی: انتخاب زمان مناسب سفر موج‌سواری در یونان</h2>
+        <p>فرض کنید کاربری قصد دارد برای سال آینده سفری به یونان برنامه‌ریزی کند و از یک عامل هوش مصنوعی می‌خواهد پیش‌بینی کند کدام هفته احتمالاً برای موج‌سواری آب‌وهوای مناسب‌تری دارد.</p>
+        <p>مدل زبانی بزرگ (LLM) که هسته عامل را تشکیل می‌دهد، لزوماً در الگوهای آب‌وهوایی تخصص ندارد. بنابراین عامل باید اطلاعات موردنیاز را از منابع بیرونی به دست آورد و مسئله را به چند زیرکار تقسیم کند.</p>
+
+        <h3>گام اول: دریافت داده‌های تاریخی آب‌وهوا</h3>
+        <p>عامل به یک پایگاه داده بیرونی متصل می‌شود که گزارش‌های روزانه آب‌وهوای یونان را در چند سال گذشته نگهداری کرده است. این داده‌ها می‌توانند الگوهای تاریخی دما، بارندگی و شرایط جوی را نشان دهند.</p>
+
+        <h3>گام دوم: شناسایی معیارهای مناسب موج‌سواری</h3>
+        <p>داده‌های آب‌وهوا به‌تنهایی برای تعیین بهترین شرایط موج‌سواری کافی نیستند. بنابراین عامل یک زیرکار دیگر ایجاد می‌کند و به وب‌سایت‌های تخصصی موج‌سواری مراجعه می‌کند. از این منابع یاد می‌گیرد که جزر و مد مناسب، هوای آفتابی و بارندگی بسیار کم یا بدون بارندگی، از شرایط مطلوب برای این فعالیت هستند.</p>
+
+        <h3>گام سوم: ترکیب اطلاعات و استدلال</h3>
+        <p>اکنون عامل دو دسته اطلاعات دارد: داده‌های تاریخی آب‌وهوا و معیارهای تخصصی شرایط مناسب موج‌سواری. با ترکیب آن‌ها می‌تواند الگوها را بررسی و پیش‌بینی کند که در کدام هفته سال آینده احتمال هم‌زمانی جزر و مد مناسب، آفتاب و احتمال کم بارندگی بیشتر است.</p>
+
+        <h3>گام چهارم: ارائه نتیجه به کاربر</h3>
+        <p>عامل یافته‌های خود را به شکل پیشنهاد در اختیار کاربر قرار می‌دهد. نکته مهم این است که نتیجه صرفاً از دانش اولیه مدل به دست نیامده؛ بلکه از گردآوری، ترکیب و تحلیل اطلاعات چند منبع بیرونی حاصل شده است.</p>
+
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>تعریف مسئله</h3>
+            <p>پیدا کردن هفته مناسب برای موج‌سواری در یونان طی سال آینده.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>دریافت داده تاریخی</h3>
+            <p>بررسی گزارش‌های روزانه آب‌وهوا در سال‌های گذشته.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>جست‌وجوی تخصصی</h3>
+            <p>استخراج معیارهای شرایط مناسب موج‌سواری از وب‌سایت‌های تخصصی.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>ترکیب و پیش‌بینی</h3>
+            <p>تحلیل هم‌زمان داده‌های آب‌وهوا و معیارهای موج‌سواری و ارائه پیشنهاد.</p>
+          </div>
+        </div>
+
+        <div class="box important">
+          <p><strong>تفاوت مهم عامل با ابزار هوش مصنوعی ایستا:</strong> عامل می‌تواند برای پاسخ به یک هدف، زیرکارهای لازم را تشخیص دهد، به ابزارهای مختلف متصل شود، اطلاعات تازه به دست آورد و نتایج آن‌ها را برای استدلال و ارائه پاسخ ترکیب کند. در مقابل، یک رابط هوش مصنوعی ایستا ممکن است به دانش اولیه و محدودیت زمانی اطلاعات مدل متکی بماند.</p>
+        </div>
+      </section>
+
+      <section class="section gold" id="section-summary">
+        <h2 class="section-title">✅ ۶. جمع‌بندی و نکات کلیدی</h2>
+        <ul class="checklist">
+          <li>سه منبع مهم یادگیری عامل‌ها عبارت‌اند از عامل‌های دیگر، اطلاعات بیرونی و بازخورد انسان‌ها.</li>
+          <li>مفهوم <bdi dir="ltr" class="en">Human in the Loop (HITL)</bdi> بر مشارکت انسان در آموزش، نظارت و اصلاح عامل تأکید دارد.</li>
+          <li>نقش انسان در چرخه عمر عامل از توسعه و تعیین اهداف تا استقرار، نظارت و اصلاح ادامه پیدا می‌کند.</li>
+          <li>بازخورد انسانی ارزشمند است، اما جمع‌آوری و تحلیل آن می‌تواند زمان‌بر و پرهزینه باشد.</li>
+          <li>در یادگیری عامل‌به‌عامل، یک عامل می‌تواند راه‌حل موفق خود را با عامل‌های همکار به اشتراک بگذارد.</li>
+          <li>مجموعه‌داده‌های خارجی، جست‌وجوی وب و <bdi dir="ltr" class="en">API</bdi> از منابع مهم دریافت اطلاعات بیرونی هستند.</li>
+          <li>عامل می‌تواند اطلاعات چند منبع را ترکیب کند تا مسئله‌ای را حل کند که دانش اولیه مدل به‌تنهایی برای آن کافی نیست.</li>
+        </ul>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">🎯</div>
+          <div>
+            <h3>اصل نهایی</h3>
+            <p>قدرت عامل فقط به مدل مرکزی آن وابسته نیست؛ توانایی استفاده از ابزارها، بهره‌گیری از تجربه عامل‌های دیگر و دریافت بازخورد انسانی نیز در کیفیت عملکرد آن نقش دارد.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" id="quiz">
+      <h2 class="section-title">📝 ۷. آزمون پایانی</h2>
+      <p>به سه پرسش زیر پاسخ دهید تا درک خود را از نقش انسان، یادگیری میان عامل‌ها و دریافت اطلاعات از منابع خارجی ارزیابی کنید.</p>
+
+      <section class="quiz-container" data-quiz>
+        <header class="quiz-header">
+          <div>
+            <strong>آزمون یادگیری و منابع دانش عامل‌ها</strong>
+            <p>۳ پرسش · بازخورد و ارزیابی خودکار</p>
+          </div>
+          <span class="quiz-counter" data-quiz-counter>۰ سؤال پاسخ داده‌شده</span>
+          <span class="quiz-progress-label">پیشرفت آزمون</span>
+        </header>
+        <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="quiz-progress__bar" data-quiz-progress></div>
+        </div>
+
+        <article class="quiz-item" data-type="single_select" data-correct="a" data-feedback-correct="درست است؛ دریافت و بررسی بازخورد انسانی به زمان و تلاش نیاز دارد و می‌تواند پرهزینه باشد." data-feedback-incorrect="به محدودیت مطرح‌شده در مثال چت‌بات پشتیبانی توجه کنید: ارزش بازخورد بالاست، اما به دست آوردن و بررسی آن ساده و کم‌هزینه نیست.">
+          <p class="quiz-question"><span class="quiz-question__number">۱</span> مهم‌ترین محدودیت اتکا به بازخورد انسانی در آموزش و بهبود عامل‌هایی مانند چت‌بات پشتیبانی چیست؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">دریافت بازخورد انسانی می‌تواند پرهزینه و زمان‌بر باشد.</button>
+            <button class="quiz-option" type="button" data-value="b">سامانه‌های هوش مصنوعی معمولاً در مرحله بهره‌برداری بازخورد انسانی را نادیده می‌گیرند.</button>
+            <button class="quiz-option" type="button" data-value="c">بازخورد انسانی مانع یادگیری عامل‌ها از تعامل با کاربران می‌شود.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="b" data-feedback-correct="درست است؛ عامل یک مسئله تازه را حل می‌کند و راه‌حل را با عامل‌های دیگر به اشتراک می‌گذارد تا در موارد مشابه از آن استفاده کنند." data-feedback-incorrect="یادگیری عامل‌به‌عامل زمانی رخ می‌دهد که یک عامل تجربه یا راه‌حل خود را با عامل‌های دیگر به اشتراک بگذارد؛ دریافت داده از API یا اینترنت یادگیری از اطلاعات بیرونی است.">
+          <p class="quiz-question"><span class="quiz-question__number">۲</span> کدام سناریو بهترین نمونه از یادگیری عامل‌به‌عامل است؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">یک عامل هوش مصنوعی با استفاده از یک API بیرونی، پایگاه دانش آب‌وهوایی خود را به‌روزرسانی می‌کند.</button>
+            <button class="quiz-option" type="button" data-value="b">یک عامل پشتیبانی مسئله‌ای تازه را حل می‌کند و راه‌حل را با عامل‌های دیگر به اشتراک می‌گذارد تا در موارد مشابه از آن استفاده کنند.</button>
+            <button class="quiz-option" type="button" data-value="c">یک عامل درباره خطاهای قبلی خود از انسان بازخورد دریافت می‌کند.</button>
+            <button class="quiz-option" type="button" data-value="d">یک عامل داده‌های تاریخی آب‌وهوا را از اینترنت دریافت می‌کند و بر اساس آن‌ها استدلال می‌کند.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="categorization" data-feedback-correct="آفرین؛ همکاری میان عامل‌ها در دسته یادگیری از عامل‌ها قرار می‌گیرد و مجموعه‌داده‌ها، جست‌وجوی وب و APIها منابع اطلاعات بیرونی هستند." data-feedback-incorrect="به منبعی توجه کنید که هر روش از آن دانش دریافت می‌کند: اشتراک تجربه میان عامل‌ها یا بازیابی داده از سامانه‌های بیرونی.">
+          <p class="quiz-question"><span class="quiz-question__number">۳</span> هر روش کسب دانش را در دسته درست قرار دهید: «یادگیری از عامل‌ها» یا «یادگیری از اطلاعات بیرونی».</p>
+          <div class="category-grid">
+            <div class="category-row">
+              <span class="category-term">دسترسی به مجموعه‌داده‌های بیرونی</span>
+              <select class="quiz-control matching-select" data-answer="external">
+                <option value="">انتخاب دسته</option>
+                <option value="agents">یادگیری از عامل‌ها</option>
+                <option value="external">یادگیری از اطلاعات بیرونی</option>
+              </select>
+            </div>
+            <div class="category-row">
+              <span class="category-term">یادگیری مشارکتی عامل‌به‌عامل</span>
+              <select class="quiz-control matching-select" data-answer="agents">
+                <option value="">انتخاب دسته</option>
+                <option value="agents">یادگیری از عامل‌ها</option>
+                <option value="external">یادگیری از اطلاعات بیرونی</option>
+              </select>
+            </div>
+            <div class="category-row">
+              <span class="category-term">بازخورد چندعاملی (Multi-agent feedback)</span>
+              <select class="quiz-control matching-select" data-answer="agents">
+                <option value="">انتخاب دسته</option>
+                <option value="agents">یادگیری از عامل‌ها</option>
+                <option value="external">یادگیری از اطلاعات بیرونی</option>
+              </select>
+            </div>
+            <div class="category-row">
+              <span class="category-term">جست‌وجوی وب و APIها</span>
+              <select class="quiz-control matching-select" data-answer="external">
+                <option value="">انتخاب دسته</option>
+                <option value="agents">یادگیری از عامل‌ها</option>
+                <option value="external">یادگیری از اطلاعات بیرونی</option>
+              </select>
+            </div>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <div class="quiz-submit-area quiz-actions">
+          <button class="quiz-action quiz-action--secondary" type="button" data-quiz-reset>↻ شروع مجدد آزمون</button>
+        </div>
+        <div class="quiz-result" data-quiz-result aria-live="polite">
+          <strong>نتیجه آزمون</strong>
+          <span class="quiz-result__score" data-quiz-score></span>
+          <span data-quiz-result-detail></span>
+        </div>
+      </section>
+    </section>
+
+    <section class="social">
+      <h2>🌱 یادگیری با تمرین ادامه پیدا می‌کند</h2>
+      <p>برای تثبیت مفاهیم، یک کاربرد واقعی انتخاب کنید و مشخص کنید عامل در آن به چه داده‌های بیرونی، چه عامل‌های همکار و چه نوع بازخورد انسانی نیاز دارد.</p>
+      <div class="buttons">
+        <a class="btn telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">پیوستن به کانال تلگرام</a>
+        <a class="btn instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">صفحه اینستاگرام</a>
+        <a class="btn btn-blue" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">ارتباط در لینکدین</a>
+      </div>
+    </section>
+
+    <nav class="lesson-navigation" aria-label="ناوبری جلسات">
+      <a class="lesson-navigation__link" href="Lesson_03.html">
+        <span><span class="lesson-navigation__label">بازگشت به جلسه قبل</span><span class="lesson-navigation__title">Lesson_03 · ساختارهای عامل‌ها</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_05.html">
+        <span><span class="lesson-navigation__label">ادامه مسیر یادگیری</span><span class="lesson-navigation__title">رفتن به جلسه پنجم</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <footer class="site-footer">
+      <p>© MATCUB · یادداشت‌های آموزشی</p>
+      <p><a class="inline-link" href="#top">بازگشت به ابتدای صفحه</a></p>
+    </footer>
+  </main>
+</body>
+</html>

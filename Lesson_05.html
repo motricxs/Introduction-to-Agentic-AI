@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><style data-atlas-ui-policy="v3">
+[data-testid="accounts-profile-button"],
+[data-testid="profile-menu-button"],
+.accounts-profile-button,
+[aria-label="Open profile menu"],
+[data-testid*="history-item"][data-testid*="options"],
+[aria-label="Open conversation options"],
+[data-testid="conversation-options-button"],
+[data-sidebar-item="true"] .trailing button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing-pair button.__menu-item-trailing-btn,
+[data-sidebar-item="true"] .trailing [data-trailing-button],
+[data-sidebar-item="true"] .trailing-pair [data-trailing-button],
+.trailing.highlight button.__menu-item-trailing-btn,
+.trailing.highlight [data-trailing-button],
+button[aria-label="Show project details"],
+button[aria-label*="project details" i],
+[data-testid*="delete" i],
+[aria-label*="delete" i],
+[role="menuitem"][data-testid*="delete" i],
+a[href*="/settings"],
+[data-testid="settings-button"],
+[data-atlas-ui-restricted="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+button.__menu-item-trailing-btn[aria-label="New project"],
+button.__menu-item-trailing-btn[aria-label="Organize chats"],
+button[data-trailing-button][aria-label="New project"],
+button[data-trailing-button][aria-label="Organize chats"] {
+	display: inline-flex !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+}
+#atlas-logout-container {
+	position: fixed;
+	bottom: var(--atlas-sidebar-bottom, 0);
+	left: var(--atlas-sidebar-left, 0);
+	width: var(--atlas-sidebar-width, 0);
+	z-index: 2147483647;
+	padding: 8px 10px max(12px, env(safe-area-inset-bottom));
+	box-sizing: border-box;
+	pointer-events: none;
+}
+#atlas-logout-container[data-visible="false"] { display: none !important; }
+#atlas-logout-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	padding: 10px 14px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #fff, #f8f8f8);
+	color: #141313;
+	box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+	cursor: pointer;
+	font: 600 14px ui-sans-serif, system-ui, sans-serif;
+	pointer-events: auto;
+}
+#atlas-logout-button:hover { transform: translateY(-2px); }
+#atlas-logout-button svg { width: 18px; height: 18px; }
+</style><script data-atlas-ui-policy-runtime="v3">(()=>{if(window.__atlasUiPolicyV3)return;window.__atlasUiPolicyV3=true;const allowed=new Set(["new project","organize chats"]),selector='[role="menuitem"],[role="button"],button',restrict=root=>{const nodes=[];if(root&&root.nodeType===Node.ELEMENT_NODE&&root.matches&&root.matches(selector))nodes.push(root);if(root&&root.querySelectorAll)root.querySelectorAll(selector).forEach(node=>nodes.push(node));nodes.forEach(node=>{if(node.closest("#atlas-logout-container"))return;const label=(node.getAttribute("aria-label")||"").trim().toLowerCase();if(allowed.has(label))return;const text=(node.textContent||"").replace(/\s+/g," ").trim().toLowerCase();if(/\b(delete|remove)\b/.test(text)||text.includes("حذف"))node.dataset.atlasUiRestricted="true"})},sidebar=()=>{const selectors=['[data-testid="sidebar"]','[data-testid="left-sidebar"]','[data-testid="conversation-sidebar"]','[data-sidebar]','aside','nav[aria-label*="chat" i]','nav[aria-label*="navigation" i]'],mobile=matchMedia("(max-width: 768px)").matches,candidates=[];selectors.forEach((value,index)=>{try{document.querySelectorAll(value).forEach(element=>{if(!(element instanceof HTMLElement)||candidates.some(item=>item.element===element))return;const rect=element.getBoundingClientRect(),style=getComputedStyle(element),visible=rect.width>=48&&rect.width<=Math.min(440,innerWidth)&&rect.height>120&&rect.right>0&&rect.left<innerWidth&&rect.bottom>0&&rect.top<innerHeight&&style.display!=="none"&&style.visibility!=="hidden"&&parseFloat(style.opacity||"1")>0;if(!visible||(mobile&&rect.width<180))return;candidates.push({element,rect,score:(selectors.length-index)*100000-Math.max(0,rect.left)*100+Math.min(rect.height,innerHeight)+Math.min(rect.width,400)})})}catch{}});candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null},ensureLogout=()=>{if(!document.body)return;let container=document.getElementById("atlas-logout-container");if(!container){container=document.createElement("div");container.id="atlas-logout-container";container.innerHTML='<button id="atlas-logout-button" type="button" aria-label="خروج از سامانه"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span>خروج</span></button>';container.querySelector("button").addEventListener("click",()=>{if(confirm("آیا مطمئن هستید که می‌خواهید خارج شوید؟"))location.assign("/logout")});document.body.appendChild(container)}if(container.parentElement!==document.body)document.body.appendChild(container);const host=sidebar();if(!host){container.dataset.visible="false";return}container.dataset.visible="true";container.style.setProperty("--atlas-sidebar-left",host.rect.left+"px");container.style.setProperty("--atlas-sidebar-width",Math.max(48,Math.min(host.rect.width,innerWidth))+"px");container.style.setProperty("--atlas-sidebar-bottom",Math.max(0,innerHeight-host.rect.bottom)+"px")},start=()=>{if(!document.body)return;restrict(document.body);ensureLogout();let queued=false;const pending=new Set,schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{pending.forEach(restrict);pending.clear();ensureLogout();queued=false})};new MutationObserver(records=>{let changed=false;records.forEach(record=>{if(record.target instanceof Element&&record.target.closest("#atlas-logout-container"))return;changed=true;record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)pending.add(node)})});if(changed)schedule()}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style","hidden","aria-expanded","aria-hidden","data-state"]});addEventListener("resize",schedule,{passive:true});document.addEventListener("transitionend",schedule,true)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",start,{once:true}):start()})();</script><script data-atlas-runtime="v3">(()=>{const h=new Set(["chatgpt.com","chat.openai.com"]),r=u=>{try{const s=typeof u==="string"?u:u instanceof URL?u.href:null;if(!s)return u;const x=new URL(s,location.href);if(!h.has(x.hostname))return u;x.protocol=x.protocol==="wss:"||x.protocol==="ws:"?(location.protocol==="https:"?"wss:":"ws:"):location.protocol;x.host=location.host;return x.href}catch{return u}};if(window.fetch){const f=window.fetch;window.fetch=new Proxy(f,{apply(t,a,g){const i=g[0];if(i instanceof Request){const n=r(i.url);if(n!==i.url)g[0]=new Request(n,i)}else g[0]=r(i);return Reflect.apply(t,a,g)}})}if(window.XMLHttpRequest){const o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u,...a){return o.call(this,m,r(u),...a)}}if(window.WebSocket){const W=window.WebSocket;window.WebSocket=new Proxy(W,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(window.EventSource){const E=window.EventSource;window.EventSource=new Proxy(E,{construct(t,a,n){a[0]=r(a[0]);return Reflect.construct(t,a,n)}})}if(navigator.sendBeacon){const b=navigator.sendBeacon.bind(navigator);navigator.sendBeacon=new Proxy(b,{apply(t,a,g){g[0]=r(g[0]);return Reflect.apply(t,a,g)}})}})();</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="درسنامه پنجم دوره عامل‌های هوش مصنوعی؛ تفاوت LLM، گردش‌کار هوش مصنوعی و عامل‌ها، چارچوب‌های ReAct و ReWOO و سامانه‌های تک‌عاملی و چندعاملی.">
+  <title>Lesson_05 | تفاوت LLM، گردش‌کار و عامل‌های هوش مصنوعی</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="quiz-engine.js" defer></script>
+  <script src="syntax-highlighter.js" defer></script>
+</head>
+<body id="top">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <main class="container">
+    <nav class="profile-socials" aria-label="شبکه‌های اجتماعی">
+      <a class="profile-socials__link profile-socials__link--instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">◎</span><span>Instagram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon" aria-hidden="true">➤</span><span>Telegram</span>
+      </a>
+      <a class="profile-socials__link profile-socials__link--linkedin" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">
+        <span class="profile-socials__icon profile-socials__icon--linkedin" aria-hidden="true">in</span><span>LinkedIn</span>
+      </a>
+    </nav>
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#top">MATCUB · Learning Notes</a>
+      <nav class="topbar__links" aria-label="ناوبری صفحه">
+        <a href="#overview">معرفی</a>
+        <a href="#content">درسنامه</a>
+        <a href="#frameworks">چارچوب‌ها</a>
+        <a href="#quiz">آزمون</a>
+      </nav>
+    </header>
+
+    <header class="hero" id="overview">
+      <div class="hero-content">
+        <div class="hero-label">🤖 مبانی عامل‌های هوش مصنوعی</div>
+        <h1>تفاوت <span>LLM</span>، گردش‌کار و عامل‌های هوش مصنوعی</h1>
+        <p class="hero-subtitle">از پاسخ‌گویی به پرامپت تا برنامه‌ریزی، استفاده از ابزارها و همکاری چند عامل تخصصی</p>
+        <div class="hero-badge">شناخت معماری عامل‌ها · چارچوب‌های ReAct و ReWOO · سامانه‌های تک‌عاملی و چندعاملی</div>
+      </div>
+    </header>
+
+    <div class="lesson-meta" aria-label="اطلاعات درس">
+      <span class="lesson-meta__item">🧭 <strong>Lesson_05</strong></span>
+      <span class="lesson-meta__item">🎯 سطح: <strong>مقدماتی تا متوسط</strong></span>
+      <span class="lesson-meta__item">⏱️ زمان مطالعه: <strong>۲۲ دقیقه</strong></span>
+      <span class="lesson-meta__item">🧪 همراه با آزمون تعاملی</span>
+    </div>
+
+    <div class="badges" aria-label="موضوعات درس">
+      <span class="badge gold">LLM و AI Workflow</span>
+      <span class="badge green">عامل‌های خودمختار</span>
+      <span class="badge purple">ReAct و ReWOO</span>
+      <span class="badge blue">Single-Agent</span>
+      <span class="badge orange">Multi-Agent</span>
+    </div>
+
+    <section class="learning-intro" aria-labelledby="learning-intro-title">
+      <div class="learning-intro__eyebrow">✨ در این درس چه چیزی یاد می‌گیریم؟</div>
+      <h2 id="learning-intro-title">مسیر یادگیری</h2>
+      <p>برای طراحی سامانه‌های هوش مصنوعی کاربردی، باید بدانیم یک مدل زبانی، یک گردش‌کار متصل به ابزارها و یک عامل هوشمند چه تفاوتی با یکدیگر دارند. سپس دو الگوی مهم تعامل عامل با ابزارها و شیوه سازمان‌دهی یک یا چند عامل را بررسی می‌کنیم.</p>
+      <ul class="learning-objectives">
+        <li>تمایز میان مدل زبانی بزرگ، گردش‌کار هوش مصنوعی و عامل هوش مصنوعی</li>
+        <li>درک نقش خودمختاری، استدلال و استفاده از ابزارها</li>
+        <li>شناخت چرخه استدلال و اقدام در چارچوب ReAct</li>
+        <li>مقایسه برنامه‌ریزی ReWOO با رویکرد ReAct</li>
+        <li>مقایسه سامانه‌های تک‌عاملی و چندعاملی</li>
+        <li>شناخت ساختار متمرکز و غیرمتمرکز در همکاری عامل‌ها</li>
+      </ul>
+    </section>
+
+    <nav class="toc" aria-label="فهرست مطالب">
+      <h2>📑 فهرست مطالب</h2>
+      <ol>
+        <li><a href="#section-llm">مدل زبانی بزرگ (LLM)</a></li>
+        <li><a href="#section-workflow">گردش‌کار هوش مصنوعی (AI Workflow)</a></li>
+        <li><a href="#section-agent">عامل هوش مصنوعی (AI Agent)</a></li>
+        <li><a href="#section-meeting">یک مثال عملی: برنامه‌ریزی جلسه حضوری</a></li>
+        <li><a href="#frameworks">چارچوب ReAct؛ استدلال و اقدام</a></li>
+        <li><a href="#section-rewoo">چارچوب ReWOO؛ برنامه‌ریزی پیش از مشاهده</a></li>
+        <li><a href="#section-single">سامانه تک‌عاملی</a></li>
+        <li><a href="#section-multi">سامانه چندعاملی</a></li>
+        <li><a href="#section-summary">جمع‌بندی و مقایسه</a></li>
+        <li><a href="#quiz">آزمون پایانی</a></li>
+      </ol>
+    </nav>
+
+    <div id="content">
+      <section class="section gold" id="section-llm">
+        <h2 class="section-title">🧠 ۱. مدل زبانی بزرگ (Large Language Model - LLM)</h2>
+        <p>مدل زبانی بزرگ، هسته‌ای است که بر اساس ورودی متنی کاربر، پاسخ متناسب با پرسش یا دستور او تولید می‌کند. در ساده‌ترین شکل استفاده، کاربر یک <bdi dir="ltr" class="en">Prompt</bdi> ارسال می‌کند و مدل پاسخی مرتبط با متن و زمینه همان مکالمه ارائه می‌دهد.</p>
+        <p>برای مثال، اگر از یک رابط گفت‌وگویی مانند <bdi dir="ltr" class="en">ChatGPT</bdi> بخواهید جمله‌ای را ترجمه کند، مدل ترجمه را برمی‌گرداند و کار متوقف می‌شود تا درخواست بعدی را ارسال کنید. مدل به‌خودی‌خود تصمیم نمی‌گیرد که کار دیگری انجام دهد یا اقدامی را آغاز کند.</p>
+        <div class="box example">
+          <p><strong>مثال:</strong> کاربر جمله‌ای را در پنجره گفت‌وگو وارد می‌کند و می‌نویسد «این جمله را به انگلیسی ترجمه کن». مدل فقط ترجمه را تولید می‌کند؛ به صندوق ایمیل کاربر دسترسی ندارد و نمی‌تواند بدون اتصال و مجوز مناسب، آخرین ایمیل او را پیدا کند.</p>
+        </div>
+        <h3>محدودیت دسترسی به اطلاعات</h3>
+        <p>در این شیوه استفاده، مدل تنها می‌تواند بر دانش آموزش‌دیده و اطلاعاتی که در متن مکالمه در اختیارش قرار گرفته تکیه کند. بنابراین ممکن است از اطلاعات خصوصی کاربر، ایمیل‌های جدید یا داده‌هایی که در اختیار مدل قرار نگرفته‌اند آگاه نباشد.</p>
+        <div class="box note">
+          <p>نکته مهم این است که «مدل زبانی» به‌تنهایی با یک سامانه متصل به ایمیل، تقویم یا اینترنت یکسان نیست. دسترسی به این منابع به اتصال ابزارها و طراحی سامانه نیاز دارد.</p>
+        </div>
+      </section>
+
+      <section class="section blue" id="section-workflow">
+        <h2 class="section-title">🔗 ۲. گردش‌کار هوش مصنوعی (AI Workflow)</h2>
+        <p>گردش‌کار هوش مصنوعی مجموعه‌ای از گام‌های از پیش طراحی‌شده است که در آن یک مدل زبانی با ابزارها یا سامانه‌های بیرونی ارتباط برقرار می‌کند تا کاری پیچیده‌تر از تولید یک پاسخ ساده انجام شود.</p>
+        <p>فرض کنید برنامه‌ای ساخته‌ایم که پس از درخواست کاربر، آخرین ایمیل او را دریافت می‌کند و متن آن را به زبان دیگری ترجمه می‌کند. این برنامه می‌تواند به سرویس ایمیل متصل شود، پیام اخیر را بازیابی کند، آن را برای ترجمه به مدل زبانی بفرستد و نتیجه را به برنامه بازگرداند.</p>
+
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>درخواست کاربر</h3>
+            <p>کاربر درخواست ترجمه آخرین ایمیل را ثبت می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>اتصال به ایمیل</h3>
+            <p>برنامه پیام اخیر را از سرویس ایمیل دریافت می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>پردازش با LLM</h3>
+            <p>متن ایمیل برای ترجمه به مدل زبانی ارسال می‌شود.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>ارائه نتیجه</h3>
+            <p>ترجمه آماده‌شده به کاربر نمایش داده می‌شود.</p>
+          </div>
+        </div>
+
+        <p>این سامانه از یک مدل زبانی و یک ابزار خارجی استفاده می‌کند؛ اما داشتن این اتصال به‌تنهایی آن را به عامل هوش مصنوعی تبدیل نمی‌کند. مسیر انجام کار از قبل توسط انسان طراحی شده و سامانه فقط همان مراحل مشخص را اجرا می‌کند.</p>
+        <h3>چرا گردش‌کار می‌تواند انعطاف‌پذیری محدودی داشته باشد؟</h3>
+        <p>فرض کنید از همین برنامه بخواهید به ایمیل پاسخ دهد و جلسه‌ای را در تقویم شما تنظیم کند. اگر اتصال به تقویم و منطق بررسی زمان‌های آزاد در گردش‌کار تعریف نشده باشد، برنامه نمی‌تواند این وظیفه جدید را به‌طور مستقل انجام دهد.</p>
+        <p>گردش‌کار معمولاً فقط در مسیرهایی حرکت می‌کند که از قبل برای آن طراحی شده‌اند. حتی اگر اطلاعات خصوصی کاربر را به مدل برساند، مسیر بازیابی این اطلاعات و ترتیب مراحل همچنان از پیش تعیین شده است.</p>
+        <div class="box warning">
+          <p>اتصال مدل به یک یا چند ابزار، به‌تنهایی نشانه خودمختاری نیست. اگر مسیر تصمیم‌گیری و مراحل اجرا کاملاً ثابت و از پیش برنامه‌ریزی‌شده باشند، با یک گردش‌کار روبه‌رو هستیم.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="section-agent">
+        <h2 class="section-title">🤖 ۳. عامل هوش مصنوعی (AI Agent)</h2>
+        <p>عامل هوش مصنوعی برای رسیدن به یک هدف، می‌تواند شرایط را بررسی کند، درباره گام بعدی استدلال کند و ابزار مناسب را انتخاب و اجرا کند. برخلاف گردش‌کار ثابت، عامل مجبور نیست تمام جزئیات مسیر انجام کار را از ابتدا و به‌صورت صریح از انسان دریافت کند.</p>
+        <p>برای نمونه، عاملی را در نظر بگیرید که به ایمیل، تقویم و اینترنت دسترسی دارد و هدفش خواندن آخرین ایمیل و آماده کردن پاسخ مناسب است. اگر ایمیل درباره درخواست جلسه حضوری در هفته آینده باشد، عامل می‌تواند موضوع را تشخیص دهد و مراحل لازم را برای رسیدن به هدف دنبال کند.</p>
+        <ul>
+          <li>صندوق ایمیل را باز می‌کند و پیام را می‌خواند.</li>
+          <li>محتوا و زمینه پیام را تحلیل می‌کند و تشخیص می‌دهد که موضوع، تنظیم جلسه است.</li>
+          <li>تقویم را بررسی می‌کند تا زمان‌های مناسب را پیدا کند.</li>
+          <li>در صورت نیاز، پیش‌بینی آب‌وهوا را بررسی می‌کند تا درباره فضای داخلی یا بیرونی تصمیم بگیرد.</li>
+          <li>پاسخ پیشنهادی را آماده می‌کند و در صورت داشتن مجوز، آن را ارسال می‌کند.</li>
+        </ul>
+        <p>عامل می‌تواند در طول زمان از ترجیحات کاربر نیز استفاده کند. برای مثال، اگر کاربر اعلام کند مکان خاصی را برای جلسه نمی‌پسندد، عامل می‌تواند این ترجیح را در حافظه خود ثبت کند تا در پیشنهادهای بعدی آن مکان را انتخاب نکند.</p>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">🎯</div>
+          <div>
+            <h3>ویژگی محوری عامل</h3>
+            <p>عامل به‌جای اجرای صرف یک مسیر ثابت، با توجه به هدف و اطلاعات محیط درباره اقدام بعدی تصمیم می‌گیرد؛ سپس با ابزارها اقدام می‌کند و می‌تواند از تجربه و ترجیحات جدید برای بهبود عملکرد استفاده کند.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section purple" id="section-meeting">
+        <h2 class="section-title">📅 ۴. مثال عملی: برنامه‌ریزی یک جلسه حضوری</h2>
+        <p>تنظیم یک جلسه حضوری ممکن است شامل چندین تصمیم و هماهنگی باشد. ابتدا همکار شما پیشنهاد جلسه حضوری می‌دهد. باید تقویم را بررسی کنید، چند زمان آزاد پیشنهاد دهید و منتظر انتخاب طرف مقابل بمانید. سپس درباره محل جلسه تصمیم بگیرید.</p>
+        <p>اگر آن روز از خانه کار می‌کنید، باید مکانی نزدیک انتخاب شود. شاید یک کافه روباز مناسب باشد؛ اما لازم است وضعیت آب‌وهوا و شلوغی کافه را بررسی کنید. ممکن است لازم باشد با کافه تماس بگیرید یا وب‌سایت آن را بررسی کنید و اگر امکان رزرو نبود، مکان جایگزینی پیدا کنید. در پایان نیز باید جزئیات را به شرکت‌کنندگان اطلاع دهید و دعوت‌نامه تقویم ارسال کنید.</p>
+        <p>عامل هوش مصنوعی می‌تواند این مراحل را با استدلال درباره اقدام بعدی و استفاده از ابزار مناسب پیش ببرد:</p>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>چه زمانی؟</h4>
+            <p>با اتصال به تقویم، زمان‌های آزاد را پیدا و گزینه‌های مناسب را پیشنهاد می‌کند.</p>
+          </article>
+          <article class="info-card">
+            <h4>کجا؟</h4>
+            <p>با بررسی برنامه کاری، محل حضور فرد را مشخص می‌کند و مکان‌های مناسب را در نظر می‌گیرد.</p>
+          </article>
+          <article class="info-card">
+            <h4>داخل یا بیرون؟</h4>
+            <p>با بررسی پیش‌بینی آب‌وهوا، مناسب بودن فضای باز یا بسته را ارزیابی می‌کند.</p>
+          </article>
+          <article class="info-card">
+            <h4>آیا جا وجود دارد؟</h4>
+            <p>با استفاده از ابزار تماس صوتی یا وب‌سایت، امکان رزرو کافه را بررسی می‌کند.</p>
+          </article>
+        </div>
+        <p>پس از تصمیم‌گیری، عامل می‌تواند محل جلسه را به شرکت‌کنندگان اطلاع دهد، دعوت‌نامه تقویم و ایمیل را آماده کند و در صورت داشتن مجوز لازم، آن‌ها را ارسال کند.</p>
+        <div class="box important">
+          <p>الگوی تکرارشونده در این مثال، «استدلال و سپس اقدام» است: عامل اطلاعات موجود را بررسی می‌کند، بهترین اقدام بعدی را انتخاب می‌کند و آن را اجرا می‌کند. این الگو مبنای چارچوب <bdi dir="ltr" class="en">ReAct</bdi> است.</p>
+        </div>
+      </section>
+
+      <section class="section orange" id="frameworks">
+        <h2 class="section-title">⚙️ ۵. چارچوب ReAct؛ استدلال و اقدام (Reasoning and Acting)</h2>
+        <p>نام <bdi dir="ltr" class="en">ReAct</bdi> از ترکیب دو مفهوم <bdi dir="ltr" class="en">Reasoning</bdi> و <bdi dir="ltr" class="en">Acting</bdi> گرفته شده است. در این چارچوب، عامل در هر مرحله اطلاعات موجود را بررسی می‌کند، درباره بهترین اقدام بعدی تصمیم می‌گیرد و سپس آن اقدام را اجرا می‌کند.</p>
+        <p>برای مثال، اگر عامل نداند کاربر در روز جلسه از خانه کار می‌کند یا از دفتر، ابتدا ابزار برنامه‌ریزی منابع انسانی را بررسی می‌کند. پس از دریافت اطلاعات محل کار، تصمیم بعدی خود را بر اساس داده تازه می‌گیرد. این چرخه در طول انجام وظیفه ادامه پیدا می‌کند.</p>
+        <div class="path-flow">
+          <div class="path-flow__step">
+            <h3>استدلال</h3>
+            <p>عامل وضعیت فعلی و اطلاعات در دسترس را تحلیل می‌کند.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>انتخاب اقدام</h3>
+            <p>عامل مشخص می‌کند برای پیشرفت به سوی هدف چه کاری لازم است.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>اجرای ابزار</h3>
+            <p>اقدام انتخاب‌شده را از طریق ابزار مناسب انجام می‌دهد.</p>
+          </div>
+          <div class="path-flow__step">
+            <h3>ادامه استدلال</h3>
+            <p>نتیجه ابزار را دریافت می‌کند و مرحله بعد را تعیین می‌کند.</p>
+          </div>
+        </div>
+        <p>از آنجا که عامل پس از هر تعامل با ابزار می‌تواند اطلاعات جدید را در تصمیم بعدی لحاظ کند، این رویکرد در برابر تغییرات میان‌راه انعطاف‌پذیر است. البته انعطاف‌پذیری بیشتر ممکن است عامل را در معرض حواس‌پرتی یا دنبال کردن اطلاعات غیرضروری نیز قرار دهد؛ مثلاً ممکن است هنگام بررسی وب‌سایت کافه با پیشنهادهای تبلیغاتی مواجه شود و از مسیر اصلی منحرف شود.</p>
+      </section>
+
+      <section class="section blue" id="section-rewoo">
+        <h2 class="section-title">🧩 ۶. چارچوب ReWOO؛ برنامه‌ریزی پیش از مشاهده (Reasoning Without Observation)</h2>
+        <p>چارچوب <bdi dir="ltr" class="en">ReWOO</bdi> بر این ایده استوار است که عامل ابتدا تمام مراحل موردنیاز را از ابتدا تا انتها برنامه‌ریزی کند و سپس اجرای برنامه را آغاز کند. در مرحله برنامه‌ریزی، خروجی ابزارها هنوز دریافت نشده است؛ بنابراین برنامه اولیه بر اساس اطلاعات موجود و بدون اتکا به مشاهده نتایج میانی تنظیم می‌شود.</p>
+        <p>در مثال جلسه حضوری، عامل ابتدا فهرست گام‌های لازم را آماده می‌کند: بررسی تقویم، مراجعه به سامانه برنامه کاری برای تعیین محل حضور، بررسی ظرفیت کافه و در صورت نیاز پیدا کردن مکان جایگزین. پس از تکمیل برنامه، مراحل را اجرا می‌کند و در جریان اجرا بر اساس خروجی هر ابزار برنامه را از نو تنظیم نمی‌کند.</p>
+
+        <h3>مقایسه ReAct و ReWOO</h3>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>معیار</th>
+                <th><bdi dir="ltr" class="en">ReAct</bdi></th>
+                <th><bdi dir="ltr" class="en">ReWOO</bdi></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>زمان برنامه‌ریزی</td>
+                <td>در طول فرایند و گام‌به‌گام</td>
+                <td>ابتدا، پیش از اجرای مراحل</td>
+              </tr>
+              <tr>
+                <td>نقش خروجی ابزارها</td>
+                <td>در تصمیم‌گیری گام بعدی استفاده می‌شود</td>
+                <td>برنامه اولیه را در مرحله اجرا تغییر نمی‌دهد</td>
+              </tr>
+              <tr>
+                <td>انعطاف‌پذیری</td>
+                <td>بیشتر؛ امکان اصلاح مسیر با اطلاعات تازه</td>
+                <td>کمتر؛ پایبندی به برنامه اولیه</td>
+              </tr>
+              <tr>
+                <td>محدودیت احتمالی</td>
+                <td>احتمال انحراف با اطلاعات یا محرک‌های غیرضروری</td>
+                <td>سازگاری دشوارتر با تغییرات پیش‌بینی‌نشده</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>فرض کنید کافه‌ای که در برنامه اولیه انتخاب شده، برای زمان موردنظر ظرفیت نداشته باشد. عامل <bdi dir="ltr" class="en">ReAct</bdi> می‌تواند پس از دریافت این نتیجه، گزینه دیگری را بررسی کند. اما عامل <bdi dir="ltr" class="en">ReWOO</bdi> طبق توصیف این رویکرد، به‌سادگی برنامه خود را بر اساس خروجی میانی تغییر نمی‌دهد و در مواجهه با چنین تغییری انعطاف کمتری دارد.</p>
+        <div class="box note">
+          <p>هیچ‌کدام از این دو چارچوب در همه شرایط بهترین نیستند. انتخاب میان آن‌ها به میزان نیاز مسئله به برنامه‌ریزی از پیش، واکنش به اطلاعات تازه و تحمل تغییرات در طول اجرا بستگی دارد.</p>
+        </div>
+      </section>
+
+      <section class="section green" id="section-single">
+        <h2 class="section-title">👤 ۷. سامانه تک‌عاملی (Single-Agent System)</h2>
+        <p>در سامانه تک‌عاملی، یک عامل هوش مصنوعی مسئول مدیریت وظایف و گردش‌کار است. چنین سامانه‌ای معمولاً ساده‌تر است و توسعه، ارزیابی و نگهداری آن آسان‌تر انجام می‌شود؛ به همین دلیل نقطه شروع مناسبی برای بسیاری از کاربردهاست.</p>
+        <p>وجود تنها یک عامل به معنی ضعیف بودن سامانه نیست. هر ابزار جدیدی که به عامل متصل شود می‌تواند دامنه توانایی‌های آن را گسترش دهد. برای نمونه، یک دستیار شخصی واحد ممکن است بتواند به ایمیل‌ها پاسخ دهد، مکان جلسه رزرو کند و زمان مناسبی برای برگزاری جلسه پیشنهاد دهد.</p>
+        <div class="box example">
+          <p><strong>نمونه سامانه تک‌عاملی:</strong> یک دستیار هوشمند که با استفاده از ابزارهای ایمیل، تقویم و رزرو مکان، وظایف مرتبط با برنامه‌ریزی جلسه را از ابتدا تا انتها مدیریت می‌کند.</p>
+        </div>
+        <div class="box important">
+          <p>پیش از افزودن عامل‌های بیشتر، بهتر است توانایی‌های یک عامل واحد را با ابزارهای موردنیاز توسعه دهید. در بسیاری از گردش‌کارهای پیچیده، یک عامل مجهز به ابزارهای مناسب کافی است.</p>
+        </div>
+      </section>
+
+      <section class="section purple" id="section-multi">
+        <h2 class="section-title">👥 ۸. سامانه چندعاملی (Multi-Agent System)</h2>
+        <p>در یک پروژه تیمی، معمولاً انتظار نداریم همه افراد تمام نقش‌ها را بر عهده بگیرند. برای بازطراحی صفحه اصلی یک وب‌سایت، ممکن است به طراح گرافیک، نویسنده محتوا، متخصص بازاریابی، مدیر برند و مشاور بهینه‌سازی موتور جست‌وجو نیاز داشته باشیم. همکاری افراد متخصص در نقش‌های مختلف می‌تواند نتیجه بهتری ایجاد کند.</p>
+        <p>همین منطق در سامانه‌های چندعاملی نیز به کار می‌رود: چند عامل تخصصی با توانایی‌های متفاوت، مسئولیت بخش‌های مختلف یک پروژه را بر عهده می‌گیرند و برای رسیدن به هدف مشترک همکاری می‌کنند.</p>
+        <h3>مزیت‌ها و هزینه‌های چندعاملی بودن</h3>
+        <div class="info-grid">
+          <article class="info-card">
+            <h4>تقسیم مسئولیت</h4>
+            <p>وظایف پیچیده به بخش‌های تخصصی‌تر تقسیم می‌شوند و هر عامل روی حوزه مشخصی تمرکز می‌کند.</p>
+          </article>
+          <article class="info-card">
+            <h4>بازبینی متقابل</h4>
+            <p>عامل‌ها می‌توانند خروجی یکدیگر را بررسی و ارزیابی کنند و به کاهش خطاها کمک کنند.</p>
+          </article>
+          <article class="info-card">
+            <h4>مقیاس‌پذیری</h4>
+            <p>تفکیک وظایف و تخصص‌ها می‌تواند در پروژه‌های بزرگ‌تر به بهبود عملکرد و گسترش سامانه کمک کند.</p>
+          </article>
+          <article class="info-card">
+            <h4>پیچیدگی بیشتر</h4>
+            <p>توسعه سامانه، هماهنگی وظایف و مدیریت ارتباط میان عامل‌ها دشوارتر می‌شود.</p>
+          </article>
+        </div>
+        <p>برای استفاده مؤثر از چند عامل، باید وظایف آن‌ها در جریان کلی پروژه هماهنگ شود. عامل‌ها می‌توانند از طریق فراخوانی ابزارها اطلاعات به‌روز دریافت کنند، گردش‌کارها را بهینه کنند و برای رسیدن به هدف‌های پیچیده‌تر، زیرکارهای مستقل بسازند.</p>
+
+        <h3>دو الگوی رایج سازمان‌دهی عامل‌ها</h3>
+        <div class="concept-grid">
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🧑‍💼</div>
+            <h3>ساختار متمرکز با مدیر</h3>
+            <p>یک مدیر مرکزی، کار چند عامل تخصصی را هماهنگ می‌کند و وظایف را میان آن‌ها تقسیم می‌کند. مدیر می‌تواند یک انسان یا یک عامل اختصاصی باشد.</p>
+          </article>
+          <article class="concept-card">
+            <div class="concept-card__icon" aria-hidden="true">🔄</div>
+            <h3>ساختار غیرمتمرکز همتا</h3>
+            <p>عامل‌ها در جایگاه همتا فعالیت می‌کنند و بر اساس تخصص خود، وظایف را به یکدیگر واگذار می‌کنند؛ مدیر مرکزی وجود ندارد.</p>
+          </article>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ویژگی</th>
+                <th>ساختار متمرکز</th>
+                <th>ساختار غیرمتمرکز</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>هماهنگی</td>
+                <td>از طریق مدیر مرکزی</td>
+                <td>از طریق تعامل میان عامل‌های همتا</td>
+              </tr>
+              <tr>
+                <td>تقسیم وظایف</td>
+                <td>مدیر وظایف را به عامل‌های تخصصی می‌سپارد</td>
+                <td>عامل‌ها بر اساس تخصص، کار را به یکدیگر واگذار می‌کنند</td>
+              </tr>
+              <tr>
+                <td>مدیر مرکزی</td>
+                <td>وجود دارد؛ انسان یا عامل</td>
+                <td>وجود ندارد</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>چه زمانی به چند عامل نیاز داریم؟</h3>
+        <p>توصیه معمول این است که ابتدا با یک عامل شروع کنید و توانایی‌های آن را تا حد ممکن گسترش دهید. اگر عامل در اجرای دستورالعمل‌های پیچیده مشکل دارد یا مرتباً ابزار نامناسبی را انتخاب می‌کند، می‌توان وظایف را به بخش‌های کوچک‌تر تقسیم کرد و عامل‌های تخصصی بیشتری افزود.</p>
+        <p>چندعاملی بودن می‌تواند تفکیک مسئولیت و بازبینی متقابل را بهبود دهد، اما پیچیدگی توسعه و هماهنگی را نیز افزایش می‌دهد. بنابراین افزودن عامل جدید باید پاسخی به یک نیاز واقعی باشد، نه صرفاً راهی برای بزرگ‌تر کردن معماری.</p>
+        <div class="box warning">
+          <p>استفاده از چند عامل همیشه به معنی کاهش پیچیدگی یا حذف نیاز به بازخورد انسانی نیست. مزیت اصلی آن، همکاری و تخصصی‌سازی است؛ در مقابل، هماهنگی و نگهداری سامانه دشوارتر می‌شود.</p>
+        </div>
+      </section>
+
+      <section class="section gold" id="section-summary">
+        <h2 class="section-title">✅ ۹. جمع‌بندی و مقایسه نهایی</h2>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>نوع سامانه</th>
+                <th>نحوه انجام کار</th>
+                <th>میزان خودمختاری</th>
+                <th>محدودیت اصلی</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>رابط ساده LLM</td>
+                <td>با دریافت پرامپت، پاسخ تولید می‌کند.</td>
+                <td>کمترین</td>
+                <td>بدون درخواست کاربر اقدام مستقلی آغاز نمی‌کند.</td>
+              </tr>
+              <tr>
+                <td>گردش‌کار هوش مصنوعی</td>
+                <td>مراحل از پیش طراحی‌شده را با کمک مدل و ابزار اجرا می‌کند.</td>
+                <td>بیشتر از رابط ساده، اما محدود به مسیر تعریف‌شده</td>
+                <td>برای وظایف خارج از گردش‌کار طراحی‌شده انعطاف کمی دارد.</td>
+              </tr>
+              <tr>
+                <td>عامل هوش مصنوعی</td>
+                <td>برای رسیدن به هدف استدلال می‌کند، ابزار انتخاب می‌کند و اقدام انجام می‌دهد.</td>
+                <td>بیشترین</td>
+                <td>به طراحی مناسب، ابزارهای مرتبط و کنترل‌های لازم نیاز دارد.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="checklist">
+          <li>مدل زبانی بزرگ در پاسخ به پرامپت، محتوای مرتبط تولید می‌کند.</li>
+          <li>گردش‌کار هوش مصنوعی چند مرحله و ابزار را در یک مسیر از پیش تعیین‌شده به هم متصل می‌کند.</li>
+          <li>عامل هوش مصنوعی با توجه به هدف، درباره مسیر انجام کار استدلال می‌کند و اقدام مناسب را انتخاب می‌کند.</li>
+          <li><bdi dir="ltr" class="en">ReAct</bdi> در هر مرحله استدلال می‌کند، ابزار را به کار می‌گیرد و با توجه به نتیجه، گام بعدی را انتخاب می‌کند.</li>
+          <li><bdi dir="ltr" class="en">ReWOO</bdi> ابتدا کل مسیر را برنامه‌ریزی می‌کند و سپس برنامه را اجرا می‌کند؛ بنابراین در برابر تغییرات میانی انعطاف کمتری دارد.</li>
+          <li>سامانه تک‌عاملی ساده‌تر است و با افزودن ابزارها می‌تواند توانایی‌های زیادی پیدا کند.</li>
+          <li>سامانه چندعاملی با همکاری عامل‌های تخصصی می‌تواند بازبینی متقابل و مقیاس‌پذیری را بهبود دهد، اما پیچیدگی بیشتری دارد.</li>
+          <li>در سامانه چندعاملی، هماهنگی می‌تواند متمرکز و زیر نظر مدیر یا غیرمتمرکز و میان عامل‌های همتا باشد.</li>
+        </ul>
+        <div class="key-takeaway">
+          <div class="key-takeaway__icon" aria-hidden="true">💡</div>
+          <div>
+            <h3>قاعده انتخاب معماری</h3>
+            <p>با ساده‌ترین ساختاری شروع کنید که نیاز مسئله را برطرف می‌کند. ابتدا توانایی یک عامل و ابزارهایش را بسنجید؛ سپس اگر تقسیم تخصص، بازبینی متقابل یا مقیاس‌پذیری واقعاً لازم بود، به سراغ معماری چندعاملی بروید.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" id="quiz">
+      <h2 class="section-title">📝 ۱۰. آزمون پایانی</h2>
+      <p>پرسش‌های زیر مفاهیم کلیدی جلسه را پوشش می‌دهند. در پرسش مرتب‌سازی، سامانه‌ها را از کمترین تا بیشترین میزان خودمختاری مرتب کنید.</p>
+
+      <section class="quiz-container" data-quiz>
+        <header class="quiz-header">
+          <div>
+            <strong>آزمون تفاوت عامل‌ها و چارچوب‌های طراحی</strong>
+            <p>۶ پرسش · بازخورد و ارزیابی خودکار</p>
+          </div>
+          <span class="quiz-counter" data-quiz-counter>۰ سؤال پاسخ داده‌شده</span>
+          <span class="quiz-progress-label">پیشرفت آزمون</span>
+        </header>
+        <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="quiz-progress__bar" data-quiz-progress></div>
+        </div>
+
+        <article class="quiz-item" data-type="ordering" data-correct-order="llm,workflow,agent" data-feedback-correct="ترتیب درست از کمترین تا بیشترین خودمختاری: رابط LLM، گردش‌کار هوش مصنوعی و عامل هوش مصنوعی." data-feedback-incorrect="به میزان توانایی هر سامانه در استدلال و اقدام مستقل توجه کنید. رابط LLM فقط به پرامپت پاسخ می‌دهد؛ گردش‌کار مسیر از پیش تعیین‌شده دارد و عامل می‌تواند مسیر رسیدن به هدف را انتخاب کند.">
+          <p class="quiz-question"><span class="quiz-question__number">۱</span> سامانه‌های زیر را بر اساس توانایی استدلال و اقدام مستقل، از کمترین تا بیشترین میزان خودمختاری مرتب کنید.</p>
+          <ol class="ordering-list">
+            <li class="ordering-item" data-value="agent"><span>عامل هوش مصنوعی که می‌تواند مستقلاً ایمیل‌ها را بخواند، تقویم و آب‌وهوا را بررسی کند و زمان و مکان جلسه پیشنهاد دهد.</span><span class="ordering-controls"><button class="ordering-move" type="button" data-move="up" aria-label="انتقال به بالا">↑</button><button class="ordering-move" type="button" data-move="down" aria-label="انتقال به پایین">↓</button></span></li>
+            <li class="ordering-item" data-value="llm"><span>ChatGPT؛ رابط مدل زبانی که فقط به پرامپت‌های کاربر پاسخ می‌دهد.</span><span class="ordering-controls"><button class="ordering-move" type="button" data-move="up" aria-label="انتقال به بالا">↑</button><button class="ordering-move" type="button" data-move="down" aria-label="انتقال به پایین">↓</button></span></li>
+            <li class="ordering-item" data-value="workflow"><span>برنامه ساده گردش‌کار هوش مصنوعی که پس از درخواست کاربر، آخرین ایمیل را دریافت و ترجمه می‌کند.</span><span class="ordering-controls"><button class="ordering-move" type="button" data-move="up" aria-label="انتقال به بالا">↑</button><button class="ordering-move" type="button" data-move="down" aria-label="انتقال به پایین">↓</button></span></li>
+          </ol>
+          <span class="quiz-empty-note" data-ordering-status aria-live="polite"></span>
+          <button class="quiz-action" type="button" data-quiz-submit>بررسی ترتیب</button>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="a" data-feedback-correct="درست است؛ ReAct در هر مرحله اطلاعات موجود را بررسی می‌کند، اقدام مناسب را انتخاب می‌کند و سپس آن را اجرا می‌کند." data-feedback-incorrect="اصل ReAct ترکیب استدلال و اقدام است؛ عامل در هر مرحله بر اساس اطلاعات موجود، اقدام بعدی را تعیین و اجرا می‌کند.">
+          <p class="quiz-question"><span class="quiz-question__number">۲</span> کدام گزینه اصل محوری چارچوب عامل هوش مصنوعی <bdi dir="ltr" class="en">ReAct</bdi> را بهتر توصیف می‌کند؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">در هر مرحله استدلال می‌کند، اطلاعات موجود را پردازش می‌کند، اقدام مناسب را تعیین می‌کند و سپس آن را اجرا می‌کند.</button>
+            <button class="quiz-option" type="button" data-value="b">فقط اطلاعات را جمع‌آوری می‌کند و تمام تصمیم‌های نهایی را به انسان واگذار می‌کند.</button>
+            <button class="quiz-option" type="button" data-value="c">تمام درخواست‌های جلسه‌ای را که با برنامه زمانی از پیش تعیین‌شده هماهنگ نیستند مسدود می‌کند.</button>
+            <button class="quiz-option" type="button" data-value="d">بدون در نظر گرفتن ترجیحات شرکت‌کنندگان، دعوت‌نامه تقویم ارسال می‌کند.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="true_false" data-correct="false" data-feedback-correct="درست است؛ ReWOO ابتدا برنامه کامل را تدوین می‌کند و در مرحله اجرا، به‌سرعت بر اساس خروجی‌های میانی برنامه را تغییر نمی‌دهد." data-feedback-incorrect="ReWOO به برنامه‌ریزی کامل پیش از اجرا متکی است و در برابر تغییرات جزئی حین اجرا انعطاف کمتری دارد؛ بنابراین گزاره نادرست است.">
+          <p class="quiz-question"><span class="quiz-question__number">۳</span> عامل مبتنی بر چارچوب <bdi dir="ltr" class="en">ReWOO</bdi> می‌تواند در صورت بروز مشکلی جزئی، مانند تکمیل ظرفیت کافه، به‌سرعت برنامه خود را تغییر دهد.</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="true">درست</button>
+            <button class="quiz-option" type="button" data-value="false">نادرست</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="matching" data-feedback-correct="آفرین؛ هر چهار اصطلاح با تعریف مناسب خود تطبیق داده شده‌اند." data-feedback-incorrect="به تعداد عامل‌ها و نقش هر سامانه توجه کنید: ارزیابی به سنجش عملکرد اشاره دارد و دستیار شخصی نمونه‌ای از سامانه تک‌عاملی است.">
+          <p class="quiz-question"><span class="quiz-question__number">۴</span> هر اصطلاح را با تعریف مناسب آن تطبیق دهید.</p>
+          <div class="matching-grid">
+            <div class="matching-row">
+              <span class="matching-term">سامانه چندعاملی</span>
+              <select class="quiz-control matching-select" data-answer="multi">
+                <option value="">انتخاب تعریف</option>
+                <option value="multi">سامانه هوش مصنوعی که دو یا چند عامل در آن با یکدیگر همکاری می‌کنند.</option>
+                <option value="evaluation">فرایند سنجش عملکرد و اثربخشی یک سامانه هوش مصنوعی.</option>
+                <option value="single">سامانه هوش مصنوعی که فقط یک عامل وظایف یا گردش‌کارها را مدیریت می‌کند.</option>
+                <option value="assistant">نمونه‌ای از عامل واحد که ایمیل‌ها، جلسه‌ها و رزرو مکان را مدیریت می‌کند.</option>
+              </select>
+            </div>
+            <div class="matching-row">
+              <span class="matching-term">ارزیابی</span>
+              <select class="quiz-control matching-select" data-answer="evaluation">
+                <option value="">انتخاب تعریف</option>
+                <option value="multi">سامانه هوش مصنوعی که دو یا چند عامل در آن با یکدیگر همکاری می‌کنند.</option>
+                <option value="evaluation">فرایند سنجش عملکرد و اثربخشی یک سامانه هوش مصنوعی.</option>
+                <option value="single">سامانه هوش مصنوعی که فقط یک عامل وظایف یا گردش‌کارها را مدیریت می‌کند.</option>
+                <option value="assistant">نمونه‌ای از عامل واحد که ایمیل‌ها، جلسه‌ها و رزرو مکان را مدیریت می‌کند.</option>
+              </select>
+            </div>
+            <div class="matching-row">
+              <span class="matching-term">سامانه تک‌عاملی</span>
+              <select class="quiz-control matching-select" data-answer="single">
+                <option value="">انتخاب تعریف</option>
+                <option value="multi">سامانه هوش مصنوعی که دو یا چند عامل در آن با یکدیگر همکاری می‌کنند.</option>
+                <option value="evaluation">فرایند سنجش عملکرد و اثربخشی یک سامانه هوش مصنوعی.</option>
+                <option value="single">سامانه هوش مصنوعی که فقط یک عامل وظایف یا گردش‌کارها را مدیریت می‌کند.</option>
+                <option value="assistant">نمونه‌ای از عامل واحد که ایمیل‌ها، جلسه‌ها و رزرو مکان را مدیریت می‌کند.</option>
+              </select>
+            </div>
+            <div class="matching-row">
+              <span class="matching-term">عامل دستیار شخصی</span>
+              <select class="quiz-control matching-select" data-answer="assistant">
+                <option value="">انتخاب تعریف</option>
+                <option value="multi">سامانه هوش مصنوعی که دو یا چند عامل در آن با یکدیگر همکاری می‌کنند.</option>
+                <option value="evaluation">فرایند سنجش عملکرد و اثربخشی یک سامانه هوش مصنوعی.</option>
+                <option value="single">سامانه هوش مصنوعی که فقط یک عامل وظایف یا گردش‌کارها را مدیریت می‌کند.</option>
+                <option value="assistant">نمونه‌ای از عامل واحد که ایمیل‌ها، جلسه‌ها و رزرو مکان را مدیریت می‌کند.</option>
+              </select>
+            </div>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="b" data-feedback-correct="درست است؛ در ساختار غیرمتمرکز، عامل‌ها همتا هستند و وظایف را بدون مدیر مرکزی به یکدیگر واگذار می‌کنند." data-feedback-incorrect="در ساختار غیرمتمرکز، مدیر مرکزی وجود ندارد و عامل‌ها به‌صورت همتا با یکدیگر همکاری می‌کنند.">
+          <p class="quiz-question"><span class="quiz-question__number">۵</span> در یک تیم از عامل‌های هوش مصنوعی، کدام ساختار سازمانی باعث می‌شود عامل‌ها بدون مدیر مرکزی به‌صورت همتا فعالیت کنند و وظایف را به یکدیگر واگذار کنند؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">ساختار متمرکز با مدیر</button>
+            <button class="quiz-option" type="button" data-value="b">ساختار غیرمتمرکز همتا</button>
+            <button class="quiz-option" type="button" data-value="c">سامانه تک‌عاملی مجهز به ابزار</button>
+            <button class="quiz-option" type="button" data-value="d">معماری متخصص منفرد</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <article class="quiz-item" data-type="single_select" data-correct="a" data-feedback-correct="درست است؛ عامل‌های تخصصی می‌توانند خروجی یکدیگر را بازبینی کنند و با ارائه بازخورد، به کاهش خطاها کمک کنند." data-feedback-incorrect="مزیت اصلی مطرح‌شده برای همکاری چند عامل، امکان بررسی متقابل کارها و ارائه بازخورد برای کاهش خطاهاست.">
+          <p class="quiz-question"><span class="quiz-question__number">۶</span> مهم‌ترین مزیت استفاده از چند عامل تخصصی در گردش‌کار یک پروژه چیست؟</p>
+          <div class="quiz-options">
+            <button class="quiz-option" type="button" data-value="a">می‌توانند کار یکدیگر را بازبینی کنند و به کاهش خطاها کمک کنند.</button>
+            <button class="quiz-option" type="button" data-value="b">همیشه پیچیدگی فرایند توسعه را کاهش می‌دهند.</button>
+            <button class="quiz-option" type="button" data-value="c">نیاز به هرگونه بازخورد انسانی را از بین می‌برند.</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </article>
+
+        <div class="quiz-submit-area quiz-actions">
+          <button class="quiz-action quiz-action--secondary" type="button" data-quiz-reset>↻ شروع مجدد آزمون</button>
+        </div>
+        <div class="quiz-result" data-quiz-result aria-live="polite">
+          <strong>نتیجه آزمون</strong>
+          <span class="quiz-result__score" data-quiz-score></span>
+          <span data-quiz-result-detail></span>
+        </div>
+      </section>
+    </section>
+
+    <section class="social">
+      <h2>🌱 از مفهوم تا طراحی سامانه</h2>
+      <p>هنگام طراحی یک کاربرد واقعی، ابتدا مشخص کنید آیا یک مدل پاسخ‌گو کافی است، آیا به گردش‌کاری ثابت نیاز دارید یا باید عاملی با امکان تصمیم‌گیری و استفاده از ابزارها بسازید. سپس درباره تک‌عاملی یا چندعاملی بودن معماری تصمیم بگیرید.</p>
+      <div class="buttons">
+        <a class="btn telegram" href="https://t.me/matcub" target="_blank" rel="noopener noreferrer">پیوستن به کانال تلگرام</a>
+        <a class="btn instagram" href="https://www.instagram.com/matcub_official/" target="_blank" rel="noopener noreferrer">صفحه اینستاگرام</a>
+        <a class="btn btn-blue" href="https://www.linkedin.com/in/mohammadfallah1373/" target="_blank" rel="noopener noreferrer">ارتباط در لینکدین</a>
+      </div>
+    </section>
+
+    <nav class="lesson-navigation" aria-label="ناوبری جلسات">
+      <a class="lesson-navigation__link" href="Lesson_04.html">
+        <span><span class="lesson-navigation__label">بازگشت به جلسه قبل</span><span class="lesson-navigation__title">Lesson_04 · یادگیری عامل‌ها</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="lesson-navigation__link lesson-navigation__link--next" href="Lesson_06.html">
+        <span><span class="lesson-navigation__label">ادامه مسیر یادگیری</span><span class="lesson-navigation__title">رفتن به جلسه ششم</span></span>
+        <span class="lesson-navigation__arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <footer class="site-footer">
+      <p>© MATCUB · یادداشت‌های آموزشی</p>
+      <p><a class="inline-link" href="#top">بازگشت به ابتدای صفحه</a></p>
+    </footer>
+  </main>
+</body>
+</html>
